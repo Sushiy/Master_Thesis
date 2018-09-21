@@ -70,9 +70,9 @@ public class GOAP_Agent : MonoBehaviour
         }
 	}
 
-    private HashSet<KeyValuePair<string, object>> FetchWorldState()
+    private HashSet<GOAP_Worldstate> FetchWorldState()
     {
-        HashSet<KeyValuePair<string, object>> result = new HashSet<KeyValuePair<string, object>>();
+        HashSet<GOAP_Worldstate> result = new HashSet<GOAP_Worldstate>();
 
         return result;
     }

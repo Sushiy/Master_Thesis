@@ -6,8 +6,8 @@ using UnityEngine;
 
 public abstract class GOAP_Action
 {
-    private HashSet<KeyValuePair<string, object>> requiredWorldstates;
-    private HashSet<KeyValuePair<string, object>> satisfyWorldstates;
+    private HashSet<GOAP_Worldstate> requiredWorldstates;
+    private HashSet<GOAP_Worldstate> satisfyWorldstates;
 
     public float cost = 1f;
 
@@ -15,8 +15,8 @@ public abstract class GOAP_Action
 
     public virtual void Awake()
     {
-        requiredWorldstates = new HashSet<KeyValuePair<string, object>>();
-        satisfyWorldstates = new HashSet<KeyValuePair<string, object>>();
+        requiredWorldstates = new HashSet<GOAP_Worldstate>();
+        satisfyWorldstates = new HashSet<GOAP_Worldstate>();
     }
 
     //Run this Action
@@ -31,17 +31,25 @@ public abstract class GOAP_Action
     public abstract bool RequiresInRange();
 
     
-    private void AddRequiredWorldState(string state, object value)
+    private void AddRequiredWorldState(WorldStateKey key, GameObject target, object value)
     {
-        requiredWorldstates.Add(new KeyValuePair<string, object>(state, value));
+        GOAP_Worldstate state;
+        state.key = key;
+        state.target = target;
+        state.value = value;
+        requiredWorldstates.Add(state);
     }
 
-    private void AddSatisfyWorldState(string state, object value)
+    private void AddSatisfyWorldState(WorldStateKey key, GameObject target, object value)
     {
-        satisfyWorldstates.Add(new KeyValuePair<string, object>(state, value));
+        GOAP_Worldstate state;
+        state.key = key;
+        state.target = target;
+        state.value = value;
+        satisfyWorldstates.Add(state);
     }
 
-    public HashSet<KeyValuePair<string, object>> RequiredWorldstates
+    public HashSet<GOAP_Worldstate> RequiredWorldstates
     {
         get
         {
@@ -49,7 +57,7 @@ public abstract class GOAP_Action
         }
     }
 
-    public HashSet<KeyValuePair<string, object>> SatisfyWorldStates
+    public HashSet<GOAP_Worldstate> SatisfyWorldStates
     {
         get
         {
