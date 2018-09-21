@@ -21,3 +21,4 @@ public struct GOAP_Worldstate
     public object value;
     
 }
+
