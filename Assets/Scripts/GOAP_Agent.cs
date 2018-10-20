@@ -16,7 +16,10 @@ public class GOAP_Agent : MonoBehaviour
     HashSet<GOAP_Action> availableActions;
     Queue<GOAP_Action> currentActions;
 
-    GOAP_Planner planner;
+    public GOAP_Planner planner;
+
+    public float planningWaitTimer = 2.0f;
+    bool allowedToPlan = true;
 
     void Awake()
     {
@@ -29,33 +32,46 @@ public class GOAP_Agent : MonoBehaviour
         {
             availableActions.Add(action);
         }
+
+        HashSet<GOAP_Worldstate> goal1 = new HashSet<GOAP_Worldstate>();// = agent.getCurrentGoal();
+        GOAP_Worldstate p = new GOAP_Worldstate(WorldStateKey.bHasWood, true, null);
+        goal1.Add(p);
+
+        GOAP_Worldstate q = new GOAP_Worldstate(WorldStateKey.bHasWood, true, null);
+
+        Debug.Log("Does this work?" + (q.key == p.key));
     }
 
-	// Update is called once per frame
-	void Update ()
+    // Update is called once per frame
+    void Update ()
     {
-	    if(currentState == FSM_State.IDLE)
+	    if(currentState == FSM_State.IDLE && allowedToPlan)
         {
             //Fetch a new Plan from the planner
             Queue<GOAP_Action> newPlan = planner.Plan(this, availableActions, FetchWorldState());
             if (newPlan != null)
             {
                 //do what the plan says!
-
+                currentActions = newPlan;
+                currentState = FSM_State.PERFORMACTION;
             }
             else
             {
                 //try again? or something...
+
             }
         }
 
         else if(currentState == FSM_State.PERFORMACTION)
         {
+            GOAP_Action nextAction = null;
             //Use one of the currentActions
-            GOAP_Action nextAction = currentActions.Peek();
+            if (currentActions.Count > 0)
+                nextAction = currentActions.Peek();
             if(nextAction != null)
             {
                 nextAction.Run(this);
+                currentActions.Dequeue();
             }
             else
             {
@@ -69,6 +85,13 @@ public class GOAP_Agent : MonoBehaviour
 
         }
 	}
+
+    private IEnumerator DelayPlanning()
+    {
+        allowedToPlan = false;
+        yield return new WaitForSeconds(planningWaitTimer);
+        allowedToPlan = true;
+    }
 
     private HashSet<GOAP_Worldstate> FetchWorldState()
     {

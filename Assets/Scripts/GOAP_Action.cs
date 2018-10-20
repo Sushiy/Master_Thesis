@@ -4,14 +4,37 @@ using UnityEngine;
 
 //This class contains all info on individual actions. Most of all it holds the required and satisfyWorldstate fields, which are needed for planning.
 
-public abstract class GOAP_Action
+public abstract class GOAP_Action : MonoBehaviour
 {
     private HashSet<GOAP_Worldstate> requiredWorldstates;
     private HashSet<GOAP_Worldstate> satisfyWorldstates;
 
-    public float cost = 1f;
-
-    public GameObject target;
+    [HideInInspector]
+    protected float cost = 1f;
+    public float ActionCost
+    {
+        get
+        {
+            return cost;
+        }
+    }
+    [HideInInspector]
+    protected string actionID = "";
+    public string ActionID
+    {
+        get
+        {
+            return actionID;
+        }
+    }
+    protected GameObject target;
+    public GameObject ActionTarget
+    {
+        get
+        {
+            return target;
+        }
+    }
 
     public virtual void Awake()
     {
@@ -20,10 +43,7 @@ public abstract class GOAP_Action
     }
 
     //Run this Action
-    public virtual void Run(GOAP_Agent agent)
-    {
-
-    }
+    public abstract void Run(GOAP_Agent agent);
 
     //Check conditions that might change or need additional computation (like reachability)
     public abstract bool CheckProceduralConditions();
@@ -31,7 +51,7 @@ public abstract class GOAP_Action
     public abstract bool RequiresInRange();
 
     
-    private void AddRequiredWorldState(WorldStateKey key, GameObject target, object value)
+    protected void AddRequiredWorldState(WorldStateKey key, bool value, GameObject target = null)
     {
         GOAP_Worldstate state;
         state.key = key;
@@ -40,7 +60,7 @@ public abstract class GOAP_Action
         requiredWorldstates.Add(state);
     }
 
-    private void AddSatisfyWorldState(WorldStateKey key, GameObject target, object value)
+    protected void AddSatisfyWorldState(WorldStateKey key, bool value, GameObject target = null)
     {
         GOAP_Worldstate state;
         state.key = key;

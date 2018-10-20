@@ -10,7 +10,7 @@ public enum WorldStateKey
     iStoredWood
 }
 
-public struct GOAP_Worldstate
+public struct GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
 {
     //from the above list
     public WorldStateKey key;
@@ -18,7 +18,53 @@ public struct GOAP_Worldstate
     //Can be null
     public GameObject target;
     //This is unsafe, each WorldstateKey signifies which type of value it should receive, but this can't be properly checked.
-    public object value;
-    
+    public bool value;
+
+    public GOAP_Worldstate(WorldStateKey key, bool value, GameObject target)
+    {
+        this.key = key;
+        this.value = value;
+        this.target = target;
+    }
+
+    public bool Equals(GOAP_Worldstate other)
+    {
+        return Equals(other, this);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj == null || GetType() != obj.GetType())
+        {
+            return false;
+        }
+
+        GOAP_Worldstate objectToCompareWith = (GOAP_Worldstate)obj;
+        return objectToCompareWith.key == key && objectToCompareWith.value == value;
+    }
+
+    public override int GetHashCode()
+    {
+        int calculation = (int)key;
+        return calculation;
+    }
+
+    public static bool operator ==(GOAP_Worldstate state1, GOAP_Worldstate state2)
+    {
+        if (object.ReferenceEquals(state1, state2)) return true;
+        if (object.ReferenceEquals(state1, null)) return false;
+        if (object.ReferenceEquals(state2, null)) return false;
+
+        return state1.Equals(state2);
+    }
+
+    public static bool operator !=(GOAP_Worldstate state1, GOAP_Worldstate state2)
+    {
+        if (object.ReferenceEquals(state1, state2)) return false;
+        if (object.ReferenceEquals(state1, null)) return true;
+        if (object.ReferenceEquals(state2, null)) return true;
+
+        return !state1.Equals(state2);
+    }
 }
 
