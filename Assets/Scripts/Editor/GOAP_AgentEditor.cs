@@ -9,6 +9,5 @@ public class GOAP_AgentEditor : Editor
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-        
     }
 }

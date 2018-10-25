@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class GOAP_Planner : MonoBehaviour
 {
+    string plannerLog = "";
 
     public Queue<GOAP_Action> Plan(GOAP_Agent agent, HashSet<GOAP_Action> availableActions, HashSet<GOAP_Worldstate> currentWorldState)
     {
         Debug.Log("Start Plan");
+        plannerLog = "";
         int actionCount = availableActions.Count;
         Queue<GOAP_Action> plan = new Queue<GOAP_Action>();
 
@@ -17,19 +19,20 @@ public class GOAP_Planner : MonoBehaviour
 
         /***** SEARCH FOR A VALID PLAN *****/
 
-        Node n = buildGraph(goal, new List<GOAP_Action>(availableActions), currentWorldState, null);
+        Node n = buildGraph(goal, new List<GOAP_Action>(availableActions), currentWorldState, null, 0);
 
         //Return null if you couldn't find a plan!
         if (n == null)
         {
-            Debug.Log("Couldn't find actions fulfilling this goal");
+            Debug.Log("<color=#ff0000>Couldn't find actions fulfilling this goal.</color>");
             return null;
         }
+        Debug.Log(plannerLog);
         //Otherwise return the queue
         return makeQueue(n);
     }
 
-    private Node buildGraph(HashSet<GOAP_Worldstate> requiredWorldState, List<GOAP_Action> availableActions, HashSet<GOAP_Worldstate> currentWorldState, Node parent)
+    private Node buildGraph(HashSet<GOAP_Worldstate> requiredWorldState, List<GOAP_Action> availableActions, HashSet<GOAP_Worldstate> currentWorldState, Node parent, int graphDepth)
     {
         //How many worldstates do we still need to fulfill?
         int requiredWorldStateCount = requiredWorldState.Count;
@@ -48,12 +51,12 @@ public class GOAP_Planner : MonoBehaviour
             Node tmp = GetPlannerNode(requiredWorldState, currentWorldState, action, parent);
             if (tmp != null)
             {
-                //string msg = "";
-                //foreach (GOAP_Worldstate state in action.RequiredWorldstates)
-                //{
-                //    msg += state.key.ToString() + ",";
-                //}
-                //Debug.Log("Checked " + action.ActionID + "(" + tmp.estimatedPathCost + "); Requires: " + msg);
+                string msg = "";
+                foreach (GOAP_Worldstate state in action.RequiredWorldstates)
+                {
+                    msg += state.key.ToString() + ",";
+                }
+                plannerLog += (makeIndent(graphDepth) + "-><color=#CCCC00>Checked</color> " + action.ActionID + "(" + tmp.estimatedPathCost + "); Requires: " + msg + "\n");
                 closedSet.Add(tmp);
                 openSet.Remove(action);
             }
@@ -74,11 +77,11 @@ public class GOAP_Planner : MonoBehaviour
                     {
                         msg += state.key.ToString() + ",";
                     }
-                    Debug.Log("Chose " + bestNode.action.ActionID + "; Queue still requires: " + msg);
-                    Node next = buildGraph(bestNode.newRequired, openSet, currentWorldState, bestNode);
+                    plannerLog += (makeIndent(graphDepth) + "-><color=#00CC00>Chose</color> " + bestNode.action.ActionID + "(" + bestNode.estimatedPathCost + "); Queue still requires: " + msg +"\n");
+                    Node next = buildGraph(bestNode.newRequired, openSet, currentWorldState, bestNode, graphDepth+1);
                     if (next == null)
                     {
-                        Debug.Log(bestNode.action.ActionID + " cannot fulfill the goal");
+                        plannerLog += makeIndent(graphDepth) + "-><color=#CC0000>Canceled</color>" + bestNode.action.ActionID + "; Cannot fulfill the goal  \n";
                         closedSet.Remove(bestNode);
                         openSet.Add(bestNode.action);
                         continue;
@@ -90,7 +93,7 @@ public class GOAP_Planner : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("Chose " + bestNode.action.ActionID + "; Found a Path to goal!");
+                    plannerLog += (makeIndent(graphDepth) + "-><color=#00AA00>Chose</color> " + bestNode.action.ActionID + "(" + bestNode.estimatedPathCost + "); Found a Path to goal!\n");
                     return bestNode;
                 }
             }
@@ -99,10 +102,20 @@ public class GOAP_Planner : MonoBehaviour
         return null;
     }
 
+    string makeIndent(int depth)
+    {
+        string s = "";
+        for(int i = 0; i<depth; i++)
+        {
+            s += "  ";
+        }
+        return s;
+    }
+
     private Queue<GOAP_Action> makeQueue(Node start)
     {
         Queue<GOAP_Action> queue = new Queue<GOAP_Action>();
-        string message = "ActionQueue: ";
+        string message = "<color=#00AA00>ActionQueue:</color> ";
         Node current = start;
         while(current != null)
         {

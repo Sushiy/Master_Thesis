@@ -61,11 +61,18 @@ public class GOAP_Agent : MonoBehaviour
             GOAP_Action nextAction = null;
             //Use one of the currentActions
             if (currentActions.Count > 0)
-                nextAction = currentActions.Peek();
+            {
+                nextAction = currentActions.Dequeue();
+
+            }
+
             if(nextAction != null)
             {
+                if(nextAction.RequiresInRange())
+                {
+
+                }
                 nextAction.Run(this);
-                currentActions.Dequeue();
             }
             else
             {

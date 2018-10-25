@@ -10,6 +10,7 @@ public enum WorldStateKey
     iStoredWood
 }
 
+[System.Serializable]
 public struct GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
 {
     //from the above list
