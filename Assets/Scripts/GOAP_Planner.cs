@@ -146,77 +146,6 @@ public class GOAP_Planner : MonoBehaviour
         return queue;
     }
 
-    private Node buildGraph(HashSet<GOAP_Worldstate> requiredWorldState, List<GOAP_Action> availableActions, HashSet<GOAP_Worldstate> currentWorldState, Node parent, int graphDepth)
-    {
-        //How many worldstates do we still need to fulfill?
-        int requiredWorldStateCount = requiredWorldState.Count;
-
-        //How many actions are available
-        int actionCount = availableActions.Count;
-
-        List<Node> closedSet = new List<Node>();
-        
-        Node bestNode = null;
-
-        for(int i = 0; i < actionCount; i++)
-        {
-            GOAP_Action action = availableActions[i];
-            Node tmp = GetPlannerNode(requiredWorldState, currentWorldState, action, parent);
-            if (tmp != null)
-            {
-                string msg = "";
-                foreach (GOAP_Worldstate state in action.RequiredWorldstates)
-                {
-                    msg += state.key.ToString() + ",";
-                }
-                plannerLog += (makeIndent(graphDepth) + "-><color=#CCCC00>Valid</color> " + action.ActionID + "(" + tmp.estimatedPathCost + "); Requires: " + msg + "\n");
-                closedSet.Add(tmp);
-                if(!action.KeepOpen)
-                {
-                    //openSet.Remove(action);
-                }
-            }
-        }
-        closedSet.Sort();
-        //if at least one node was found
-        while (closedSet.Count > 0)
-        {
-            bestNode = closedSet[0];
-            if (bestNode != null)
-            {
-                //We need to keep looking for more nodes
-                if (bestNode.required.Count > 0)
-                {
-                    string msg = "";
-                    foreach(GOAP_Worldstate state in bestNode.required)
-                    {
-                        msg += state.key.ToString() + ",";
-                    }
-                    plannerLog += (makeIndent(graphDepth) + "-><color=#00CC00>Chose</color> " + bestNode.action.ActionID + "(" + bestNode.estimatedPathCost + "); Queue still requires: " + msg +"\n");
-                    Node next = buildGraph(bestNode.required, availableActions, currentWorldState, bestNode, graphDepth+1);
-
-
-                    if (next == null)
-                    {
-                        plannerLog += makeIndent(graphDepth) + "-><color=#CC0000>Canceled</color>" + bestNode.action.ActionID + "; Cannot fulfill the goal  \n";
-                        closedSet.Remove(bestNode);
-                        continue;
-                    }
-                    else
-                    {
-                        return next;
-                    }
-                }
-                else
-                {
-                    plannerLog += (makeIndent(graphDepth) + "-><color=#00AA00>Chose</color> " + bestNode.action.ActionID + "(" + bestNode.estimatedPathCost + "); Found a Path to goal!\n");
-                    return bestNode;
-                }
-            }
-        }
-        return null;
-    }
-
     string makeIndent(int depth)
     {
         string s = "";
@@ -226,45 +155,7 @@ public class GOAP_Planner : MonoBehaviour
         }
         return s;
     }
-
-    //Compare these Worldstates to determine if they match up
-    private Node GetPlannerNode(HashSet<GOAP_Worldstate> required, HashSet<GOAP_Worldstate> current, GOAP_Action action, Node parent)
-    {
-        bool isValidAction = false;
-        HashSet<GOAP_Worldstate> newRequired = new HashSet<GOAP_Worldstate>(required);
-        if (action.ActionID != "PostQuest")
-        {
-            foreach (GOAP_Worldstate state in required)
-            {
-                if (action.SatisfyWorldStates.Contains(state))
-                {
-                    newRequired.Remove(state);
-                    isValidAction = true;
-                }
-            }
-
-            //add the actions own required worldstates to the Node
-            foreach (GOAP_Worldstate state in action.RequiredWorldstates)
-            {
-                if (!current.Contains(state))
-                {
-                    newRequired.Add(state);
-                }
-            }
-        
-        }
-        else
-        {
-            ((Action_PostQuest)action).SetQuestStates(newRequired);
-            newRequired.Clear();
-            isValidAction = true;
-        }
-
-        //Debug.Log(action.ActionID + " isValidAction? " + isValidAction);
-
-        return isValidAction ? new Node(parent, newRequired, action, newRequired.Count + action.ActionCost + parent.estimatedPathCost) : null;
-    }
-
+    
     private class Node : System.IComparable<Node>, System.IEquatable<GOAP_Worldstate>
     {
         public Node parent;
