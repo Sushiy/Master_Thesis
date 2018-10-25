@@ -4,7 +4,7 @@ using UnityEngine;
 
 //This class contains all info on individual actions. Most of all it holds the required and satisfyWorldstate fields, which are needed for planning.
 
-public abstract class GOAP_Action : MonoBehaviour
+public abstract class GOAP_Action :MonoBehaviour
 {
     private HashSet<GOAP_Worldstate> requiredWorldstates;
     private HashSet<GOAP_Worldstate> satisfyWorldstates;
@@ -41,6 +41,7 @@ public abstract class GOAP_Action : MonoBehaviour
         requiredWorldstates = new HashSet<GOAP_Worldstate>();
         satisfyWorldstates = new HashSet<GOAP_Worldstate>();
     }
+  
 
     //Run this Action
     public abstract void Run(GOAP_Agent agent);

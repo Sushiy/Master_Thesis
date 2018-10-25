@@ -23,15 +23,9 @@ public class GOAP_Agent : MonoBehaviour
 
     void Awake()
     {
-        availableActions = new HashSet<GOAP_Action>();
-        currentActions = new Queue<GOAP_Action>();
-
         //Load available actions
-        GOAP_Action[] actionsArray = gameObject.GetComponents<GOAP_Action>();
-        foreach(GOAP_Action action in actionsArray)
-        {
-            availableActions.Add(action);
-        }
+        availableActions = new HashSet<GOAP_Action>(gameObject.GetComponents<GOAP_Action>());
+        currentActions = new Queue<GOAP_Action>();
 
         HashSet<GOAP_Worldstate> goal1 = new HashSet<GOAP_Worldstate>();// = agent.getCurrentGoal();
         GOAP_Worldstate p = new GOAP_Worldstate(WorldStateKey.bHasWood, true, null);

@@ -789,7 +789,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06407204b77bd6642b6599dce22d3216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionsArray:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   planner: {fileID: 1749383442}
+  planningWaitTimer: 2
 --- !u!114 &1749383444
 MonoBehaviour:
   m_ObjectHideFlags: 0
