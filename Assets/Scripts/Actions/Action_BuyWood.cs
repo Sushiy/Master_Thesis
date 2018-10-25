@@ -7,8 +7,9 @@ public class Action_BuyWood : GOAP_Action
     public override void Awake()
     {
         base.Awake();
+        workCost = 10f;
+        coinCost = 10f;
         actionID = "BuyWood";
-        cost = 10f;
         AddSatisfyWorldState(WorldStateKey.bHasWood, true);
     }
 

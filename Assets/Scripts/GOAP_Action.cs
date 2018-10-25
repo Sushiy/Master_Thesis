@@ -1,21 +1,30 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 //This class contains all info on individual actions. Most of all it holds the required and satisfyWorldstate fields, which are needed for planning.
 
-public abstract class GOAP_Action :MonoBehaviour
+public abstract class GOAP_Action :MonoBehaviour, System.IEquatable<GOAP_Action>
 {
     private HashSet<GOAP_Worldstate> requiredWorldstates;
     private HashSet<GOAP_Worldstate> satisfyWorldstates;
 
     [HideInInspector]
-    protected float cost = 1f;
+    protected float workCost = 1f;
+    protected float coinCost = 0f;
     public float ActionCost
     {
         get
         {
-            return cost;
+            return workCost;
+        }
+    }
+    public float CoinCost
+    {
+        get
+        {
+            return coinCost;
         }
     }
     [HideInInspector]
@@ -35,6 +44,14 @@ public abstract class GOAP_Action :MonoBehaviour
             return target;
         }
     }
+    protected bool keepOpen = false;
+    public bool KeepOpen
+    {
+        get
+        {
+            return keepOpen;
+        }
+    }
 
     public virtual void Awake()
     {
@@ -48,6 +65,8 @@ public abstract class GOAP_Action :MonoBehaviour
 
     //Check conditions that might change or need additional computation (like reachability)
     public abstract bool CheckProceduralConditions();
+
+    //public abstract void UpdateCosts(GOAP_Agent agent);
 
     public abstract bool RequiresInRange();
 
@@ -68,6 +87,12 @@ public abstract class GOAP_Action :MonoBehaviour
         state.target = target;
         state.value = value;
         satisfyWorldstates.Add(state);
+    }
+
+    bool IEquatable<GOAP_Action>.Equals(GOAP_Action other)
+    {
+        if (other == null) return false;
+        return other.actionID.Equals(actionID);
     }
 
     public HashSet<GOAP_Worldstate> RequiredWorldstates

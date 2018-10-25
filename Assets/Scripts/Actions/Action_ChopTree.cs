@@ -8,7 +8,7 @@ public class Action_ChopTree : GOAP_Action
     {
         base.Awake();
         actionID = "ChopTree";
-        cost = 2f;
+        workCost = 2f;
         AddRequiredWorldState(WorldStateKey.bHasAxe, true);
         AddSatisfyWorldState(WorldStateKey.bHasLog, true);
     }
