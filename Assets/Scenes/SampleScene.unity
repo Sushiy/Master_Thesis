@@ -757,14 +757,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1749383441}
-  - component: {fileID: 1749383440}
   - component: {fileID: 1749383439}
   - component: {fileID: 1749383438}
   - component: {fileID: 1749383444}
   - component: {fileID: 1749383437}
   - component: {fileID: 1749383443}
   - component: {fileID: 1749383442}
-  - component: {fileID: 1749383445}
   m_Layer: 0
   m_Name: TestAgent
   m_TagString: Untagged
@@ -803,17 +801,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d72f3b95b42f1349becb4a2e95f40be, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1749383440
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1749383436}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed430cba78e533148968a3d3eec4ccaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!4 &1749383441
@@ -862,17 +849,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ef5f6f6e09c939c4ab0e711a43cd0a85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1749383445
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1749383436}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69dc65efc2e70824e8c9807e3da084c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &1988785908

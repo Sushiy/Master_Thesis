@@ -14,11 +14,6 @@ public class Action_PostQuest : GOAP_Action
         keepOpen = true;
     }
 
-    public int GetQuestCost(float estimatedCost)
-    {
-        return 5;
-    }
-
     public override bool CheckProceduralConditions()
     {
         return true;
@@ -32,6 +27,7 @@ public class Action_PostQuest : GOAP_Action
     public void SetQuestStates(HashSet<GOAP_Worldstate> states )
     {
         questStates = new HashSet<GOAP_Worldstate>(states);
+        workCost = questStates.Count + 1;
     }
 
     public override void Run(GOAP_Agent agent)

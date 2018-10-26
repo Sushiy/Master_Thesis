@@ -57,7 +57,8 @@ public class GOAP_Planner : MonoBehaviour
             plannerLog += makeIndent(graphDepth) + "-><color=#00CC00>ClosedSet Updated</color> (" + current.estimatedPathCost + "); ";
             if (msg.Equals("")) msg = "empty";
             plannerLog += "(" + msg + ")";
-            if (current.action != null) plannerLog += "Action: " + current.action.ActionID + "\n";
+            if (current.action != null) plannerLog += "Action: " + current.action.ActionID;
+            plannerLog += "\n";
             if (current.required.Count == 0)
             {
                 return current;
@@ -83,7 +84,8 @@ public class GOAP_Planner : MonoBehaviour
                     plannerLog += makeIndent(graphDepth) + "-><color=#CCCC00>OpenSet Updated</color> (" + neighbor.estimatedPathCost + "); ";
                     if (msg.Equals("")) msg = "empty";
                     plannerLog += "(" + msg + ") ";
-                    if (neighbor.action != null) plannerLog += "Action: " + neighbor.action.ActionID + "\n";
+                    if (neighbor.action != null) plannerLog += "Action: " + neighbor.action.ActionID;
+                    plannerLog += "\n";
                 }
             }
             graphDepth++;
@@ -120,7 +122,8 @@ public class GOAP_Planner : MonoBehaviour
         }
         else
         {
-            ((Action_PostQuest)action).SetQuestStates(newRequired);
+            Action_PostQuest postQuest = (Action_PostQuest)action;
+            postQuest.SetQuestStates(newRequired);
             newRequired.Clear();
             isValidAction = true;
         }
