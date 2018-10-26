@@ -17,6 +17,8 @@ public class GOAP_Agent : MonoBehaviour
     Queue<GOAP_Action> currentActions;
 
     public GOAP_Planner planner;
+    [HideInInspector]
+    public GOAP_Character character;
 
     public float planningWaitTimer = 2.0f;
     bool allowedToPlan = true;
@@ -26,14 +28,10 @@ public class GOAP_Agent : MonoBehaviour
         //Load available actions
         availableActions = new HashSet<GOAP_Action>(gameObject.GetComponents<GOAP_Action>());
         currentActions = new Queue<GOAP_Action>();
+        character = GetComponent<GOAP_Character>();
 
         HashSet<GOAP_Worldstate> goal1 = new HashSet<GOAP_Worldstate>();// = agent.getCurrentGoal();
-        GOAP_Worldstate p = new GOAP_Worldstate(WorldStateKey.bHasWood, true, null);
-        goal1.Add(p);
-
-        GOAP_Worldstate q = new GOAP_Worldstate(WorldStateKey.bHasWood, true, null);
-
-        Debug.Log("Does this work?" + (q.key == p.key));
+        goal1.Add(new GOAP_Worldstate(WorldStateKey.bHasWood, true, null));
     }
 
     // Update is called once per frame

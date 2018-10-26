@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Action_ChopWood : GOAP_Action
+public class Action_MakeAxe : GOAP_Action
 {
     public override void Awake()
     {
         base.Awake();
-        actionID = "ChopWood";
-        workCost = 2f;
-        AddRequiredWorldState(WorldStateKey.bHasAxe, true);
-        AddRequiredWorldState(WorldStateKey.bHasLog, true);
-        AddSatisfyWorldState(WorldStateKey.bHasWood, true);
-        requiredSkill = new GOAP_Skill("woodCutting", 1);
+        actionID = "MakeAxe";
+        AddSatisfyWorldState(WorldStateKey.bHasAxe, true);
+        AddRequiredWorldState(WorldStateKey.bHasIron, true);
+        requiredSkill = new GOAP_Skill("smithing", 3);
     }
 
     public override bool CheckProceduralConditions()

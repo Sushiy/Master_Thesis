@@ -4,10 +4,12 @@ using UnityEngine;
 
 public enum WorldStateKey
 {
-    bHasAxe,
-    bHasLog,
-    bHasWood,
-    iStoredWood
+    bHasAxe = 0,
+    bHasLog = 1,
+    bHasWood = 2,
+    bAttackingTarget = 3,
+    bWeaponEquipped = 4,
+    bHasIron = 5
 }
 
 [System.Serializable]

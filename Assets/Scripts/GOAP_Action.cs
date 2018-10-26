@@ -10,6 +10,7 @@ public abstract class GOAP_Action :MonoBehaviour, System.IEquatable<GOAP_Action>
     private HashSet<GOAP_Worldstate> requiredWorldstates;
     private HashSet<GOAP_Worldstate> satisfyWorldstates;
 
+
     [HideInInspector]
     protected float workCost = 1f;
     protected float coinCost = 0f;
@@ -52,6 +53,16 @@ public abstract class GOAP_Action :MonoBehaviour, System.IEquatable<GOAP_Action>
             return keepOpen;
         }
     }
+
+    protected GOAP_Skill requiredSkill = null;
+    public GOAP_Skill RequiredSkill
+    {
+        get
+        {
+            return requiredSkill;
+        }
+    }
+
 
     public virtual void Awake()
     {
