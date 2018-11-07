@@ -69,5 +69,10 @@ public struct GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
 
         return !state1.Equals(state2);
     }
+
+    public override string ToString()
+    {
+        return key.ToString() + ":" + value.ToString();
+    }
 }
 

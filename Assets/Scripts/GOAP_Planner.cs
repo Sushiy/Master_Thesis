@@ -5,7 +5,6 @@ using UnityEngine;
 public class GOAP_Planner : MonoBehaviour
 {
     string plannerLog = "";
-
     public Queue<GOAP_Action> Plan(GOAP_Agent agent, HashSet<GOAP_Action> availableActions, HashSet<GOAP_Worldstate> currentWorldState)
     {
         Debug.Log("Start Plan");
@@ -28,7 +27,7 @@ public class GOAP_Planner : MonoBehaviour
         }
         Debug.Log(plannerLog);
         //Otherwise return the queue
-        return makeQueue(n);
+        return makeQueue(n, agent);
     }
 
     private Node WhileBuild(HashSet<GOAP_Worldstate> goalWorldState, List<GOAP_Action> availableActions, HashSet<GOAP_Worldstate> currentWorldState, GOAP_Agent agent)
@@ -155,23 +154,51 @@ public class GOAP_Planner : MonoBehaviour
         return isValidAction ? new Node(activeNode, newRequired, action, newRequired.Count + action.ActionCost * skillModifier + activeNode.estimatedPathCost, isSkilled) : null;
     }
 
-    private Queue<GOAP_Action> makeQueue(Node start)
+    private Queue<GOAP_Action> makeQueue(Node start, GOAP_Agent agent)
     {
         Queue<GOAP_Action> queue = new Queue<GOAP_Action>();
         string message = "<color=#00AA00>ActionQueue:</color> ";
         Node current = start;
+        bool needsQuest = false;
+        List<GOAP_Worldstate> questRequiredStates = new List<GOAP_Worldstate>();
+        List<GOAP_Worldstate> questProvidedStates = new List<GOAP_Worldstate>();
+
         while (current.parent != null)
         {
-            queue.Enqueue(current.action);
             if(current.isSkilled)
+            {
+                queue.Enqueue(current.action);
                 message += " -> " + current.action.ActionID;
+                if(!needsQuest)
+                {
+                    foreach(GOAP_Worldstate state in current.action.SatisfyWorldStates)
+                    {
+                        questProvidedStates.Add(state);
+                    }
+                }
+            }
             else
-                message += " -> <color=#CC0000>" + current.action.ActionID + "</color>";
+            {
+                queue.Clear();
+                message = " -> <color=#CC0000> QUEST instead of " + current.action.ActionID + "</color>";
+                foreach (GOAP_Worldstate state in current.action.SatisfyWorldStates)
+                {
+                    questRequiredStates.Add(state);
+                }
+                needsQuest = true;
+            }
 
             current = current.parent;
         }
         message += "|";
         Debug.Log(message);
+
+        if (needsQuest)
+        {
+            GOAP_Quest quest = new GOAP_Quest(agent, questRequiredStates, questProvidedStates);
+            agent.postedQuest = quest;
+            GOAP_WhiteBoard.instance.AddQuest(quest);
+        }
         return queue;
     }
 

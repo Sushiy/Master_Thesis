@@ -23,6 +23,8 @@ public class GOAP_Agent : MonoBehaviour
     public float planningWaitTimer = 2.0f;
     bool allowedToPlan = true;
 
+    public GOAP_Quest postedQuest = null;
+
     void Awake()
     {
         //Load available actions
@@ -37,7 +39,7 @@ public class GOAP_Agent : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-	    if(currentState == FSM_State.IDLE && allowedToPlan)
+	    if(currentState == FSM_State.IDLE && allowedToPlan && postedQuest == null)
         {
             //Fetch a new Plan from the planner
             Queue<GOAP_Action> newPlan = planner.Plan(this, availableActions, FetchWorldState());
