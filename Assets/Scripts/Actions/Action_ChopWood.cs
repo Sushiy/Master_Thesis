@@ -8,9 +8,11 @@ public class Action_ChopWood : GOAP_Action
     {
         base.Awake();
         actionID = "ChopWood";
+        workCost = 2f;
         AddRequiredWorldState(WorldStateKey.bHasAxe, true);
         AddRequiredWorldState(WorldStateKey.bHasLog, true);
         AddSatisfyWorldState(WorldStateKey.bHasWood, true);
+        requiredSkill = new GOAP_Skill("woodCutting", 1);
     }
 
     public override bool CheckProceduralConditions()

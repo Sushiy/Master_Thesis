@@ -4,10 +4,12 @@ using UnityEngine;
 
 public enum WorldStateKey
 {
-    bHasAxe,
-    bHasLog,
-    bHasWood,
-    iStoredWood
+    bHasAxe = 0,
+    bHasLog = 1,
+    bHasWood = 2,
+    bAttackingTarget = 3,
+    bWeaponEquipped = 4,
+    bHasIron = 5
 }
 
 [System.Serializable]
@@ -66,6 +68,11 @@ public struct GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
         if (object.ReferenceEquals(state2, null)) return true;
 
         return !state1.Equals(state2);
+    }
+
+    public override string ToString()
+    {
+        return key.ToString() + ":" + value.ToString();
     }
 }
 

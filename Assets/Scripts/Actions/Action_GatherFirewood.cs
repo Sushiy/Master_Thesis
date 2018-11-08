@@ -8,7 +8,7 @@ public class Action_GatherFirewood : GOAP_Action
     {
         base.Awake();
         actionID = "GatherWood";
-        cost = 13f;
+        workCost = 13f;
         AddSatisfyWorldState(WorldStateKey.bHasWood, true);
     }
 

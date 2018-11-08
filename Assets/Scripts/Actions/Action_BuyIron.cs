@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Action_BuyWood : GOAP_Action
+public class Action_BuyIron : GOAP_Action
 {
     public override void Awake()
     {
         base.Awake();
         workCost = 10f;
         coinCost = 10f;
-        actionID = "BuyWood";
-        AddSatisfyWorldState(WorldStateKey.bHasWood, true);
+        actionID = "BuyIron";
+        AddSatisfyWorldState(WorldStateKey.bHasIron, true);
     }
 
     public override bool CheckProceduralConditions()
