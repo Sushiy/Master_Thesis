@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Action_PostQuest : GOAP_Action
 {
-    HashSet<GOAP_Worldstate> questStates;
-
     public override void Awake()
     {
         base.Awake();
@@ -14,7 +12,7 @@ public class Action_PostQuest : GOAP_Action
         keepOpen = true;
     }
 
-    public override bool CheckProceduralConditions()
+    public override bool CheckProceduralConditions(GOAP_Agent agent)
     {
         return true;
     }
@@ -24,21 +22,10 @@ public class Action_PostQuest : GOAP_Action
         return false;
     }
 
-    public void SetQuestStates(HashSet<GOAP_Worldstate> states )
+    public override bool Run(GOAP_Agent agent)
     {
-        questStates = new HashSet<GOAP_Worldstate>(states);
-        workCost = questStates.Count + 1;
-    }
-
-    public override void Run(GOAP_Agent agent)
-    {
-        if (questStates == null) return;
-        string msg = "Posting Quest:\n";
-        foreach (GOAP_Worldstate state in questStates)
-        {
-            msg += "Fulfill: (" + state.key.ToString() + "|" + state.value.ToString() +  ")\n";
-        }
-
-        Debug.Log(msg);
+        if (agent.postedQuest != null) return false;
+        Debug.Log("Quest was completed");
+        return true;
     }
 }

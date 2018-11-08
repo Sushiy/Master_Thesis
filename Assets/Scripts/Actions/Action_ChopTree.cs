@@ -11,21 +11,26 @@ public class Action_ChopTree : GOAP_Action
         workCost = 4f;
         AddRequiredWorldState(WorldStateKey.bHasAxe, true);
         AddSatisfyWorldState(WorldStateKey.bHasLog, true);
-        requiredSkill = new GOAP_Skill("woodCutting", 2);
+        requiredSkill = new GOAP_Skill(Skills.WoodCutting, 2);
     }
 
-    public override bool CheckProceduralConditions()
+    public override bool CheckProceduralConditions(GOAP_Agent agent)
     {
-        return true;
+        target = InfoBlackBoard.instance.FindClosest(InfoBlackBoard.LOCATIONS.CHOPTREE, agent.transform.position).gameObject; //TODO: This isnt technically correct
+        if (target)
+            return true;
+        else
+            return false;
     }
 
     public override bool RequiresInRange()
     {
-        return false;
+        return true;
     }
 
-    public override void Run(GOAP_Agent agent)
+    public override bool Run(GOAP_Agent agent)
     {
         Debug.Log("performing: " + actionID);
+        return true;
     }
 }

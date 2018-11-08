@@ -2,14 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Skills
+{
+    WoodCutting = 0,
+    Smithing = 1,
+    Fighting = 2
+}
 
 [System.Serializable]
 public class GOAP_Skill : System.IEquatable<GOAP_Skill>
 {
-    public string id;
+    public Skills id;
     public int level;
 
-    public GOAP_Skill(string id, int level)
+    public GOAP_Skill(Skills id, int level)
     {
         this.id = id;
         this.level = level;

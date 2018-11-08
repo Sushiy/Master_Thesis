@@ -11,19 +11,24 @@ enum FSM_State
 
 public class GOAP_Agent : MonoBehaviour
 {
-
     FSM_State currentState = FSM_State.IDLE;
+
+    HashSet<GOAP_Worldstate> standardGoal;
+    public HashSet<GOAP_Worldstate> goal;
+
     HashSet<GOAP_Action> availableActions;
     Queue<GOAP_Action> currentActions;
-
-    public GOAP_Planner planner;
+    GOAP_Action activeAction;
+    
     [HideInInspector]
     public GOAP_Character character;
 
     public float planningWaitTimer = 2.0f;
     bool allowedToPlan = true;
+    bool actionCompleted = true;
 
     public GOAP_Quest postedQuest = null;
+    public GOAP_Quest activeQuest = null;
 
     void Awake()
     {
@@ -32,17 +37,21 @@ public class GOAP_Agent : MonoBehaviour
         currentActions = new Queue<GOAP_Action>();
         character = GetComponent<GOAP_Character>();
 
-        HashSet<GOAP_Worldstate> goal1 = new HashSet<GOAP_Worldstate>();// = agent.getCurrentGoal();
-        goal1.Add(new GOAP_Worldstate(WorldStateKey.bHasWood, true, null));
+        standardGoal = new HashSet<GOAP_Worldstate>(); // TODO: implement proper goals for agents; => agent.getCurrentGoal();
+        standardGoal.Add(new GOAP_Worldstate(WorldStateKey.bHasWood, true, null)); //TODO: remove this when I have proper goals
+        goal = standardGoal;
     }
 
     // Update is called once per frame
     void Update ()
     {
+        activeQuest = CheckForQuests();
+        if (activeQuest == null) goal = standardGoal;
+        else goal = activeQuest.RequiredStates;
 	    if(currentState == FSM_State.IDLE && allowedToPlan && postedQuest == null)
         {
             //Fetch a new Plan from the planner
-            Queue<GOAP_Action> newPlan = planner.Plan(this, availableActions, FetchWorldState());
+            Queue<GOAP_Action> newPlan = GOAP_Planner.instance.Plan(this, goal, availableActions, FetchWorldState());
             if (newPlan != null)
             {
                 //do what the plan says!
@@ -58,21 +67,38 @@ public class GOAP_Agent : MonoBehaviour
 
         else if(currentState == FSM_State.PERFORMACTION)
         {
-            GOAP_Action nextAction = null;
             //Use one of the currentActions
-            if (currentActions.Count > 0)
+            if (actionCompleted)
             {
-                nextAction = currentActions.Dequeue();
+                if(currentActions.Count > 0)
+                {
+                    activeAction = currentActions.Dequeue();
+
+                }
+                else
+                {
+                    if(activeQuest != null)
+                    {
+                        Debug.Log("<color=#0000cc>" + character.characterName + "</color> completed Quest " + activeQuest.id);
+
+                        activeQuest.Complete();
+                        activeQuest = null;
+                    }
+                    activeAction = null;
+                }
 
             }
 
-            if(nextAction != null)
+            if (activeAction != null)
             {
-                if(nextAction.RequiresInRange())
+                if(!activeAction.IsInRange(this))
                 {
-
+                    currentState = FSM_State.MOVETO;
                 }
-                nextAction.Run(this);
+                else
+                {
+                    actionCompleted = activeAction.Run(this);
+                }
             }
             else
             {
@@ -83,9 +109,35 @@ public class GOAP_Agent : MonoBehaviour
         else if(currentState == FSM_State.MOVETO)
         {
             //Move to the target!
-
+            if(!activeAction.IsInRange(this))
+            {
+                transform.position += (activeAction.ActionTarget.transform.position - transform.position).normalized * 3.0f * Time.deltaTime;
+            }
+            else
+            {
+                currentState = FSM_State.PERFORMACTION;
+            }
         }
 	}
+
+    public GOAP_Quest CheckForQuests()
+    {
+        GOAP_Quest result = null;
+        foreach(GOAP_Quest quest in GOAP_QuestBoard.instance.quests)
+        {
+            if (quest.Owner != this)
+            {
+                result = quest;
+                break;
+            }
+        }
+        if(result != null)
+        {
+            Debug.Log("<color=#0000cc>" + character.characterName + "</color> chose Quest " + result.id);
+            GOAP_QuestBoard.instance.ChooseQuest(result);
+        }
+        return result;
+    }
 
     private IEnumerator DelayPlanning()
     {

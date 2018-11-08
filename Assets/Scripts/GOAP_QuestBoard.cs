@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GOAP_WhiteBoard : MonoBehaviour
+public class GOAP_QuestBoard : MonoBehaviour
 {
-    public static GOAP_WhiteBoard instance;
+    public static GOAP_QuestBoard instance;
     public List<GOAP_Quest> quests;
 
 	// Use this for initialization
 	void Awake ()
     {
-        instance = this;
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(this);
         quests = new List<GOAP_Quest>();
 	}
 	
@@ -23,5 +26,9 @@ public class GOAP_WhiteBoard : MonoBehaviour
     {
         quests[index].Complete();
         quests.RemoveAt(index);
+    }
+    public void ChooseQuest(GOAP_Quest quest)
+    {
+        quests.Remove(quest);
     }
 }

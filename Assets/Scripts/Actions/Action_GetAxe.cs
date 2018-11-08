@@ -11,7 +11,7 @@ public class Action_GetAxe : GOAP_Action
         AddSatisfyWorldState(WorldStateKey.bHasAxe, true);
     }
 
-    public override bool CheckProceduralConditions()
+    public override bool CheckProceduralConditions(GOAP_Agent agent)
     {
         return true;
     }
@@ -21,8 +21,9 @@ public class Action_GetAxe : GOAP_Action
         return false;
     }
 
-    public override void Run(GOAP_Agent agent)
+    public override bool Run(GOAP_Agent agent)
     {
         Debug.Log("performing: " + actionID);
+        return true;
     }
 }

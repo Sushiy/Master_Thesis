@@ -10,10 +10,10 @@ public class Action_MakeAxe : GOAP_Action
         actionID = "MakeAxe";
         AddSatisfyWorldState(WorldStateKey.bHasAxe, true);
         AddRequiredWorldState(WorldStateKey.bHasIron, true);
-        requiredSkill = new GOAP_Skill("smithing", 3);
+        requiredSkill = new GOAP_Skill(Skills.Smithing, 3);
     }
 
-    public override bool CheckProceduralConditions()
+    public override bool CheckProceduralConditions(GOAP_Agent agent)
     {
         return true;
     }
@@ -23,8 +23,9 @@ public class Action_MakeAxe : GOAP_Action
         return false;
     }
 
-    public override void Run(GOAP_Agent agent)
+    public override bool Run(GOAP_Agent agent)
     {
         Debug.Log("performing: " + actionID);
+        return true;
     }
 }

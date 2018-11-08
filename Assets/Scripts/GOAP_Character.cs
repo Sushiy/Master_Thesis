@@ -8,7 +8,7 @@ public class GOAP_Character : MonoBehaviour
 
     public List<GOAP_Skill> skills;
 
-    public void AddSkill(string id, int level)
+    public void AddSkill(Skills id, int level)
     {
         GOAP_Skill skill = new GOAP_Skill(id, level);
         if (skills.Contains(skill)) return;

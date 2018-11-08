@@ -72,16 +72,26 @@ public abstract class GOAP_Action :MonoBehaviour, System.IEquatable<GOAP_Action>
   
 
     //Run this Action
-    public abstract void Run(GOAP_Agent agent);
+    public abstract bool Run(GOAP_Agent agent);
 
     //Check conditions that might change or need additional computation (like reachability)
-    public abstract bool CheckProceduralConditions();
+    public abstract bool CheckProceduralConditions(GOAP_Agent agent);
 
     //public abstract void UpdateCosts(GOAP_Agent agent);
 
     public abstract bool RequiresInRange();
 
-    
+    public bool IsInRange(GOAP_Agent agent)
+    {
+        if (!RequiresInRange()) return true;
+        if (RequiresInRange() && target != null && Vector3.Distance(target.transform.position, agent.transform.position) < 1.0f)
+        {
+            return true; //TODO: put some actual rangeTesting in here, dependant on the target
+        }
+        return false;
+    }
+
+
     protected void AddRequiredWorldState(WorldStateKey key, bool value, GameObject target = null)
     {
         GOAP_Worldstate state;

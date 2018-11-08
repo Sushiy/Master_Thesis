@@ -7,7 +7,7 @@ public class CharacterWindow : EditorWindow
 {
     GOAP_Character character;
 
-    string newSkill = "";
+    Skills newSkill = Skills.WoodCutting;
     int newSkillLevel = 0;
 
     public static void ShowWindow(GOAP_Character character)
@@ -22,13 +22,13 @@ public class CharacterWindow : EditorWindow
 
         GUILayout.Label("Add New Skill", EditorStyles.boldLabel);
         EditorGUILayout.BeginHorizontal();
-        newSkill = EditorGUILayout.TextField("SkillID", newSkill);
+        newSkill = (Skills)EditorGUILayout.EnumPopup("SkillID", newSkill);
         newSkillLevel = (int)EditorGUILayout.Slider("Slider", newSkillLevel, 0, 5);
         EditorGUILayout.EndHorizontal();
         if(GUILayout.Button("Add Skill"))
         {
             character.AddSkill(newSkill,newSkillLevel);
-            newSkill = "";
+            newSkill = Skills.WoodCutting;
             newSkillLevel = 0;
         }
 

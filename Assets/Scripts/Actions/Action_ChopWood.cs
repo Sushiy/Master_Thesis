@@ -12,21 +12,26 @@ public class Action_ChopWood : GOAP_Action
         AddRequiredWorldState(WorldStateKey.bHasAxe, true);
         AddRequiredWorldState(WorldStateKey.bHasLog, true);
         AddSatisfyWorldState(WorldStateKey.bHasWood, true);
-        requiredSkill = new GOAP_Skill("woodCutting", 1);
+        requiredSkill = new GOAP_Skill(Skills.WoodCutting, 1);
     }
 
-    public override bool CheckProceduralConditions()
+    public override bool CheckProceduralConditions(GOAP_Agent agent)
     {
-        return true;
+        target = InfoBlackBoard.instance.FindClosest(InfoBlackBoard.LOCATIONS.WOODWORKSHOP, agent.transform.position).gameObject; //TODO: This isnt technically correct
+        if (target)
+            return true;
+        else
+            return false;
     }
 
     public override bool RequiresInRange()
     {
-        return false;
+        return true;
     }
 
-    public override void Run(GOAP_Agent agent)
+    public override bool Run(GOAP_Agent agent)
     {
         Debug.Log("performing: " + actionID);
+        return true;
     }
 }
