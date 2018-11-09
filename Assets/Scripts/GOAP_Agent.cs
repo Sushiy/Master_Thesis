@@ -45,11 +45,12 @@ public class GOAP_Agent : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-        activeQuest = CheckForQuests();
-        if (activeQuest == null) goal = standardGoal;
-        else goal = activeQuest.RequiredStates;
 	    if(currentState == FSM_State.IDLE && allowedToPlan && postedQuest == null)
         {
+            activeQuest = CheckForQuests();
+            if (activeQuest == null) goal = standardGoal;
+            else goal = activeQuest.RequiredStates;
+
             //Fetch a new Plan from the planner
             Queue<GOAP_Action> newPlan = GOAP_Planner.instance.Plan(this, goal, availableActions, FetchWorldState());
             if (newPlan != null)
@@ -61,7 +62,8 @@ public class GOAP_Agent : MonoBehaviour
             else
             {
                 //try again? or something...
-
+                Debug.Log("No plan?");
+                StartCoroutine(DelayPlanning());
             }
         }
 
@@ -149,6 +151,13 @@ public class GOAP_Agent : MonoBehaviour
     private HashSet<GOAP_Worldstate> FetchWorldState()
     {
         HashSet<GOAP_Worldstate> result = new HashSet<GOAP_Worldstate>();
+        if(activeQuest != null)
+        {
+            foreach(GOAP_Worldstate state in activeQuest.ProvidedStates)
+            {
+                result.Add(state);
+            }
+        }
 
         return result;
     }

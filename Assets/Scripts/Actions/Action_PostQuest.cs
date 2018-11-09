@@ -25,7 +25,7 @@ public class Action_PostQuest : GOAP_Action
     public override bool Run(GOAP_Agent agent)
     {
         if (agent.postedQuest != null) return false;
-        Debug.Log("Quest was completed");
+        //Debug.Log("Quest was completed");
         return true;
     }
 }
