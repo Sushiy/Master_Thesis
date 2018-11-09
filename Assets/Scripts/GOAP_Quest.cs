@@ -17,7 +17,10 @@ public class GOAP_Quest
         get { return requiredStates; }
     }
     HashSet<GOAP_Worldstate> providedStates;
-
+    public HashSet<GOAP_Worldstate> ProvidedStates
+    {
+        get { return providedStates; }
+    }
     public GOAP_Quest(GOAP_Agent agent)
     {
         id = count++;
