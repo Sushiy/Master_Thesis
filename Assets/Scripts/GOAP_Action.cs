@@ -9,10 +9,9 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     private HashSet<GOAP_Worldstate> requiredWorldstates;
     private HashSet<GOAP_Worldstate> satisfyWorldstates;
 
-
-    [HideInInspector]
     protected float workCost = 1f;
     protected float coinCost = 0f;
+    protected float range = 1.0f;
     public float ActionCost
     {
         get
@@ -36,8 +35,8 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
             return actionID;
         }
     }
-    protected GameObject target;
-    public GameObject ActionTarget
+    protected IActionTarget target;
+    public IActionTarget ActionTarget
     {
         get
         {
@@ -83,7 +82,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     public bool IsInRange(GOAP_Agent agent)
     {
         if (!RequiresInRange()) return true;
-        if (RequiresInRange() && target != null && Vector3.Distance(target.transform.position, agent.transform.position) < 1.0f)
+        if (RequiresInRange() && target != null && agent.View.IsInRange(target.GetPosition(), range))
         {
             return true; //TODO: put some actual rangeTesting in here, dependant on the target
         }
@@ -123,12 +122,11 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         }
     }
 
-    public HashSet<GOAP_Worldstate> SatisfyWorldStates
+    public HashSet<GOAP_Worldstate> SatisfyWorldstates
     {
         get
         {
             return satisfyWorldstates;
         }
     }
-
 }

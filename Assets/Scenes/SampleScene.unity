@@ -121,15 +121,26 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 82904031}
-  - component: {fileID: 82904030}
   - component: {fileID: 82904029}
+  - component: {fileID: 82904025}
   m_Layer: 0
-  m_Name: TestAgent (1)
+  m_Name: Smith
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &82904025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 82904024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: daf779fc11dd7ed4a9333419a361ed27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &82904029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -145,19 +156,6 @@ MonoBehaviour:
   skills:
   - id: 1
     level: 4
---- !u!114 &82904030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 82904024}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06407204b77bd6642b6599dce22d3216, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  character: {fileID: 0}
-  planningWaitTimer: 2
 --- !u!4 &82904031
 Transform:
   m_ObjectHideFlags: 0
@@ -432,10 +430,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chopTreeLocations:
-  - {fileID: 974615369}
-  buyResourceLocations: []
+  - {fileID: 2002428349}
+  buyResourceLocations:
+  - {fileID: 1357996101}
   woodWorkshopLocations:
-  - {fileID: 645664180}
+  - {fileID: 624009711}
 --- !u!4 &284275237
 Transform:
   m_ObjectHideFlags: 0
@@ -1005,6 +1004,22 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400002, guid: 0ee56959656c9fc4681e95f9d29c36a3,
     type: 3}
   m_PrefabInternal: {fileID: 441442200}
+--- !u!1 &624009710 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100002, guid: e6e2f107d724720418a9a1ff889bee6e,
+    type: 3}
+  m_PrefabInternal: {fileID: 520959943}
+--- !u!114 &624009711
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 624009710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c72ac8bc7e1d80347bc55b8aa6656d67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &645664180 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400002, guid: e6e2f107d724720418a9a1ff889bee6e,
@@ -1294,6 +1309,22 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400002, guid: 2cfafaeb95db6c04cabbfe0f823be596,
     type: 3}
   m_PrefabInternal: {fileID: 1291068269}
+--- !u!1 &1357996100 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100002, guid: 0ee56959656c9fc4681e95f9d29c36a3,
+    type: 3}
+  m_PrefabInternal: {fileID: 441442200}
+--- !u!114 &1357996101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1357996100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c72ac8bc7e1d80347bc55b8aa6656d67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1408230933
 Prefab:
   m_ObjectHideFlags: 0
@@ -1541,15 +1572,26 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1749383441}
-  - component: {fileID: 1749383443}
   - component: {fileID: 1749383440}
+  - component: {fileID: 1749383437}
   m_Layer: 0
-  m_Name: TestAgent
+  m_Name: WoodCutter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1749383437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1749383436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: daf779fc11dd7ed4a9333419a361ed27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1749383440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1579,19 +1621,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1749383443
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1749383436}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06407204b77bd6642b6599dce22d3216, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  character: {fileID: 0}
-  planningWaitTimer: 2
 --- !u!1001 &1831424380
 Prefab:
   m_ObjectHideFlags: 0
@@ -2004,3 +2033,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400002, guid: 2cfafaeb95db6c04cabbfe0f823be596,
     type: 3}
   m_PrefabInternal: {fileID: 1996529249}
+--- !u!1 &2002428348 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100002, guid: 065cf6c377f280d44941d2c5dfda2fd7,
+    type: 3}
+  m_PrefabInternal: {fileID: 374970443}
+--- !u!114 &2002428349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2002428348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c72ac8bc7e1d80347bc55b8aa6656d67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

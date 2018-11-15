@@ -13,9 +13,9 @@ public class InfoBlackBoard : MonoBehaviour
 
     public static InfoBlackBoard instance;
 
-    public Transform[] chopTreeLocations;
-    public Transform[] buyResourceLocations;
-    public Transform[] woodWorkshopLocations;
+    public GameObjectActionTarget[] chopTreeLocations;
+    public GameObjectActionTarget[] buyResourceLocations;
+    public GameObjectActionTarget[] woodWorkshopLocations;
 
     // Use this for initialization
     void Awake()
@@ -26,7 +26,7 @@ public class InfoBlackBoard : MonoBehaviour
             Destroy(this);
     }
 
-    public Transform FindClosest(LOCATIONS location, Vector3 position)
+    public IActionTarget FindClosest(LOCATIONS location, Vector3 position)
     {
         switch(location)
         {
@@ -47,13 +47,13 @@ public class InfoBlackBoard : MonoBehaviour
         }
     }
 
-    private Transform FindClosest(Transform[] transforms, Vector3 position)
+    private IActionTarget FindClosest(IActionTarget[] transforms, Vector3 position)
     {
-        Transform closest = null;
+        IActionTarget closest = null;
         float minDistance = Mathf.Infinity;
-        foreach(Transform t in transforms)
+        foreach(IActionTarget t in transforms)
         {
-            float distance = Vector3.Distance(t.position, position);
+            float distance = Vector3.Distance(t.GetPosition(), position);
             if (distance < minDistance)
             {
                 closest = t;
@@ -63,8 +63,8 @@ public class InfoBlackBoard : MonoBehaviour
         return closest;
     }
     
-    private float DistanceToClosest(Transform[] transforms, Vector3 position)
+    private float DistanceToClosest(IActionTarget[] transforms, Vector3 position)
     {
-        return Vector3.Distance(FindClosest(transforms,position).position, position);
+        return Vector3.Distance(FindClosest(transforms,position).GetPosition(), position);
     }
 }

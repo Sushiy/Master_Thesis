@@ -62,7 +62,7 @@ public class GOAP_Quest
 
     public override string ToString()
     {
-        string quest = "QUEST " + id + ": " + owner.character.characterName + " needs someone to complete:";
+        string quest = "QUEST " + id + ": " + owner.Character.characterName + " needs someone to complete:";
         foreach (GOAP_Worldstate state in requiredStates)
         {
             quest += " " + state.ToString() + ";";
