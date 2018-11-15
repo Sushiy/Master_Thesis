@@ -67,7 +67,7 @@ public class GOAP_Planner : MonoBehaviour
         {
             availableActions.Add(new Action_MakeAxe());
         }
-        string msg = "<b>Initializing Planner \n Available Actions: \n</b>";
+        string msg = "<b>Initializing Planner \nAvailable Actions:</b>\n";
         foreach(GOAP_Action action in availableActions)
         {
             msg += action.ActionID + "\n";
@@ -83,7 +83,7 @@ public class GOAP_Planner : MonoBehaviour
     //Get the agents goal and try to find a plan for it
     public Queue<GOAP_Action> Plan(GOAP_Agent agent, HashSet<GOAP_Worldstate> goal, HashSet<GOAP_Worldstate> currentWorldState)
     {
-        Debug.Log("<color=#0000cc>" + agent.character.characterName + "</color> started planning.");
+        Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> started planning.");
         plannerLog = "";
 
         //Search for a valid plan
@@ -92,7 +92,7 @@ public class GOAP_Planner : MonoBehaviour
         //Return null if you couldn't find a plan!
         if (startingNode == null)
         {
-            Debug.Log("<color=#ff0000>Couldn't find actions fulfilling " + agent.character.characterName + "s goal.</color>");
+            Debug.Log("<color=#ff0000>Couldn't find actions fulfilling " + agent.Character.characterName + "s goal.</color>");
             return null;
         }
         Debug.Log(plannerLog);
@@ -191,7 +191,7 @@ public class GOAP_Planner : MonoBehaviour
         //Actions need to fulfill at least one required Worldstate to result in a valid neighbor
         foreach (GOAP_Worldstate state in activeNode.required)
         {
-            if (action.SatisfyWorldStates.Contains(state))
+            if (action.SatisfyWorldstates.Contains(state))
             {
                 newRequired.Remove(state);
                 isValidAction = true;
@@ -214,10 +214,10 @@ public class GOAP_Planner : MonoBehaviour
         bool isSkilled = true;
         if (action.RequiredSkill != null)
         {
-            int index = agent.character.skills.IndexOf(action.RequiredSkill);
+            int index = agent.Character.skills.IndexOf(action.RequiredSkill);
             if (index != -1)
             {
-                int difference = action.RequiredSkill.level - agent.character.skills[index].level;
+                int difference = action.RequiredSkill.level - agent.Character.skills[index].level;
                 if (difference > 0) skillModifier *= difference + 1;
                 else skillModifier /= (-difference) + 1;
             }
@@ -249,7 +249,7 @@ public class GOAP_Planner : MonoBehaviour
                 if(!needsQuest)
                 {
                     quest.ClearProvided();
-                    foreach(GOAP_Worldstate state in current.action.SatisfyWorldStates)
+                    foreach(GOAP_Worldstate state in current.action.SatisfyWorldstates)
                     {
                         quest.AddProvided(state);
                     }
@@ -262,7 +262,7 @@ public class GOAP_Planner : MonoBehaviour
                 queue.Enqueue(new Action_PostQuest());
                 message += " -> <color=#CC0000> QUEST: " + current.action.ActionID + "</color>";
                 quest.ClearRequired();
-                foreach (GOAP_Worldstate state in current.action.SatisfyWorldStates)
+                foreach (GOAP_Worldstate state in current.action.SatisfyWorldstates)
                 {
                     quest.AddRequired(state);
                 }

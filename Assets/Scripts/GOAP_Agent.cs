@@ -9,7 +9,7 @@ enum FSM_State
     MOVETO
 }
 
-public class GOAP_Agent : MonoBehaviour
+public class GOAP_Agent
 {
     FSM_State currentState = FSM_State.IDLE;
 
@@ -18,22 +18,33 @@ public class GOAP_Agent : MonoBehaviour
     
     Queue<GOAP_Action> currentActions;
     GOAP_Action activeAction;
-    
-    [HideInInspector]
-    public GOAP_Character character;
 
-    public float planningWaitTimer = 2.0f;
+    private GOAP_Character character;
+    public GOAP_Character Character
+    {
+        get { return character; }
+    }
+
+    public float planningWaitTimer = 3.0f;
+    private float timeSincePlanned = 0.0f;
     bool allowedToPlan = true;
     bool actionCompleted = true;
 
     public GOAP_Quest postedQuest = null;
     public GOAP_Quest activeQuest = null;
 
-    void Awake()
+    private IGOAP_AgentView view;
+    public IGOAP_AgentView View
     {
-        //Load available actions
+        get { return view; }
+    }
+
+    public GOAP_Agent(GOAP_Character character, IGOAP_AgentView view)
+    {
+        this.character = character;
+        this.view = view;
+
         currentActions = new Queue<GOAP_Action>();
-        character = GetComponent<GOAP_Character>();
 
         standardGoal = new HashSet<GOAP_Worldstate>(); // TODO: implement proper goals for agents; => agent.getCurrentGoal();
         standardGoal.Add(new GOAP_Worldstate(WorldStateKey.bHasWood, true, null)); //TODO: remove this when I have proper goals
@@ -41,27 +52,38 @@ public class GOAP_Agent : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update ()
+    public void Update (float deltaTime)
     {
-	    if(currentState == FSM_State.IDLE && allowedToPlan && postedQuest == null)
+	    if(currentState == FSM_State.IDLE && postedQuest == null)
         {
-            activeQuest = CheckForQuests();
-            if (activeQuest == null) goal = standardGoal;
-            else goal = activeQuest.RequiredStates;
-
-            //Fetch a new Plan from the planner
-            Queue<GOAP_Action> newPlan = GOAP_Planner.instance.Plan(this, goal, FetchWorldState());
-            if (newPlan != null)
+            if(allowedToPlan)
             {
-                //do what the plan says!
-                currentActions = newPlan;
-                currentState = FSM_State.PERFORMACTION;
+
+                activeQuest = CheckForQuests();
+                if (activeQuest == null) goal = standardGoal;
+                else goal = activeQuest.RequiredStates;
+
+                //Fetch a new Plan from the planner
+                Queue<GOAP_Action> newPlan = GOAP_Planner.instance.Plan(this, goal, FetchWorldState());
+                if (newPlan != null)
+                {
+                    //do what the plan says!
+                    currentActions = newPlan;
+                    currentState = FSM_State.PERFORMACTION;
+                }
+                else
+                {
+                    //try again? or something...
+                    Debug.Log("No plan?");
+                }
+                allowedToPlan = false;
+                timeSincePlanned = 0.0f;
             }
             else
             {
-                //try again? or something...
-                Debug.Log("No plan?");
-                StartCoroutine(DelayPlanning());
+                timeSincePlanned += deltaTime;
+                if (timeSincePlanned > planningWaitTimer)
+                    allowedToPlan = true;
             }
         }
 
@@ -111,7 +133,7 @@ public class GOAP_Agent : MonoBehaviour
             //Move to the target!
             if(!activeAction.IsInRange(this))
             {
-                transform.position += (activeAction.ActionTarget.transform.position - transform.position).normalized * 3.0f * Time.deltaTime;
+                view.MoveTo(activeAction.ActionTarget.GetPosition());
             }
             else
             {

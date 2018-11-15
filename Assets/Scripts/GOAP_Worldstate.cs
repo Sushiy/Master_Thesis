@@ -19,11 +19,11 @@ public struct GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
     public WorldStateKey key;
 
     //Can be null
-    public GameObject target;
-    //This is unsafe, each WorldstateKey signifies which type of value it should receive, but this can't be properly checked.
+    public IActionTarget target;
+
     public bool value;
 
-    public GOAP_Worldstate(WorldStateKey key, bool value, GameObject target)
+    public GOAP_Worldstate(WorldStateKey key, bool value, IActionTarget target)
     {
         this.key = key;
         this.value = value;
