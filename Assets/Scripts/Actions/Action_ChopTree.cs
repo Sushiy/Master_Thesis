@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Action_ChopTree : GOAP_Action
 {
-    public override void Awake()
+    public Action_ChopTree()
     {
-        base.Awake();
+        Init();
         actionID = "ChopTree";
         workCost = 4f;
         AddRequiredWorldState(WorldStateKey.bHasAxe, true);

@@ -2,10 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum PlannableActions
+{
+    None = 0,
+    BuyIron = 1 << 0,
+    BuyWood = 1 << 1,
+    ChopTree = 1 << 2,
+    ChopWood = 1 << 3,
+    GatherFirewood = 1 << 4,
+    GetAxe = 1 << 5,
+    MakeAxe = 1 << 6,
+}
+
 public class GOAP_Planner : MonoBehaviour
 {
     public static GOAP_Planner instance;
-
+    [HideInInspector]
+    public PlannableActions plannableActions;
+    private HashSet<GOAP_Action> availableActions;
 
     public bool writePlannerLog = true;
     string plannerLog = "";
@@ -16,10 +30,58 @@ public class GOAP_Planner : MonoBehaviour
             instance = this;
         else
             Destroy(this);
+
+        availableActions = new HashSet<GOAP_Action>();
+
+        InitActions();
+    }
+
+    public void InitActions()
+    {
+
+        if (IsActionAvailable(PlannableActions.BuyIron))
+        {
+            availableActions.Add(new Action_BuyIron());
+        }
+        if (IsActionAvailable(PlannableActions.BuyWood))
+        {
+            availableActions.Add(new Action_BuyWood());
+        }
+        if (IsActionAvailable(PlannableActions.ChopTree))
+        {
+            availableActions.Add(new Action_ChopTree());
+        }
+        if (IsActionAvailable(PlannableActions.ChopWood))
+        {
+            availableActions.Add(new Action_ChopWood());
+        }
+        if (IsActionAvailable(PlannableActions.GatherFirewood))
+        {
+            availableActions.Add(new Action_GatherFirewood());
+        }
+        if (IsActionAvailable(PlannableActions.GetAxe))
+        {
+            availableActions.Add(new Action_GetAxe());
+        }
+        if (IsActionAvailable(PlannableActions.MakeAxe))
+        {
+            availableActions.Add(new Action_MakeAxe());
+        }
+        string msg = "<b>Initializing Planner \n Available Actions: \n</b>";
+        foreach(GOAP_Action action in availableActions)
+        {
+            msg += action.ActionID + "\n";
+        }
+        Debug.Log(msg);
+    }
+
+    public bool IsActionAvailable(PlannableActions action)
+    {
+        return (plannableActions & action) != PlannableActions.None;
     }
 
     //Get the agents goal and try to find a plan for it
-    public Queue<GOAP_Action> Plan(GOAP_Agent agent, HashSet<GOAP_Worldstate> goal , HashSet<GOAP_Action> availableActions, HashSet<GOAP_Worldstate> currentWorldState)
+    public Queue<GOAP_Action> Plan(GOAP_Agent agent, HashSet<GOAP_Worldstate> goal, HashSet<GOAP_Worldstate> currentWorldState)
     {
         Debug.Log("<color=#0000cc>" + agent.character.characterName + "</color> started planning.");
         plannerLog = "";
@@ -197,7 +259,7 @@ public class GOAP_Planner : MonoBehaviour
             else
             {
                 queue.Clear();
-                queue.Enqueue(GetComponent<Action_PostQuest>());
+                queue.Enqueue(new Action_PostQuest());
                 message += " -> <color=#CC0000> QUEST: " + current.action.ActionID + "</color>";
                 quest.ClearRequired();
                 foreach (GOAP_Worldstate state in current.action.SatisfyWorldStates)

@@ -15,8 +15,7 @@ public class GOAP_Agent : MonoBehaviour
 
     HashSet<GOAP_Worldstate> standardGoal;
     public HashSet<GOAP_Worldstate> goal;
-
-    HashSet<GOAP_Action> availableActions;
+    
     Queue<GOAP_Action> currentActions;
     GOAP_Action activeAction;
     
@@ -33,7 +32,6 @@ public class GOAP_Agent : MonoBehaviour
     void Awake()
     {
         //Load available actions
-        availableActions = new HashSet<GOAP_Action>(gameObject.GetComponents<GOAP_Action>());
         currentActions = new Queue<GOAP_Action>();
         character = GetComponent<GOAP_Character>();
 
@@ -52,7 +50,7 @@ public class GOAP_Agent : MonoBehaviour
             else goal = activeQuest.RequiredStates;
 
             //Fetch a new Plan from the planner
-            Queue<GOAP_Action> newPlan = GOAP_Planner.instance.Plan(this, goal, availableActions, FetchWorldState());
+            Queue<GOAP_Action> newPlan = GOAP_Planner.instance.Plan(this, goal, FetchWorldState());
             if (newPlan != null)
             {
                 //do what the plan says!

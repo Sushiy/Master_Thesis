@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Action_PostQuest : GOAP_Action
 {
-    public override void Awake()
+    public Action_PostQuest()
     {
-        base.Awake();
+        Init();
         workCost = 10f;
         actionID = "PostQuest";
         keepOpen = true;

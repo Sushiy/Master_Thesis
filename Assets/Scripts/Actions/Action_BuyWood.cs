@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Action_BuyWood : GOAP_Action
 {
-    public override void Awake()
+    public Action_BuyWood()
     {
-        base.Awake();
+        Init();
         workCost = 10f;
         coinCost = 10f;
         actionID = "BuyWood";

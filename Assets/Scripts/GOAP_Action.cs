@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //This class contains all info on individual actions. Most of all it holds the required and satisfyWorldstate fields, which are needed for planning.
-
-public abstract class GOAP_Action :MonoBehaviour, System.IEquatable<GOAP_Action>
+public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
 {
     private HashSet<GOAP_Worldstate> requiredWorldstates;
     private HashSet<GOAP_Worldstate> satisfyWorldstates;
@@ -64,7 +63,7 @@ public abstract class GOAP_Action :MonoBehaviour, System.IEquatable<GOAP_Action>
     }
 
 
-    public virtual void Awake()
+    protected void Init()
     {
         requiredWorldstates = new HashSet<GOAP_Worldstate>();
         satisfyWorldstates = new HashSet<GOAP_Worldstate>();
