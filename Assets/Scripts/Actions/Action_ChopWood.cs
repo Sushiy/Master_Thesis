@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Action_ChopWood : GOAP_Action
 {
-    public override void Awake()
+    public Action_ChopWood()
     {
-        base.Awake();
+        Init();
         actionID = "ChopWood";
         workCost = 2f;
         AddRequiredWorldState(WorldStateKey.bHasAxe, true);
@@ -17,8 +17,8 @@ public class Action_ChopWood : GOAP_Action
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
     {
-        target = InfoBlackBoard.instance.FindClosest(InfoBlackBoard.LOCATIONS.WOODWORKSHOP, agent.transform.position).gameObject; //TODO: This isnt technically correct
-        if (target)
+        target = InfoBlackBoard.instance.FindClosest(InfoBlackBoard.LOCATIONS.WOODWORKSHOP, agent.View.GetPosition()); //TODO: This isnt technically correct
+        if (target != null)
             return true;
         else
             return false;

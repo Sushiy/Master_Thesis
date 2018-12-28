@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Action_MakeAxe : GOAP_Action
 {
-    public override void Awake()
+    public Action_MakeAxe()
     {
-        base.Awake();
+        Init();
         actionID = "MakeAxe";
         AddSatisfyWorldState(WorldStateKey.bHasAxe, true);
         AddRequiredWorldState(WorldStateKey.bHasIron, true);

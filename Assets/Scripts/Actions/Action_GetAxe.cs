@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Action_GetAxe : GOAP_Action
 {
-    public override void Awake()
+    public Action_GetAxe()
     {
-        base.Awake();
+        Init();
         actionID = "GetAxe";
         AddSatisfyWorldState(WorldStateKey.bHasAxe, true);
     }

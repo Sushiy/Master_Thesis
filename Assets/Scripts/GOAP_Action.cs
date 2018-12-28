@@ -4,16 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //This class contains all info on individual actions. Most of all it holds the required and satisfyWorldstate fields, which are needed for planning.
-
-public abstract class GOAP_Action :MonoBehaviour, System.IEquatable<GOAP_Action>
+public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
 {
     private HashSet<GOAP_Worldstate> requiredWorldstates;
     private HashSet<GOAP_Worldstate> satisfyWorldstates;
 
-
-    [HideInInspector]
     protected float workCost = 1f;
     protected float coinCost = 0f;
+    protected float range = 1.0f;
     public float ActionCost
     {
         get
@@ -37,8 +35,8 @@ public abstract class GOAP_Action :MonoBehaviour, System.IEquatable<GOAP_Action>
             return actionID;
         }
     }
-    protected GameObject target;
-    public GameObject ActionTarget
+    protected IActionTarget target;
+    public IActionTarget ActionTarget
     {
         get
         {
@@ -64,7 +62,7 @@ public abstract class GOAP_Action :MonoBehaviour, System.IEquatable<GOAP_Action>
     }
 
 
-    public virtual void Awake()
+    protected void Init()
     {
         requiredWorldstates = new HashSet<GOAP_Worldstate>();
         satisfyWorldstates = new HashSet<GOAP_Worldstate>();
@@ -84,7 +82,7 @@ public abstract class GOAP_Action :MonoBehaviour, System.IEquatable<GOAP_Action>
     public bool IsInRange(GOAP_Agent agent)
     {
         if (!RequiresInRange()) return true;
-        if (RequiresInRange() && target != null && Vector3.Distance(target.transform.position, agent.transform.position) < 1.0f)
+        if (RequiresInRange() && target != null && agent.View.IsInRange(target.GetPosition(), range))
         {
             return true; //TODO: put some actual rangeTesting in here, dependant on the target
         }
@@ -92,7 +90,7 @@ public abstract class GOAP_Action :MonoBehaviour, System.IEquatable<GOAP_Action>
     }
 
 
-    protected void AddRequiredWorldState(WorldStateKey key, bool value, GameObject target = null)
+    protected void AddRequiredWorldState(WorldStateKey key, bool value, IActionTarget target = null)
     {
         GOAP_Worldstate state;
         state.key = key;
@@ -101,7 +99,7 @@ public abstract class GOAP_Action :MonoBehaviour, System.IEquatable<GOAP_Action>
         requiredWorldstates.Add(state);
     }
 
-    protected void AddSatisfyWorldState(WorldStateKey key, bool value, GameObject target = null)
+    protected void AddSatisfyWorldState(WorldStateKey key, bool value, IActionTarget target = null)
     {
         GOAP_Worldstate state;
         state.key = key;
@@ -124,12 +122,11 @@ public abstract class GOAP_Action :MonoBehaviour, System.IEquatable<GOAP_Action>
         }
     }
 
-    public HashSet<GOAP_Worldstate> SatisfyWorldStates
+    public HashSet<GOAP_Worldstate> SatisfyWorldstates
     {
         get
         {
             return satisfyWorldstates;
         }
     }
-
 }

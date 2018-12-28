@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Action_BuyIron : GOAP_Action
 {
-    public override void Awake()
+    public Action_BuyIron()
     {
-        base.Awake();
+        Init();
         workCost = 10f;
         coinCost = 10f;
         actionID = "BuyIron";

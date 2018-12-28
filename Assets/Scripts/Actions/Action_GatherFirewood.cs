@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class Action_GatherFirewood : GOAP_Action
 {
-    public override void Awake()
+    public Action_GatherFirewood()
     {
-        base.Awake();
+        Init();
         actionID = "GatherWood";
-        workCost = 13f;
+        workCost = 40f;
         AddSatisfyWorldState(WorldStateKey.bHasWood, true);
     }
 
