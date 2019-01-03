@@ -8,6 +8,9 @@ public class GOAP_Character : MonoBehaviour
 
     public List<GOAP_Skill> skills;
 
+    [HideInInspector]
+    public PlannableActions availableActions;
+
     public GOAP_Agent agent;
 
     private void Awake()

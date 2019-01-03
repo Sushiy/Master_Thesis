@@ -15,7 +15,9 @@ public class GOAP_Agent
 
     HashSet<GOAP_Worldstate> standardGoal;
     public HashSet<GOAP_Worldstate> goal;
-    
+
+    public PlannableActions actions; 
+
     Queue<GOAP_Action> currentActions;
     GOAP_Action activeAction;
 
@@ -62,9 +64,16 @@ public class GOAP_Agent
                 activeQuest = CheckForQuests();
                 if (activeQuest == null) goal = standardGoal;
                 else goal = activeQuest.RequiredStates;
-
+                Queue<GOAP_Action> newPlan;
                 //Fetch a new Plan from the planner
-                Queue<GOAP_Action> newPlan = GOAP_Planner.instance.Plan(this, goal, FetchWorldState());
+                if (character.availableActions != PlannableActions.None)
+                {
+                    newPlan = GOAP_Planner.instance.Plan(this, goal, FetchWorldState(), character.availableActions);
+                }
+                else
+                {
+                    newPlan = GOAP_Planner.instance.Plan(this, goal, FetchWorldState());
+                }
                 if (newPlan != null)
                 {
                     //do what the plan says!

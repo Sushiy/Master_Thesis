@@ -18,8 +18,8 @@ public class GOAP_Planner : MonoBehaviour
 {
     public static GOAP_Planner instance;
     [HideInInspector]
-    public PlannableActions plannableActions;
-    private HashSet<GOAP_Action> availableActions;
+    public PlannableActions globalKnowledgePlannableActions;
+    private HashSet<GOAP_Action> globalKnowledgeAvailableActions;
 
     public bool writePlannerLog = true;
     string plannerLog = "";
@@ -31,64 +31,63 @@ public class GOAP_Planner : MonoBehaviour
         else
             Destroy(this);
 
-        availableActions = new HashSet<GOAP_Action>();
+        globalKnowledgeAvailableActions = new HashSet<GOAP_Action>();
 
-        InitActions();
+        GetActionSet(this.globalKnowledgePlannableActions, ref globalKnowledgeAvailableActions);
     }
 
-    public void InitActions()
+    public void GetActionSet(PlannableActions plannableActions, ref HashSet<GOAP_Action> set)
     {
 
-        if (IsActionAvailable(PlannableActions.BuyIron))
+        if (IsActionAvailable(plannableActions, PlannableActions.BuyIron))
         {
-            availableActions.Add(new Action_BuyIron());
+            set.Add(new Action_BuyIron());
         }
-        if (IsActionAvailable(PlannableActions.BuyWood))
+        if (IsActionAvailable(plannableActions, PlannableActions.BuyWood))
         {
-            availableActions.Add(new Action_BuyWood());
+            set.Add(new Action_BuyWood());
         }
-        if (IsActionAvailable(PlannableActions.ChopTree))
+        if (IsActionAvailable(plannableActions, PlannableActions.ChopTree))
         {
-            availableActions.Add(new Action_ChopTree());
+            set.Add(new Action_ChopTree());
         }
-        if (IsActionAvailable(PlannableActions.ChopWood))
+        if (IsActionAvailable(plannableActions, PlannableActions.ChopWood))
         {
-            availableActions.Add(new Action_ChopWood());
+            set.Add(new Action_ChopWood());
         }
-        if (IsActionAvailable(PlannableActions.GatherFirewood))
+        if (IsActionAvailable(plannableActions, PlannableActions.GatherFirewood))
         {
-            availableActions.Add(new Action_GatherFirewood());
+            set.Add(new Action_GatherFirewood());
         }
-        if (IsActionAvailable(PlannableActions.GetAxe))
+        if (IsActionAvailable(plannableActions, PlannableActions.GetAxe))
         {
-            availableActions.Add(new Action_GetAxe());
+            set.Add(new Action_GetAxe());
         }
-        if (IsActionAvailable(PlannableActions.MakeAxe))
+        if (IsActionAvailable(plannableActions, PlannableActions.MakeAxe))
         {
-            availableActions.Add(new Action_MakeAxe());
+            set.Add(new Action_MakeAxe());
         }
-        string msg = "<b>Initializing Planner \nAvailable Actions:</b>\n";
-        foreach(GOAP_Action action in availableActions)
+        string msg = "<b>Initializing ActionSet \nAvailable Actions:</b>\n";
+        foreach(GOAP_Action action in set)
         {
             msg += action.ActionID + "\n";
         }
         Debug.Log(msg);
     }
 
-    public bool IsActionAvailable(PlannableActions action)
+    public bool IsActionAvailable(PlannableActions plannableActions, PlannableActions action)
     {
         return (plannableActions & action) != PlannableActions.None;
     }
 
-    //Get the agents goal and try to find a plan for it
-    public Queue<GOAP_Action> Plan(GOAP_Agent agent, HashSet<GOAP_Worldstate> goal, HashSet<GOAP_Worldstate> currentWorldState)
+    public Queue<GOAP_Action> Plan(GOAP_Agent agent, HashSet<GOAP_Worldstate> goal, HashSet<GOAP_Worldstate> currentWorldState, HashSet<GOAP_Action> availableActions)
     {
         Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> started planning.");
         plannerLog = "";
 
         //Search for a valid plan
         Node startingNode = WhileBuild(goal, new List<GOAP_Action>(availableActions), currentWorldState, agent);
-    
+
         //Return null if you couldn't find a plan!
         if (startingNode == null)
         {
@@ -99,6 +98,19 @@ public class GOAP_Planner : MonoBehaviour
 
         //Otherwise return the queue
         return makeQueue(startingNode, agent);
+    }
+
+    //Get the agents goal and try to find a plan for it
+    public Queue<GOAP_Action> Plan(GOAP_Agent agent, HashSet<GOAP_Worldstate> goal, HashSet<GOAP_Worldstate> currentWorldState)
+    {
+        return Plan(agent, goal, currentWorldState, globalKnowledgeAvailableActions);
+    }
+
+    public Queue<GOAP_Action> Plan(GOAP_Agent agent, HashSet<GOAP_Worldstate> goal, HashSet<GOAP_Worldstate> currentWorldState, PlannableActions plannableActions)
+    {
+        HashSet<GOAP_Action> availableActions = new HashSet<GOAP_Action>();
+        GetActionSet(plannableActions, ref availableActions);
+        return Plan(agent, goal, currentWorldState, availableActions);
     }
 
     //Perform A* reverse pathfinding search to get a plan
@@ -144,7 +156,7 @@ public class GOAP_Planner : MonoBehaviour
             }
             openSet.Remove(current);
             closedSet.Add(current);
-
+            bool foundValidNeighbor = false;
             for (int i = 0; i < availableActions.Count; i++)
             {
                 if (availableActions[i].ActionID.Equals(current.action)) continue; //Dont do the same action twice
@@ -152,6 +164,7 @@ public class GOAP_Planner : MonoBehaviour
                 Node neighbor = GetValidNeighborNode(current, availableActions[i], currentWorldState, agent);
                 if(neighbor != null && !openSet.Contains(neighbor))
                 {
+                    foundValidNeighbor = true;
                     openSet.Add(neighbor);
                     //Debug Log to visualize the process
                     if (writePlannerLog)
@@ -170,6 +183,26 @@ public class GOAP_Planner : MonoBehaviour
                         if (neighbor.action != null) plannerLog += "Action: " + neighbor.action.ActionID;
                         plannerLog += "\n";
                     }
+                }
+            }
+            if(!foundValidNeighbor)
+            {
+                plannerLog += makeIndent(graphDepth) + "-><color=#CC0000>Posting Quest.</color>\n";
+                Node questNode = GenerateQuestNode(current, currentWorldState, agent);
+                openSet.Add(questNode);
+                //Debug Log to visualize the process
+                if (writePlannerLog)
+                {
+                    msg = "Quest:";
+                    foreach (GOAP_Worldstate state in questNode.required)
+                    {
+                        msg += state.key.ToString() + ",";
+                    }
+                    plannerLog += makeIndent(graphDepth) + "-><color=#660000>OpenSet Updated</color> (" + questNode.estimatedPathCost + "); ";
+                    if (msg.Equals("")) msg = "empty";
+                    plannerLog += "(" + msg + ") ";
+                    if (questNode.action != null) plannerLog += "Action: " + questNode.action.ActionID;
+                    plannerLog += "\n";
                 }
             }
             graphDepth++;
@@ -231,6 +264,20 @@ public class GOAP_Planner : MonoBehaviour
         return new Node(activeNode, newRequired, action, newRequired.Count + action.ActionCost * skillModifier + activeNode.estimatedPathCost, isSkilled);
     }
 
+    //Generate a quest for the current Node, because it is somehow unsolvable
+    private Node GenerateQuestNode(Node activeNode, HashSet<GOAP_Worldstate> currentWorldState, GOAP_Agent agent)
+    {
+        HashSet<GOAP_Worldstate> newRequired = new HashSet<GOAP_Worldstate>();
+        Action_PostQuest action = new Action_PostQuest();
+        action.CheckProceduralConditions(agent);
+        foreach(GOAP_Worldstate state in activeNode.required)
+        {
+            action.AddQuestWorldstate(state);
+        }
+        float estimatedQuestCost = action.ActionCost * activeNode.required.Count;
+        return new Node(activeNode, newRequired, action, estimatedQuestCost + activeNode.estimatedPathCost, true);
+    }
+
     //Form a queue of actions from the plan of nodes
     private Queue<GOAP_Action> makeQueue(Node start, GOAP_Agent agent)
     {
@@ -244,16 +291,20 @@ public class GOAP_Planner : MonoBehaviour
         {
             if(current.isSkilled)
             {
+                if(current.action.ActionID == "PostQuest")
+                {
+                    queue.Enqueue(new Action_WaitForQuest());
+                }
                 queue.Enqueue(current.action);
                 message += " -> " + current.action.ActionID;
-                if(!needsQuest)
+                if (!needsQuest)
                 {
                     quest.ClearProvided();
-                    foreach(GOAP_Worldstate state in current.action.SatisfyWorldstates)
+                    foreach (GOAP_Worldstate state in current.action.SatisfyWorldstates)
                     {
                         quest.AddProvided(state);
                     }
-                }
+                }          
             }
             //Generate Quest instead of Actions the agent is unskilled with
             else

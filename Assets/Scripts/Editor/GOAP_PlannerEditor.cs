@@ -10,6 +10,6 @@ public class GOAP_PlannerEditor : Editor
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-        ((GOAP_Planner)target).plannableActions = (PlannableActions)EditorGUILayout.EnumFlagsField(((GOAP_Planner)target).plannableActions);
+        ((GOAP_Planner)target).globalKnowledgePlannableActions = (PlannableActions)EditorGUILayout.EnumFlagsField(((GOAP_Planner)target).globalKnowledgePlannableActions);
     }
 }

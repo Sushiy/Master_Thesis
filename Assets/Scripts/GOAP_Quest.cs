@@ -67,12 +67,16 @@ public class GOAP_Quest
         {
             quest += " " + state.ToString() + ";";
         }
-        quest += " \nIf necessary, he can provide:";
-        foreach (GOAP_Worldstate state in providedStates)
+        if(providedStates != null && providedStates.Count > 0)
         {
-            quest += " " + state.ToString() + ";";
+            quest += " \nIf necessary, he can provide:";
+            foreach (GOAP_Worldstate state in providedStates)
+            {
+                quest += " " + state.ToString() + ";";
+            }
+            quest += "\n and will pay you handsomly.";
         }
-        quest += "\n and will pay you handsomly.";
+        quest += "\n I will pay you handsomely.";
         return quest;
     }
 }
