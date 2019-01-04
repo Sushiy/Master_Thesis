@@ -27,8 +27,8 @@ public class GOAP_QuestBoard : MonoBehaviour
         quests[index].Complete();
         quests.RemoveAt(index);
     }
-    public void ChooseQuest(GOAP_Quest quest)
+    public bool ChooseQuest(GOAP_Quest quest)
     {
-        quests.Remove(quest);
+        return quests.Remove(quest); 
     }
 }

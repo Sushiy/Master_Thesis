@@ -25,6 +25,10 @@ public struct GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
 
     public int value;
 
+    public GOAP_Worldstate(WorldStateKey key, bool value, IActionTarget target = null) : this(key, value == true ? 1 : 0, target)
+    {
+    }
+
     public GOAP_Worldstate(WorldStateKey key, int value, IActionTarget target = null)
     {
         this.key = key;

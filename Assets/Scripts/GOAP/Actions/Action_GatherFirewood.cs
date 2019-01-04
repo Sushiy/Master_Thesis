@@ -9,7 +9,7 @@ public class Action_GatherFirewood : GOAP_Action
         Init();
         actionID = "GatherWood";
         workCost = 40f;
-        AddSatisfyWorldState(WorldStateKey.bHasWood, true);
+        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemIds.Wood);
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
@@ -22,9 +22,10 @@ public class Action_GatherFirewood : GOAP_Action
         return false;
     }
 
-    public override bool Run(GOAP_Agent agent)
+    public override bool Perform(GOAP_Agent agent)
     {
-        Debug.Log("performing: " + actionID);
+        BasePerform(agent);
+        agent.Character.UpdateInventory(ItemIds.Wood, true, 3);
         return true;
     }
 }

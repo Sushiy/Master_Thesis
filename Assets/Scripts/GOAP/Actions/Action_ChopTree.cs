@@ -9,8 +9,8 @@ public class Action_ChopTree : GOAP_Action
         Init();
         actionID = "ChopTree";
         workCost = 4f;
-        AddRequiredWorldState(WorldStateKey.bHasAxe, true);
-        AddSatisfyWorldState(WorldStateKey.bHasLog, true);
+        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemIds.Axe);
+        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemIds.Log);
         requiredSkill = new GOAP_Skill(Skills.WoodCutting, 2);
     }
 
@@ -28,9 +28,15 @@ public class Action_ChopTree : GOAP_Action
         return true;
     }
 
-    public override bool Run(GOAP_Agent agent)
+    public override bool Perform(GOAP_Agent agent)
     {
-        Debug.Log("performing: " + actionID);
+        BasePerform(agent);
+        agent.Character.UpdateInventory(ItemIds.Log, true);
+        if (agent.ConsumeWorldState(ItemIds.Axe, 0.2f))
+        {
+            Debug.Log("<color=#cc0000>" + agent.Character.characterName + "s Axe broke.</color>");
+            agent.Character.UpdateInventory(ItemIds.Axe, false);
+        }
         return true;
     }
 }

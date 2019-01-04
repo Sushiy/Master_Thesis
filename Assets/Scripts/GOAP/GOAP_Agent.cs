@@ -21,7 +21,7 @@ public class GOAP_Agent
     public PlannableActions actions;
 
     Queue<GOAP_Action> currentActions;
-    GOAP_Action activeAction;
+    public GOAP_Action activeAction;
 
     private GOAP_Character character;
     public GOAP_Character Character
@@ -52,17 +52,19 @@ public class GOAP_Agent
         currentWorldstates = new HashSet<GOAP_Worldstate>();
 
         standardGoal = new HashSet<GOAP_Worldstate>(); // TODO: implement proper goals for agents; => agent.getCurrentGoal();
-        standardGoal.Add(new GOAP_Worldstate(WorldStateKey.bHasWood, 1, null)); //TODO: remove this when I have proper goals
+        standardGoal.Add(new GOAP_Worldstate(WorldStateKey.eHasItem, (int)ItemIds.Wood)); //TODO: remove this when I have proper goals
         goal = standardGoal;
     }
 
     // Update is called once per frame
     public void Update(float deltaTime)
     {
+        if (!View.IsReadyToAct()) return;
         if (currentState == FSM_State.IDLE && postedQuest == null)
         {
             if (allowedToPlan)
             {
+                View.PrintMessage("Planning", 0f);
 
                 activeQuest = CheckForQuests();
                 if (activeQuest == null) goal = standardGoal;
@@ -79,6 +81,17 @@ public class GOAP_Agent
                 }
                 if (newPlan != null)
                 {
+                    if(activeQuest != null)
+                    {
+                        Debug.Log("<color=#0000cc>" + character.characterName + "</color> chose Quest " + activeQuest.id);
+
+                        if(!GOAP_QuestBoard.instance.ChooseQuest(activeQuest))
+                        {
+                            activeQuest = null;
+                            currentActions.Clear();
+                            currentState = FSM_State.IDLE;
+                        }
+                    }
                     //do what the plan says!
                     currentActions = newPlan;
                     currentState = FSM_State.PERFORMACTION;
@@ -87,12 +100,18 @@ public class GOAP_Agent
                 {
                     //try again? or something...
                     Debug.Log("No plan?");
+                    if (activeQuest != null)
+                    {
+                        activeQuest = null;
+                        currentState = FSM_State.IDLE;
+                    }
                 }
                 allowedToPlan = false;
                 timeSincePlanned = 0.0f;
             }
             else
             {
+                View.PrintMessage("Idle", 0f);
                 timeSincePlanned += deltaTime;
                 if (timeSincePlanned > planningWaitTimer)
                     allowedToPlan = true;
@@ -107,16 +126,13 @@ public class GOAP_Agent
                 if (currentActions.Count > 0)
                 {
                     activeAction = currentActions.Dequeue();
+                    actionCompleted = false;
 
                 }
                 else
                 {
                     if (activeQuest != null)
                     {
-                        Debug.Log("<color=#0000cc>" + character.characterName + "</color> completed Quest " + activeQuest.id);
-
-                        activeQuest.Complete();
-                        activeQuest = null;
                     }
                     activeAction = null;
                 }
@@ -128,10 +144,11 @@ public class GOAP_Agent
                 if (!activeAction.IsInRange(this))
                 {
                     currentState = FSM_State.MOVETO;
+                    View.PrintMessage("MoveTo " + activeAction.ActionID, 0);
                 }
                 else
                 {
-                    actionCompleted = activeAction.Run(this);
+                    actionCompleted = activeAction.Perform(this);
                 }
             }
             else
@@ -167,8 +184,7 @@ public class GOAP_Agent
         }
         if (result != null)
         {
-            Debug.Log("<color=#0000cc>" + character.characterName + "</color> chose Quest " + result.id);
-            GOAP_QuestBoard.instance.ChooseQuest(result);
+            Debug.Log("<color=#0000cc>" + character.characterName + "</color> tries to plan for Quest " + result.id);
         }
         return result;
     }
@@ -206,5 +222,38 @@ public class GOAP_Agent
         {
             currentWorldstates.Remove(newState);
         }
+    }
+
+    public bool ConsumeWorldState(WorldStateKey key, float chance = 1f)
+    {
+        chance = Mathf.Clamp(chance, 0f, 1f);
+        if(chance == 1f || Random.value <= chance)
+        {
+            ChangeCurrentWorldState(new GOAP_Worldstate(key, false));
+            return true;
+        }
+        return false;
+    }
+
+    public bool ConsumeWorldState(ItemIds id, float chance = 1f)
+    {
+        chance = Mathf.Clamp(chance, 0f, 1f);
+        if (chance == 1f || Random.value <= chance)
+        {
+            RemoveCurrentWorldState(new GOAP_Worldstate(WorldStateKey.eHasItem, (int)id));
+            return true;
+        }
+        return false;
+    }
+
+    public string PrintGoal()
+    {
+        string msg = "";
+        if (goal.Count < 1) return "None";
+        foreach(GOAP_Worldstate state in goal)
+        {
+            msg += state.ToString() + "\n";
+        }
+        return msg;
     }
 }

@@ -36,4 +36,22 @@ public class GOAP_Character : MonoBehaviour
         if (skills.Contains(skill)) return;
         skills.Add(skill);
     }
+
+    public void UpdateInventory(ItemIds id, bool adding, int count = 1)
+    {
+        if(adding)
+        {   
+            if(inventory.AddItem(new Item(id), count))
+            {
+                agent.ChangeCurrentWorldState(new GOAP_Worldstate(WorldStateKey.eHasItem, (int)id));
+            }
+        }
+        else
+        {
+            if(inventory.RemoveItem(new Item(id), count))
+            {
+                agent.ConsumeWorldState(id);
+            }
+        }
+    }
 }

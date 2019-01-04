@@ -12,10 +12,13 @@ public enum ItemIds
     Flour = 0x04,
     Water = 0x05,
     Stone = 0x06,
-    //Tools are in 0xA..
-    Axe = 0xA1,
-    Hammer = 0xA2,
+
+    //Tools are in 0x10..
+    Axe = 0x101,
+    Hammer = 0x102,
     
+    //Items are in 0x100..
+    Bread = 0x1001,
 }
 
 [System.Serializable]

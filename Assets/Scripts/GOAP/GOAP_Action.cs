@@ -43,14 +43,6 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
             return target;
         }
     }
-    protected bool keepOpen = false;
-    public bool KeepOpen
-    {
-        get
-        {
-            return keepOpen;
-        }
-    }
 
     protected GOAP_Skill requiredSkill = null;
     public GOAP_Skill RequiredSkill
@@ -70,7 +62,17 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
   
 
     //Run this Action
-    public abstract bool Run(GOAP_Agent agent);
+    public abstract bool Perform(GOAP_Agent agent);
+
+    protected void BasePerform(GOAP_Agent agent)
+    {
+        Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is performing: " + actionID);
+        agent.View.PrintMessage(ActionID, workCost);
+        foreach (GOAP_Worldstate state in satisfyWorldstates)
+        {
+            agent.ChangeCurrentWorldState(state);
+        }
+    }
 
     //Check conditions that might change or need additional computation (like reachability)
     public abstract bool CheckProceduralConditions(GOAP_Agent agent);

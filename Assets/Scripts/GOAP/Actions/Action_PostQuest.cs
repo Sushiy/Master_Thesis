@@ -10,7 +10,6 @@ public class Action_PostQuest : GOAP_Action
         Init();
         workCost = 10f;
         actionID = "PostQuest";
-        keepOpen = true;
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
@@ -21,12 +20,18 @@ public class Action_PostQuest : GOAP_Action
 
     public override bool RequiresInRange()
     {
-        return false;
+        target = InfoBlackBoard.instance.questBoardLocation; //TODO: This isnt technically correct
+        if (target != null)
+            return true;
+        else
+            return false;
     }
 
-    public override bool Run(GOAP_Agent agent)
+    public override bool Perform(GOAP_Agent agent)
     {
-        agent.activeQuest = quest;
+        Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is performing: " + actionID);
+        agent.postedQuest = quest;
+        agent.View.PrintMessage(ActionID, workCost);
         GOAP_QuestBoard.instance.AddQuest(quest);
         return true;
     }

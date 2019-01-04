@@ -8,14 +8,19 @@ public class InfoBlackBoard : MonoBehaviour
     {
         CHOPTREE,
         BUYRESOURCE,
-        WOODWORKSHOP
+        WOODWORKSHOP,
+        SMITHWORKSHOP
     }
 
     public static InfoBlackBoard instance;
 
+    [Header("ActionLocations")]
+    public GameObjectActionTarget questBoardLocation;
+    [Space]
     public GameObjectActionTarget[] chopTreeLocations;
     public GameObjectActionTarget[] buyResourceLocations;
     public GameObjectActionTarget[] woodWorkshopLocations;
+    public GameObjectActionTarget[] smithingWorkshopLocations;
 
     // Use this for initialization
     void Awake()
@@ -41,6 +46,10 @@ public class InfoBlackBoard : MonoBehaviour
             case LOCATIONS.WOODWORKSHOP:
             {
                 return FindClosest(woodWorkshopLocations, position);
+            }
+            case LOCATIONS.SMITHWORKSHOP:
+            {
+                return FindClosest(smithingWorkshopLocations, position);
             }
             default:
                 return null;

@@ -21,9 +21,9 @@ public class Action_GetAxe : GOAP_Action
         return false;
     }
 
-    public override bool Run(GOAP_Agent agent)
+    public override bool Perform(GOAP_Agent agent)
     {
-        Debug.Log("performing: " + actionID);
+        BasePerform(agent);
         return true;
     }
 }

@@ -5,25 +5,46 @@ using UnityEngine;
 [System.Serializable]
 public class Inventory
 {
-    HashSet<Item> items;
+    Dictionary<Item, int> items;
 
-    public HashSet<Item> Items
+    public Dictionary<Item, int> Items
     {
         get { return items; }
     }
 
     public Inventory()
     {
-        items = new HashSet<Item>();
+        items = new Dictionary<Item, int>();
     }
 
-    public void AddItem(Item item)
+    //Returns true if the item was new or false if it wasnt
+    public bool AddItem(Item item, int count = 1)
     {
-        items.Add(item);
+        if(items.ContainsKey(item))
+        {
+            items[item] += count;
+            return false;
+        }
+        else
+        {
+            items.Add(item, count);
+            return true;
+        }
     }
 
-    public void RemoveItem(Item item)
+    //Returns true if the item was completely removed or false if it wasnt
+    public bool RemoveItem(Item item, int count = 1)
     {
-        items.Remove(item);
+        if(items.ContainsKey(item))
+        {
+            items[item] -= count;
+            if (items[item] <= 0)
+            {
+                items.Remove(item);
+                return true;
+            }
+            return false;
+        }
+        return true;
     }    
 }

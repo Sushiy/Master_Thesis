@@ -7,4 +7,7 @@ public interface IGOAP_AgentView
     Vector3 GetPosition();
     bool IsInRange(Vector3 position, float range);
     void MoveTo(Vector3 position);
+    void PrintMessage(string message, float time);
+    bool IsReadyToAct();
+    IActionTarget GetActionTargetSelf();
 }

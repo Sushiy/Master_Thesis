@@ -8,24 +8,32 @@ public class Action_MakeAxe : GOAP_Action
     {
         Init();
         actionID = "MakeAxe";
-        AddSatisfyWorldState(WorldStateKey.bHasAxe, true);
-        AddRequiredWorldState(WorldStateKey.bHasIron, true);
+        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemIds.Axe);
+        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemIds.Iron);
+        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemIds.Wood);
         requiredSkill = new GOAP_Skill(Skills.Smithing, 3);
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
     {
-        return true;
+        target = InfoBlackBoard.instance.FindClosest(InfoBlackBoard.LOCATIONS.SMITHWORKSHOP, agent.View.GetPosition()); //TODO: This isnt technically correct
+        if (target != null)
+            return true;
+        else
+            return false;
     }
 
     public override bool RequiresInRange()
     {
-        return false;
+        return true;
     }
 
-    public override bool Run(GOAP_Agent agent)
+    public override bool Perform(GOAP_Agent agent)
     {
-        Debug.Log("performing: " + actionID);
+        BasePerform(agent);
+        agent.Character.UpdateInventory(ItemIds.Wood, false);
+        agent.Character.UpdateInventory(ItemIds.Iron, false);
+        agent.Character.UpdateInventory(ItemIds.Axe, true);
         return true;
     }
 }
