@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Action_MakeAxe : GOAP_Action
+public class Action_MakePickaxe : GOAP_Action
 {
-    public Action_MakeAxe()
+    public Action_MakePickaxe()
     {
         Init();
-        actionID = "MakeAxe";
-        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Axe);
+        actionID = "MakePickaxe";
+        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Pickaxe);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Iron);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Wood);
         requiredSkill = new GOAP_Skill(Skills.Smithing, 3);
@@ -33,11 +33,11 @@ public class Action_MakeAxe : GOAP_Action
         StartPerform(agent);
         UpdateWorkTime(deltaTime);
 
-        if(completed)
+        if (completed)
         {
             agent.Character.UpdateInventory(ItemType.Wood, false);
             agent.Character.UpdateInventory(ItemType.Iron, false);
-            agent.Character.UpdateInventory(ItemType.Axe, true);
+            agent.Character.UpdateInventory(ItemType.Pickaxe, true);
         }
         return completed;
     }

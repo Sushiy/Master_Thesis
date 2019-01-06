@@ -74,24 +74,21 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     }
   
 
-    //Run this Action
+    //Perform this Action
     public abstract bool Perform(GOAP_Agent agent, float deltaTime);
-
 
     protected void StartPerform(GOAP_Agent agent)
     {
         //Only do this, when once at the beginning of the action
-
         if (alphaWorkTime != 0f) return;
 
-        Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is performing: " + actionID);
+        Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is performing: " + actionID + " Cost is: " + ActionCost + ((requiredSkill == null ) ? "" : " reduced by:" + requiredSkill.id.ToString()) );
         agent.View.PrintMessage(ActionID);
         foreach (GOAP_Worldstate state in satisfyWorldstates)
         {
             agent.ChangeCurrentWorldState(state);
         }
     }
-
     protected void UpdateWorkTime(float deltaTime)
     {
         alphaWorkTime += deltaTime;
@@ -104,7 +101,35 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     //Check conditions that might change or need additional computation (like reachability)
     public abstract bool CheckProceduralConditions(GOAP_Agent agent);
 
-    //public abstract void UpdateCosts(GOAP_Agent agent);
+    //Returns true if the requirements are still satisfied, false if they are not
+    public bool CheckRequirements(GOAP_Agent agent)
+    {
+        if(CheckProceduralConditions(agent))
+        {
+            foreach (GOAP_Worldstate state in requiredWorldstates)
+            {
+                if (!agent.currentWorldstates.Contains(state))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+
+    }
+
+    public void ApplySkillModifier(float skillModifier)
+    {
+        this.workCost *= skillModifier;
+    }
+
+    /*
+    public void SetCoinCost(float coinCost)
+    {
+        this.coinCost = coinCost;
+    }
+    */
 
     public abstract bool RequiresInRange();
 
@@ -117,6 +142,8 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         }
         return false;
     }
+
+
 
     protected void AddRequiredWorldState(WorldStateKey key, bool value, IActionTarget target = null)
     {
@@ -134,7 +161,6 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     {
         AddSatisfyWorldState(key, value ? 1 : 0, target);
     }
-
     protected void AddSatisfyWorldState(WorldStateKey key, int value, IActionTarget target = null)
     {
         GOAP_Worldstate state;

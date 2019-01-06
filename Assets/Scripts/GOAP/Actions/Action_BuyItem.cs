@@ -22,7 +22,7 @@ public class Action_BuyItem : GOAP_Action
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
     {
-        target = InfoBlackBoard.instance.FindClosest(InfoBlackBoard.LOCATIONS.BUYRESOURCE, agent.View.GetPosition()); //TODO: This isnt technically correct
+        target = InfoBlackBoard.instance.FindClosest(InfoBlackBoard.instance.buyResourceLocations, agent.View.GetPosition()); //TODO: This isnt technically correct
         if (target != null)
             return true;
         else

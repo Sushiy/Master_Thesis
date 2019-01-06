@@ -17,7 +17,7 @@ public class Action_ChopWood : GOAP_Action
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
     {
-        target = InfoBlackBoard.instance.FindClosest(InfoBlackBoard.LOCATIONS.WOODWORKSHOP, agent.View.GetPosition()); //TODO: This isnt technically correct
+        target = InfoBlackBoard.instance.FindClosest(InfoBlackBoard.instance.woodWorkshopLocations, agent.View.GetPosition()); //TODO: This isnt technically correct
         if (target != null)
             return true;
         else
@@ -39,7 +39,7 @@ public class Action_ChopWood : GOAP_Action
             agent.Character.UpdateInventory(ItemType.Log, false);
             agent.Character.UpdateInventory(ItemType.Wood, true, 4);
 
-            if (agent.ConsumeWorldState(ItemType.Axe, 0.1f))
+            if (Random.value < 0.1f)
             {
                 Debug.Log("<color=#cc0000>" + agent.Character.characterName + "s Axe broke.</color>");
                 agent.Character.UpdateInventory(ItemType.Axe, false);

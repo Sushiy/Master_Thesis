@@ -11,7 +11,6 @@ public class Action_BakeBread : GOAP_Action
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Flour);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Water);
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Bread);
-        AddSatisfyWorldState(WorldStateKey.bHasWood, true);
         requiredSkill = new GOAP_Skill(Skills.Baking, 3);
     }
 

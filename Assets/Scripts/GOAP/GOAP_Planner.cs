@@ -13,6 +13,7 @@ public enum PlannableActions
     MakeBread = 1 << 5,
     BuyItem = 1 << 6,
     MineIron = 1 << 7,
+    MakePickaxe = 1 << 8,
 }
 
 public class GOAP_Planner : MonoBehaviour
@@ -71,6 +72,10 @@ public class GOAP_Planner : MonoBehaviour
         {
             set.Add(new Action_MineIron());
         }
+        if (IsActionAvailable(plannableActions, PlannableActions.MakePickaxe))
+        {
+            set.Add(new Action_MakePickaxe());
+        }
         string msg = "<b>Initializing ActionSet \nAvailable Actions:</b>\n";
         foreach(GOAP_Action action in set)
         {
@@ -96,6 +101,11 @@ public class GOAP_Planner : MonoBehaviour
         if (startingNode == null)
         {
             Debug.Log("<color=#ff0000>Couldn't find actions fulfilling " + agent.Character.characterName + "s goal.</color>");
+            return null;
+        }
+        //Also return null, if the startnode is the goalNode
+        if (startingNode.action == null)
+        {
             return null;
         }
         Debug.Log(plannerLog);
@@ -185,7 +195,7 @@ public class GOAP_Planner : MonoBehaviour
                         msg = "";
                         foreach (GOAP_Worldstate state in neighbor.required)
                         {
-                            msg += state.key.ToString() + ",";
+                            msg += state.key.ToString() + "|" + state.value.ToString() + ",";
                         }
                         if (neighbor.isSkilled)
                             plannerLog += makeIndent(graphDepth) + "-><color=#CCCC00>OpenSet Updated</color> (" + neighbor.estimatedPathCost + "); ";
@@ -198,9 +208,8 @@ public class GOAP_Planner : MonoBehaviour
                     }
                 }
             }
-            if(!foundValidNeighbor && agent.activeQuest == null)
+            if(!foundValidNeighbor  && agent.activeQuest == null)
             {
-                plannerLog += makeIndent(graphDepth) + "-><color=#CC0000>Posting Quest.</color>\n";
                 Node questNode = GenerateQuestNode(current, currentWorldState, agent);
                 openSet.Add(questNode);
                 //Debug Log to visualize the process
@@ -209,7 +218,7 @@ public class GOAP_Planner : MonoBehaviour
                     msg = "Quest:";
                     foreach (GOAP_Worldstate state in questNode.required)
                     {
-                        msg += state.key.ToString() + ",";
+                        msg += state.key.ToString() + "|" + state.value.ToString() + ",";
                     }
                     plannerLog += makeIndent(graphDepth) + "-><color=#660000>OpenSet Updated</color> (" + questNode.estimatedPathCost + "); ";
                     if (msg.Equals("")) msg = "empty";
@@ -244,7 +253,7 @@ public class GOAP_Planner : MonoBehaviour
     }
 
     //Try to apply the action onto the activeNode to see if it results in a valid neighbor
-    private Node GetValidNeighborNode(Node activeNode, GOAP_Action action, HashSet<GOAP_Worldstate> currentWorldState, GOAP_Agent agent)
+    private Node GetValidNeighborNode(Node activeNode, GOAP_Action action, HashSet<GOAP_Worldstate> planningWorldState, GOAP_Agent agent)
     {
         bool isValidAction = false;
 
@@ -265,7 +274,7 @@ public class GOAP_Planner : MonoBehaviour
         //add the actions own required worldstates to the Node
         foreach (GOAP_Worldstate state in action.RequiredWorldstates)
         {
-            if (!currentWorldState.Contains(state))
+            if (!planningWorldState.Contains(state))
             {
                 newRequired.Add(state);
             }
@@ -281,21 +290,26 @@ public class GOAP_Planner : MonoBehaviour
             int index = agent.Character.skills.IndexOf(action.RequiredSkill);
             if (index != -1)
             {
+                //If the character is actually skilled in this action, adjust the skillmodifier
                 int difference = action.RequiredSkill.level - agent.Character.skills[index].level;
                 if (difference > 0) skillModifier *= difference + 1;
                 else skillModifier /= (-difference) + 1;
             }
             else
             {
+                //If the character is not skilled in this action, the skillmodifier is set to 5. This only comes into play, when global knowledge planning is used.
                 isSkilled = false;
                 skillModifier = 5f;
             }
         }
 
-        return new Node(activeNode, newRequired, action, newRequired.Count + action.ActionCost * skillModifier + activeNode.estimatedPathCost, isSkilled);
+        //Change the skillmodifier on the action 
+        action.ApplySkillModifier(skillModifier);
+
+        return new Node(activeNode, newRequired, action, newRequired.Count + action.ActionCost + activeNode.estimatedPathCost, isSkilled);
     }
 
-    private Node GenerateBuyNode(Node activeNode, HashSet<GOAP_Worldstate> currentWorldState, GOAP_Agent agent)
+    private Node GenerateBuyNode(Node activeNode, HashSet<GOAP_Worldstate> planningWorldState, GOAP_Agent agent)
     {
         HashSet<GOAP_Worldstate> newRequired = new HashSet<GOAP_Worldstate>(activeNode.required);
         Action_BuyItem action = new Action_BuyItem();
@@ -322,13 +336,14 @@ public class GOAP_Planner : MonoBehaviour
     }
 
     //Generate a quest for the current Node, because it is somehow unsolvable
-    private Node GenerateQuestNode(Node activeNode, HashSet<GOAP_Worldstate> currentWorldState, GOAP_Agent agent)
+    private Node GenerateQuestNode(Node activeNode, HashSet<GOAP_Worldstate> planningWorldState, GOAP_Agent agent)
     {
         HashSet<GOAP_Worldstate> newRequired = new HashSet<GOAP_Worldstate>();
         Action_PostQuest action = new Action_PostQuest();
         action.CheckProceduralConditions(agent);
         foreach(GOAP_Worldstate state in activeNode.required)
         {
+            Debug.Log("Adding state " + state.key + "|" + state.value + " to quest");
             action.AddQuestWorldstate(state);
         }
         float estimatedQuestCost = action.ActionCost * activeNode.required.Count;
@@ -356,6 +371,7 @@ public class GOAP_Planner : MonoBehaviour
                     queue.Enqueue(waitForQuest);
                     message += " -> " + waitForQuest.ActionID;
                 }
+
                 if (!needsQuest)
                 {
                     quest.ClearProvided();
@@ -411,7 +427,7 @@ public class GOAP_Planner : MonoBehaviour
         return s;
     }
     
-    private class Node : System.IComparable<Node>, System.IEquatable<GOAP_Worldstate>
+    private class Node : System.IComparable<Node>, System.IEquatable<Node>
     {
         public Node parent;
         public float estimatedPathCost;
@@ -443,9 +459,9 @@ public class GOAP_Planner : MonoBehaviour
             return this.estimatedPathCost.CompareTo(other.estimatedPathCost);
         }
 
-        public bool Equals(GOAP_Worldstate other)
+        public bool Equals(Node other)
         {
-            return Equals(other, this);
+            return other.GetHashCode().Equals(GetHashCode());
         }
 
         public override bool Equals(object obj)
@@ -456,11 +472,7 @@ public class GOAP_Planner : MonoBehaviour
             }
 
             Node objectToCompareWith = (Node)obj;
-            if (objectToCompareWith.action == null)
-            {
-                return (action == null);
-            }
-            return objectToCompareWith.GetHashCode().Equals(GetHashCode()) && objectToCompareWith.action.Equals(action);
+            return Equals(objectToCompareWith);
         }
 
         public override int GetHashCode()

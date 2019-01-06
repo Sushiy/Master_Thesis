@@ -25,6 +25,15 @@ public class GOAP_Character : MonoBehaviour
     {
         agent = new GOAP_Agent(this, GetComponent<IGOAP_AgentView>());
         inventory = new Inventory();
+        AddStartingInventory();
+    }
+
+    private void AddStartingInventory()
+    {
+        for(int i = 0; i < startingInventory.Count; i++)
+        {
+            UpdateInventory(startingInventory[i], true);
+        }
     }
 
     private void Update()
@@ -46,13 +55,14 @@ public class GOAP_Character : MonoBehaviour
             if(inventory.AddItem(id, count))
             {
                 agent.ChangeCurrentWorldState(new GOAP_Worldstate(WorldStateKey.eHasItem, (int)id));
+                Debug.Log("Added " + id.ToString() + "(" + (int)id + ")" + " to " + characterName);
             }
         }
         else
         {
             if(inventory.RemoveItem(id, count))
             {
-                agent.ConsumeWorldState(id);
+                agent.RemoveCurrentWorldState(id);
             }
         }
     }

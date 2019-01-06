@@ -4,14 +4,8 @@ using UnityEngine;
 
 public enum WorldStateKey
 {
-    bHasAxe = 0,
-    bHasLog = 1,
-    bHasWood = 2,
-    bAttackingTarget = 3,
-    bHasIron = 4,
-    bHasFlour = 5,
-    bHasWater = 6,
-    eHasItem = 16,
+    eHasItem = 0,
+    bAttackingTarget = 1
 }
 
 [System.Serializable]
@@ -38,7 +32,7 @@ public struct GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
 
     public bool Equals(GOAP_Worldstate other)
     {
-        return Equals(other, this);
+        return other.key == key && other.value == value;
     }
 
     public override bool Equals(object obj)

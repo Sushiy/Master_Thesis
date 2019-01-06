@@ -8,7 +8,7 @@ public class Action_GetAxe : GOAP_Action
     {
         Init();
         actionID = "GetAxe";
-        AddSatisfyWorldState(WorldStateKey.bHasAxe, true);
+        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Axe);
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)

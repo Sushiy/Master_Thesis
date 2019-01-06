@@ -2,24 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ItemType
-{
-    //Resources are in 0x0..
-    Wood = 0x00,
-    Log = 0x01,
-    Iron = 0x02,
-    Wheat = 0x03,
-    Flour = 0x04,
-    Water = 0x05,
-    Stone = 0x06,
-
-    //Tools are in 0x10..
-    Axe = 0x101,
-    Hammer = 0x102,
-
-    //Items are in 0x100..
-    Bread = 0x1001,
-}
 
 [System.Serializable]
 public class Inventory
@@ -39,7 +21,7 @@ public class Inventory
     //Returns true if the item was new or false if it wasnt
     public bool AddItem(ItemType item, int count = 1)
     {
-        if(items.ContainsKey(item))
+        if (items.ContainsKey(item))
         {
             items[item] += count;
             return false;
@@ -51,10 +33,9 @@ public class Inventory
         }
     }
 
-    //Returns true if the item was completely removed or false if it wasnt
     public bool RemoveItem(ItemType item, int count = 1)
     {
-        if(items.ContainsKey(item))
+        if (items.ContainsKey(item))
         {
             items[item] -= count;
             if (items[item] <= 0)
@@ -65,5 +46,5 @@ public class Inventory
             return false;
         }
         return true;
-    }    
+    }
 }

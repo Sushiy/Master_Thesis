@@ -119,20 +119,16 @@ public class GOAP_Agent
 
         else if (currentState == FSM_State.PERFORMACTION)
         {
-            //Use one of the currentActions
+            //Get the next currentAction
             if (actionCompleted)
             {
                 if (currentActions.Count > 0)
                 {
                     activeAction = currentActions.Dequeue();
                     actionCompleted = false;
-
                 }
                 else
                 {
-                    if (activeQuest != null)
-                    {
-                    }
                     activeAction = null;
                 }
 
@@ -140,15 +136,26 @@ public class GOAP_Agent
 
             if (activeAction != null)
             {
-                if (!activeAction.IsInRange(this))
+                if (activeAction.CheckRequirements(this))
                 {
-                    currentState = FSM_State.MOVETO;
-                    View.PrintMessage("MoveTo " + activeAction.ActionID);
+                    if (!activeAction.IsInRange(this))
+                    {
+                        currentState = FSM_State.MOVETO;
+                        View.PrintMessage("MoveTo " + activeAction.ActionID);
+                    }
+                    else
+                    {
+                        actionCompleted = activeAction.Perform(this, deltaTime);
+                    }
                 }
                 else
                 {
-                    actionCompleted = activeAction.Perform(this, deltaTime);
+                    Debug.Log("<color=#0000cc>" + character.characterName + "</color> cannot perform + <color=#cc0000>" + activeAction.ActionID + "</color> anymore.");
+                    activeAction = null;
+                    currentActions.Clear();
+                    currentState = FSM_State.IDLE;
                 }
+
             }
             else
             {
@@ -168,6 +175,11 @@ public class GOAP_Agent
                 currentState = FSM_State.PERFORMACTION;
             }
         }
+    }
+
+    private void CancelPlan()
+    {
+
     }
 
     public GOAP_Quest CheckForQuests()
@@ -214,35 +226,18 @@ public class GOAP_Agent
             currentWorldstates.Add(newState);
         }
     }
-
-    public void RemoveCurrentWorldState(GOAP_Worldstate newState)
+    public void RemoveCurrentWorldState(ItemType type)
     {
-        if (currentWorldstates.Contains(newState))
-        {
-            currentWorldstates.Remove(newState);
-        }
+        GOAP_Worldstate state = new GOAP_Worldstate(WorldStateKey.eHasItem, (int)type);
+        RemoveCurrentWorldState(state);
     }
 
-    public bool ConsumeWorldState(WorldStateKey key, float chance = 1f)
+    public void RemoveCurrentWorldState(GOAP_Worldstate state)
     {
-        chance = Mathf.Clamp(chance, 0f, 1f);
-        if(chance == 1f || Random.value <= chance)
+        if (currentWorldstates.Contains(state))
         {
-            ChangeCurrentWorldState(new GOAP_Worldstate(key, false));
-            return true;
+            currentWorldstates.Remove(state);
         }
-        return false;
-    }
-
-    public bool ConsumeWorldState(ItemType id, float chance = 1f)
-    {
-        chance = Mathf.Clamp(chance, 0f, 1f);
-        if (chance == 1f || Random.value <= chance)
-        {
-            RemoveCurrentWorldState(new GOAP_Worldstate(WorldStateKey.eHasItem, (int)id));
-            return true;
-        }
-        return false;
     }
 
     public string PrintGoal()

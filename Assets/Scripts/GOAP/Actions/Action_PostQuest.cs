@@ -14,7 +14,7 @@ public class Action_PostQuest : GOAP_Action
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
     {
-        quest = new GOAP_Quest(agent);
+        if (quest == null) quest = new GOAP_Quest(agent);
         return true;
     }
 
@@ -29,7 +29,7 @@ public class Action_PostQuest : GOAP_Action
 
     public override bool Perform(GOAP_Agent agent, float deltaTime)
     {
-        if(isStartingWork)
+        if (isStartingWork)
         {
             Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is performing: " + actionID);
             agent.View.PrintMessage(ActionID);

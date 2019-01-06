@@ -4,13 +4,6 @@ using UnityEngine;
 
 public class InfoBlackBoard : MonoBehaviour
 {
-    public enum LOCATIONS
-    {
-        CHOPTREE,
-        BUYRESOURCE,
-        WOODWORKSHOP,
-        SMITHWORKSHOP
-    }
 
     public static InfoBlackBoard instance;
 
@@ -21,6 +14,7 @@ public class InfoBlackBoard : MonoBehaviour
     public GameObjectActionTarget[] buyResourceLocations;
     public GameObjectActionTarget[] woodWorkshopLocations;
     public GameObjectActionTarget[] smithingWorkshopLocations;
+    public GameObjectActionTarget[] mineIronLocations;
 
     // Use this for initialization
     void Awake()
@@ -31,32 +25,7 @@ public class InfoBlackBoard : MonoBehaviour
             Destroy(this);
     }
 
-    public IActionTarget FindClosest(LOCATIONS location, Vector3 position)
-    {
-        switch(location)
-        {
-            case LOCATIONS.CHOPTREE:
-            {
-                return FindClosest(chopTreeLocations, position);
-            }
-            case LOCATIONS.BUYRESOURCE:
-            {
-                return FindClosest(buyResourceLocations, position);
-            }
-            case LOCATIONS.WOODWORKSHOP:
-            {
-                return FindClosest(woodWorkshopLocations, position);
-            }
-            case LOCATIONS.SMITHWORKSHOP:
-            {
-                return FindClosest(smithingWorkshopLocations, position);
-            }
-            default:
-                return null;
-        }
-    }
-
-    private IActionTarget FindClosest(IActionTarget[] transforms, Vector3 position)
+    public IActionTarget FindClosest(IActionTarget[] transforms, Vector3 position)
     {
         IActionTarget closest = null;
         float minDistance = Mathf.Infinity;
