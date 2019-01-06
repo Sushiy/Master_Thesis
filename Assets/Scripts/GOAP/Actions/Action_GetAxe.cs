@@ -21,9 +21,9 @@ public class Action_GetAxe : GOAP_Action
         return false;
     }
 
-    public override bool Perform(GOAP_Agent agent)
+    public override bool Perform(GOAP_Agent agent, float deltaTime)
     {
-        BasePerform(agent);
+        StartPerform(agent);
         return true;
     }
 }

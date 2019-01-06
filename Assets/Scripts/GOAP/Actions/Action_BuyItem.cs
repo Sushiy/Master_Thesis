@@ -5,7 +5,7 @@ using UnityEngine;
 public class Action_BuyItem : GOAP_Action
 {
     //this can only buy resources no crafted items or such!
-    ItemIds wantedItem;
+    ItemType wantedItem;
 
     public Action_BuyItem()
     {
@@ -15,7 +15,7 @@ public class Action_BuyItem : GOAP_Action
         actionID = "BuyItem";
     }
 
-    public Action_BuyItem(ItemIds wantedItem) : this()
+    public Action_BuyItem(ItemType wantedItem) : this()
     {
         SetWantedItem(wantedItem);
     }
@@ -34,14 +34,19 @@ public class Action_BuyItem : GOAP_Action
         return true;
     }
 
-    public override bool Perform(GOAP_Agent agent)
+    public override bool Perform(GOAP_Agent agent, float deltaTime)
     {
-        BasePerform(agent);
-        agent.Character.UpdateInventory(wantedItem, true);
-        return true;
+        StartPerform(agent);
+        UpdateWorkTime(deltaTime);
+
+        if(completed)
+        {
+            agent.Character.UpdateInventory(wantedItem, true);
+        }
+        return completed;
     }
 
-    public void SetWantedItem(ItemIds item)
+    public void SetWantedItem(ItemType item)
     {
         wantedItem = item;
         actionID = "BuyItem: " + wantedItem.ToString();

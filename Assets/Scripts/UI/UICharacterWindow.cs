@@ -76,10 +76,10 @@ public class UICharacterWindow : BasicWindow
         }
 
         int index = 0;
-        foreach (KeyValuePair<Item, int> item in character.Inventory.Items)
+        foreach (KeyValuePair<ItemType, int> item in character.Inventory.Items)
         {
             inventoryItems[index].SetActive(true);
-            inventoryItems[index].GetComponent<TextMeshProUGUI>().text = item.Key.Name + ":" + item.Value;
+            inventoryItems[index].GetComponent<TextMeshProUGUI>().text = item.Key.ToString() + ":" + item.Value;
             index++;
         }
 

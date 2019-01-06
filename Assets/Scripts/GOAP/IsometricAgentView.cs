@@ -5,8 +5,7 @@ using UnityEngine;
 public class IsometricAgentView : MonoBehaviour, IGOAP_AgentView
 {
     public TMPro.TextMeshProUGUI actionText;
-    private bool readyToAct = true;
-    public float timeWarpFactor = 0.1f;
+    public float speed = 3.0f;
     private GameObjectActionTarget selfActionTarget;
 
     private void Awake()
@@ -26,26 +25,12 @@ public class IsometricAgentView : MonoBehaviour, IGOAP_AgentView
 
     public void MoveTo(Vector3 position)
     {
-        transform.position += (position - transform.position).normalized * 3.0f * Time.deltaTime;
+        transform.position += (position - transform.position).normalized * speed * Time.deltaTime;
     }
 
-    public void PrintMessage(string message, float time)
+    public void PrintMessage(string message)
     {
         actionText.text = message;
-        if (time > 0)
-            StartCoroutine(DelayAct(time));
-    }
-
-    IEnumerator DelayAct(float time)
-    {
-        readyToAct = false;
-        yield return new WaitForSeconds(time * timeWarpFactor);
-        readyToAct = true;
-    }
-
-    public bool IsReadyToAct()
-    {
-        return readyToAct;
     }
 
     public IActionTarget GetActionTargetSelf()

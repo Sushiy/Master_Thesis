@@ -8,9 +8,9 @@ public class Action_MakeAxe : GOAP_Action
     {
         Init();
         actionID = "MakeAxe";
-        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemIds.Axe);
-        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemIds.Iron);
-        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemIds.Wood);
+        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Axe);
+        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Iron);
+        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Wood);
         requiredSkill = new GOAP_Skill(Skills.Smithing, 3);
     }
 
@@ -28,12 +28,17 @@ public class Action_MakeAxe : GOAP_Action
         return true;
     }
 
-    public override bool Perform(GOAP_Agent agent)
+    public override bool Perform(GOAP_Agent agent, float deltaTime)
     {
-        BasePerform(agent);
-        agent.Character.UpdateInventory(ItemIds.Wood, false);
-        agent.Character.UpdateInventory(ItemIds.Iron, false);
-        agent.Character.UpdateInventory(ItemIds.Axe, true);
-        return true;
+        StartPerform(agent);
+        UpdateWorkTime(deltaTime);
+
+        if(completed)
+        {
+            agent.Character.UpdateInventory(ItemType.Wood, false);
+            agent.Character.UpdateInventory(ItemType.Iron, false);
+            agent.Character.UpdateInventory(ItemType.Axe, true);
+        }
+        return completed;
     }
 }

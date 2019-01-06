@@ -12,6 +12,19 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     protected float workCost = 1f;
     protected float coinCost = 0f;
     protected float range = 1.0f;
+
+    private float secondsToWorkCostRation = 0.1f; // How much Time should pass for 1 workCost: 0.1f/1f
+    private float workTime
+    {
+        get { return secondsToWorkCostRation * workCost; }
+    }
+    private float alphaWorkTime = 0.0f;
+    protected bool isStartingWork
+    {
+        get { return alphaWorkTime == 0f; }
+    }
+    protected bool completed = false;
+
     public float ActionCost
     {
         get
@@ -62,15 +75,29 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
   
 
     //Run this Action
-    public abstract bool Perform(GOAP_Agent agent);
+    public abstract bool Perform(GOAP_Agent agent, float deltaTime);
 
-    protected void BasePerform(GOAP_Agent agent)
+
+    protected void StartPerform(GOAP_Agent agent)
     {
+        //Only do this, when once at the beginning of the action
+
+        if (alphaWorkTime != 0f) return;
+
         Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is performing: " + actionID);
-        agent.View.PrintMessage(ActionID, workCost);
+        agent.View.PrintMessage(ActionID);
         foreach (GOAP_Worldstate state in satisfyWorldstates)
         {
             agent.ChangeCurrentWorldState(state);
+        }
+    }
+
+    protected void UpdateWorkTime(float deltaTime)
+    {
+        alphaWorkTime += deltaTime;
+        if (alphaWorkTime >= workTime)
+        {
+            completed = true;
         }
     }
 

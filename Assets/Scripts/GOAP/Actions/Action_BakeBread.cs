@@ -8,9 +8,9 @@ public class Action_BakeBread : GOAP_Action
     {
         Init();
         actionID = "BakeBread";
-        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemIds.Flour);
-        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemIds.Water);
-        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemIds.Bread);
+        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Flour);
+        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Water);
+        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Bread);
         AddSatisfyWorldState(WorldStateKey.bHasWood, true);
         requiredSkill = new GOAP_Skill(Skills.Baking, 3);
     }
@@ -25,13 +25,17 @@ public class Action_BakeBread : GOAP_Action
         return false;
     }
 
-    public override bool Perform(GOAP_Agent agent)
+    public override bool Perform(GOAP_Agent agent, float deltaTime)
     {
-        BasePerform(agent);
+        StartPerform(agent);
+        UpdateWorkTime(deltaTime);
 
-        agent.Character.UpdateInventory(ItemIds.Flour, false);
-        agent.Character.UpdateInventory(ItemIds.Water, false);
-        agent.Character.UpdateInventory(ItemIds.Bread, true);
-        return true;
+        if(completed)
+        {
+            agent.Character.UpdateInventory(ItemType.Flour, false);
+            agent.Character.UpdateInventory(ItemType.Water, false);
+            agent.Character.UpdateInventory(ItemType.Bread, true);
+        }
+        return completed;
     }
 }

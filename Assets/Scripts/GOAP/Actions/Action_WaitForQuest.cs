@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Action_WaitForQuest : GOAP_Action
 {
-    bool hasLogged = false;
     public Action_WaitForQuest()
     {
         Init();
@@ -22,16 +21,15 @@ public class Action_WaitForQuest : GOAP_Action
         return false;
     }
 
-    public override bool Perform(GOAP_Agent agent)
+    public override bool Perform(GOAP_Agent agent, float deltaTime)
     {
         if (agent.postedQuest != null)
         {
-            if(!hasLogged)
+            if(isStartingWork)
             {
                 Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is performing: " + actionID);
-                hasLogged = true;
+                agent.View.PrintMessage(ActionID);
             }
-            agent.View.PrintMessage(ActionID, workCost);
             return false;
         }
         Debug.Log("<color=#0000cc>" + agent.Character.characterName + "s</color> Quest was completed!");

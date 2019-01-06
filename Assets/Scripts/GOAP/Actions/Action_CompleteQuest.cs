@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Action_CompleteQuest : GOAP_Action
 {
-    bool hasLogged = false;
     GOAP_Agent otherAgent;
     public Action_CompleteQuest()
     {
@@ -23,15 +22,23 @@ public class Action_CompleteQuest : GOAP_Action
         return true;
     }
 
-    public override bool Perform(GOAP_Agent agent)
+    public override bool Perform(GOAP_Agent agent, float deltaTime)
     {
-        Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> completed Quest " + agent.activeQuest.id);
-        
-        TradeQuestItems(agent);
+        if(isStartingWork)
+        {
+            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is completing Quest " + agent.activeQuest.id);
+        }
 
-        agent.activeQuest.Complete();
-        agent.activeQuest = null;
-        return true;
+        UpdateWorkTime(deltaTime);
+        if(completed)
+        {
+            TradeQuestItems(agent);
+
+            agent.activeQuest.Complete();
+            agent.activeQuest = null;
+        }
+
+        return completed;
     }
 
     public void TradeQuestItems(GOAP_Agent agent)
@@ -40,8 +47,8 @@ public class Action_CompleteQuest : GOAP_Action
         {
             if(questState.key == WorldStateKey.eHasItem)
             {
-                otherAgent.Character.UpdateInventory((ItemIds)questState.value, true);
-                agent.Character.UpdateInventory((ItemIds)questState.value, false);
+                otherAgent.Character.UpdateInventory((ItemType)questState.value, true);
+                agent.Character.UpdateInventory((ItemType)questState.value, false);
             }
         }
     }

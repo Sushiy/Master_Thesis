@@ -17,6 +17,8 @@ public class GOAP_Character : MonoBehaviour
     [HideInInspector]
     public PlannableActions availableActions;
 
+    public List<ItemType> startingInventory;
+
     public GOAP_Agent agent;
 
     private void Awake()
@@ -37,18 +39,18 @@ public class GOAP_Character : MonoBehaviour
         skills.Add(skill);
     }
 
-    public void UpdateInventory(ItemIds id, bool adding, int count = 1)
+    public void UpdateInventory(ItemType id, bool adding, int count = 1)
     {
         if(adding)
         {   
-            if(inventory.AddItem(new Item(id), count))
+            if(inventory.AddItem(id, count))
             {
                 agent.ChangeCurrentWorldState(new GOAP_Worldstate(WorldStateKey.eHasItem, (int)id));
             }
         }
         else
         {
-            if(inventory.RemoveItem(new Item(id), count))
+            if(inventory.RemoveItem(id, count))
             {
                 agent.ConsumeWorldState(id);
             }

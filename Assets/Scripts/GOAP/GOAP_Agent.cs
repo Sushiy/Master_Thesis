@@ -52,19 +52,18 @@ public class GOAP_Agent
         currentWorldstates = new HashSet<GOAP_Worldstate>();
 
         standardGoal = new HashSet<GOAP_Worldstate>(); // TODO: implement proper goals for agents; => agent.getCurrentGoal();
-        standardGoal.Add(new GOAP_Worldstate(WorldStateKey.eHasItem, (int)ItemIds.Wood)); //TODO: remove this when I have proper goals
+        standardGoal.Add(new GOAP_Worldstate(WorldStateKey.eHasItem, (int)ItemType.Wood)); //TODO: remove this when I have proper goals
         goal = standardGoal;
     }
 
     // Update is called once per frame
     public void Update(float deltaTime)
     {
-        if (!View.IsReadyToAct()) return;
         if (currentState == FSM_State.IDLE && postedQuest == null)
         {
             if (allowedToPlan)
             {
-                View.PrintMessage("Planning", 0f);
+                View.PrintMessage("Planning");
 
                 activeQuest = CheckForQuests();
                 if (activeQuest == null) goal = standardGoal;
@@ -111,7 +110,7 @@ public class GOAP_Agent
             }
             else
             {
-                View.PrintMessage("Idle", 0f);
+                View.PrintMessage("Idle");
                 timeSincePlanned += deltaTime;
                 if (timeSincePlanned > planningWaitTimer)
                     allowedToPlan = true;
@@ -144,11 +143,11 @@ public class GOAP_Agent
                 if (!activeAction.IsInRange(this))
                 {
                     currentState = FSM_State.MOVETO;
-                    View.PrintMessage("MoveTo " + activeAction.ActionID, 0);
+                    View.PrintMessage("MoveTo " + activeAction.ActionID);
                 }
                 else
                 {
-                    actionCompleted = activeAction.Perform(this);
+                    actionCompleted = activeAction.Perform(this, deltaTime);
                 }
             }
             else
@@ -235,7 +234,7 @@ public class GOAP_Agent
         return false;
     }
 
-    public bool ConsumeWorldState(ItemIds id, float chance = 1f)
+    public bool ConsumeWorldState(ItemType id, float chance = 1f)
     {
         chance = Mathf.Clamp(chance, 0f, 1f);
         if (chance == 1f || Random.value <= chance)

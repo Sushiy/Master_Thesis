@@ -27,13 +27,22 @@ public class Action_PostQuest : GOAP_Action
             return false;
     }
 
-    public override bool Perform(GOAP_Agent agent)
+    public override bool Perform(GOAP_Agent agent, float deltaTime)
     {
-        Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is performing: " + actionID);
-        agent.postedQuest = quest;
-        agent.View.PrintMessage(ActionID, workCost);
-        GOAP_QuestBoard.instance.AddQuest(quest);
-        return true;
+        if(isStartingWork)
+        {
+            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is performing: " + actionID);
+            agent.View.PrintMessage(ActionID);
+        }
+
+        UpdateWorkTime(deltaTime);
+        
+        if(completed)
+        {
+            agent.postedQuest = quest;
+            GOAP_QuestBoard.instance.AddQuest(quest);
+        }
+        return completed;
     }
 
     public void AddQuestWorldstate(GOAP_Worldstate state)

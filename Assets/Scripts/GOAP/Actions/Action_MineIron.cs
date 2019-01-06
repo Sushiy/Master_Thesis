@@ -9,7 +9,7 @@ public class Action_MineIron : GOAP_Action
         Init();
         actionID = "MineIron";
         workCost = 10f;
-        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemIds.Iron);
+        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Iron);
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
@@ -22,10 +22,15 @@ public class Action_MineIron : GOAP_Action
         return false;
     }
 
-    public override bool Perform(GOAP_Agent agent)
+    public override bool Perform(GOAP_Agent agent, float deltaTime)
     {
-        BasePerform(agent);
-        agent.Character.UpdateInventory(ItemIds.Iron, true, 2);
-        return true;
+        StartPerform(agent);
+        UpdateWorkTime(deltaTime);
+
+        if(completed)
+        {
+            agent.Character.UpdateInventory(ItemType.Iron, true, 2);
+        }
+        return completed;
     }
 }

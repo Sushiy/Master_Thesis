@@ -308,7 +308,7 @@ public class GOAP_Planner : MonoBehaviour
         {
             if (state.key == WorldStateKey.eHasItem)
             {
-                action.SetWantedItem((ItemIds)state.value);
+                action.SetWantedItem((ItemType)state.value);
                 newRequired.Remove(state);
                 isValidAction = true;
                 break;
