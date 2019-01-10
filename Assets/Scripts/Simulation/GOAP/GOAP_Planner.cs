@@ -73,13 +73,13 @@ public class GOAP_Planner : MonoBehaviour
         return (plannableActions & action) != PlannableActions.None;
     }
 
-    public Queue<GOAP_Action> Plan(GOAP_Agent agent, Node goalNode, HashSet<GOAP_Worldstate> currentWorldState, HashSet<GOAP_Action> availableActions)
+    public Queue<GOAP_Action> Plan(GOAP_Agent agent, List<GOAP_Worldstate> goal, HashSet<GOAP_Worldstate> currentWorldState, HashSet<GOAP_Action> availableActions)
     {
         Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> started planning.");
         plannerLog = "";
 
         //Search for a valid plan
-        Node startNode = WhileBuild(goalNode, new List<GOAP_Action>(availableActions), currentWorldState, agent);
+        Node startNode = WhileBuild(goal, new List<GOAP_Action>(availableActions), currentWorldState, agent);
 
         //Return null if you couldn't find a plan!
         if (startNode == null)
@@ -99,20 +99,20 @@ public class GOAP_Planner : MonoBehaviour
     }
 
     //Get the agents goal and try to find a plan for it
-    public Queue<GOAP_Action> Plan(GOAP_Agent agent, Node goalNode, HashSet<GOAP_Worldstate> currentWorldState)
+    public Queue<GOAP_Action> Plan(GOAP_Agent agent, List<GOAP_Worldstate> goal, HashSet<GOAP_Worldstate> currentWorldState)
     {
-        return Plan(agent, goalNode, currentWorldState, globalKnowledgeAvailableActions);
+        return Plan(agent, goal, currentWorldState, globalKnowledgeAvailableActions);
     }
 
-    public Queue<GOAP_Action> Plan(GOAP_Agent agent, Node goalNode, HashSet<GOAP_Worldstate> currentWorldState, PlannableActions plannableActions)
+    public Queue<GOAP_Action> Plan(GOAP_Agent agent, List<GOAP_Worldstate> goal, HashSet<GOAP_Worldstate> currentWorldState, PlannableActions plannableActions)
     {
         HashSet<GOAP_Action> availableActions = new HashSet<GOAP_Action>();
         GetActionSet(plannableActions, ref availableActions);
-        return Plan(agent, goalNode, currentWorldState, availableActions);
+        return Plan(agent, goal, currentWorldState, availableActions);
     }
 
     //Perform A* reverse pathfinding search to get a plan
-    private Node WhileBuild(Goal goal, List<GOAP_Action> availableActions, HashSet<GOAP_Worldstate> currentWorldState, GOAP_Agent agent)
+    private Node WhileBuild(List<GOAP_Worldstate> goal, List<GOAP_Action> availableActions, HashSet<GOAP_Worldstate> currentWorldState, GOAP_Agent agent)
     {
         Node current = null;
 
@@ -121,7 +121,7 @@ public class GOAP_Planner : MonoBehaviour
         List<Node> openSet = new List<Node>(); //This is a List so it can be sorted
 
         //Add the goal as first node
-        openSet.Add(GetStartNode(goal));
+        openSet.Add(GetStartNode(currentWorldState, goal));
 
         int graphDepth = 0;
         //Reverse A*
@@ -209,7 +209,7 @@ public class GOAP_Planner : MonoBehaviour
         return null;
     }
 
-    public bool IsGoalSatisfied(HashSet<GOAP_Worldstate> currentWorldState, HashSet<GOAP_Worldstate> goalWorldState)
+    public bool IsGoalSatisfied(HashSet<GOAP_Worldstate> currentWorldState, List<GOAP_Worldstate> goalWorldState)
     {
         //First, check if we have not already reached the goal, by checking it against our currentWorldstate
 
@@ -224,7 +224,7 @@ public class GOAP_Planner : MonoBehaviour
     }
 
     //Combine Current and Goal Worldstate to see if a plan needs to be made in order to fulfill this goal
-    private Node GetStartNode(HashSet<GOAP_Worldstate> currentWorldState, HashSet<GOAP_Worldstate> goalWorldState)
+    private Node GetStartNode(HashSet<GOAP_Worldstate> currentWorldState, List<GOAP_Worldstate> goalWorldState)
     {
         HashSet<GOAP_Worldstate> newRequired = new HashSet<GOAP_Worldstate>(goalWorldState);
         string msg = "StartNode:";

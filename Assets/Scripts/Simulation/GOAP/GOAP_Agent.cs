@@ -13,7 +13,9 @@ public class GOAP_Agent
 {
     FSM_State currentState = FSM_State.IDLE;
     
-    public Goal goal;
+    public List<GOAP_Worldstate> goal;
+
+    public List<int> checkedQuestIds;
 
     public HashSet<GOAP_Worldstate> currentWorldstates;
 
@@ -55,25 +57,28 @@ public class GOAP_Agent
 
     public List<GOAP_Worldstate> ChooseGoal()
     {
-        List<GOAP_Worldstate> result;
+        List<GOAP_Worldstate> result = null;
+        Debug.Log(character.characterName + " is checking his goals.");
 
         //Check goals top to bottom, to see which need to be fulfilled
-        for(int i = 0; i < character.goals.Count; i++)
+        for (int i = 0; i < character.goals.Count; i++)
         {
             List<GOAP_Worldstate> goal = character.goals[i];
-            if(GOAP_Planner.instance.IsGoalSatisfied(FetchWorldState(), new HashSet<GOAP_Worldstate>(goal)))
+            if(!GOAP_Planner.instance.IsGoalSatisfied(FetchWorldState(), goal))
             {
-
+                result = goal;
+                break;
             }
         }
 
         //if none of the goals needed to be fulfilled, instead check the quests
         if(result == null)
         {
-
+            Debug.Log(character.characterName + " has fulfilled all of his goals.");
+            CheckForQuests();
         }
 
-        return node;
+        return result;
     }
 
     // Update is called once per frame
@@ -93,7 +98,7 @@ public class GOAP_Agent
                     //Fetch a new Plan from the planner
                     if (character.availableActions != PlannableActions.None)
                     {
-                        newPlan = GOAP_Planner.instance.Plan(this, , FetchWorldState(), character.availableActions);
+                        newPlan = GOAP_Planner.instance.Plan(this, goal, FetchWorldState(), character.availableActions);
                     }
                     else
                     {
@@ -213,8 +218,21 @@ public class GOAP_Agent
     public GOAP_Quest CheckForQuests()
     {
         GOAP_Quest result = null;
+        //First go through all questIds we have tried to plan for before and see if they are even still available
+        //I use a quick check here, that only deletes ids that are lower than the lowest quest on the board
+        //This is basically just garbagecollection
+        for(int i = 0; i < checkedQuestIds.Count; i++)
+        {
+            //The lowest quest has the lowest id
+            if(GOAP_QuestBoard.instance.quests[0].id > checkedQuestIds[i])
+            {
+                checkedQuestIds.Remove(checkedQuestIds[i]);
+            }
+        }
+
         foreach (GOAP_Quest quest in GOAP_QuestBoard.instance.quests)
         {
+            //if we don't own this quest, lets try to plan for it
             if (quest.Owner != this)
             {
                 result = quest;
@@ -225,6 +243,7 @@ public class GOAP_Agent
         {
             Debug.Log("<color=#0000cc>" + character.characterName + "</color> tries to plan for Quest " + result.id);
         }
+        checkedQuestIds.Add(result.id);
         return result;
     }
 
@@ -271,8 +290,8 @@ public class GOAP_Agent
     public string PrintGoal()
     {
         string msg = "";
-        if (goal.required.Count < 1) return "None";
-        foreach(GOAP_Worldstate state in goal.required)
+        if (goal.Count < 1) return "None";
+        foreach(GOAP_Worldstate state in goal)
         {
             msg += state.ToString() + "\n";
         }
