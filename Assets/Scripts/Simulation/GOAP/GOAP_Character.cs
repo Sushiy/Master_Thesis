@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class GOAP_Character : MonoBehaviour
 {
     public string characterName;
 
     public List<GOAP_Skill> skills;
+
+    public List<List<GOAP_Worldstate>> goals;
 
     Inventory inventory;
     public Inventory Inventory
@@ -20,6 +23,38 @@ public class GOAP_Character : MonoBehaviour
     public List<ItemType> startingInventory;
 
     public GOAP_Agent agent;
+
+    [Header("HealthData")]
+
+    //All three values are measured from 1-100
+    float food;
+    float hungerSpeed = 1f;
+    float sleep;
+    float tiredSpeed = 1f;
+    float health;
+
+    public void UpdateHealthData(float deltaTime)
+    {
+        if (food < 0)
+        {
+            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is starving");
+            food = 0;
+        }
+        else
+        {
+            food -= deltaTime * hungerSpeed;
+        }
+
+        if (sleep < 0)
+        {
+            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is sleep apprived");
+            sleep = 0;
+        }
+        else
+        {
+            sleep -= deltaTime * tiredSpeed;
+        }
+    }
 
     private void Awake()
     {
@@ -38,7 +73,9 @@ public class GOAP_Character : MonoBehaviour
 
     private void Update()
     {
-        agent.Update(Time.deltaTime);
+        float deltaTime = Time.deltaTime;
+        agent.Update(deltaTime);
+        UpdateHealthData(deltaTime);
     }
 
     public void AddSkill(Skills id, int level)

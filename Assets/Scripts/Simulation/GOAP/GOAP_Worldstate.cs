@@ -5,7 +5,12 @@ using UnityEngine;
 public enum WorldStateKey
 {
     eHasItem = 0,
-    bAttackingTarget = 1
+    bAttackingTarget = 1,
+    bHasWorked,
+    bIsHungry,
+    bIsHealthy,
+    bIsTired,
+
 }
 
 [System.Serializable]

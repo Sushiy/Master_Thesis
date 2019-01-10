@@ -12,9 +12,8 @@ enum FSM_State
 public class GOAP_Agent
 {
     FSM_State currentState = FSM_State.IDLE;
-
-    HashSet<GOAP_Worldstate> standardGoal;
-    public HashSet<GOAP_Worldstate> goal;
+    
+    public Goal goal;
 
     public HashSet<GOAP_Worldstate> currentWorldstates;
 
@@ -51,9 +50,30 @@ public class GOAP_Agent
         currentActions = new Queue<GOAP_Action>();
         currentWorldstates = new HashSet<GOAP_Worldstate>();
 
-        standardGoal = new HashSet<GOAP_Worldstate>(); // TODO: implement proper goals for agents; => agent.getCurrentGoal();
-        standardGoal.Add(new GOAP_Worldstate(WorldStateKey.eHasItem, (int)ItemType.Wood)); //TODO: remove this when I have proper goals
-        goal = standardGoal;
+        ChooseGoal();
+    }
+
+    public List<GOAP_Worldstate> ChooseGoal()
+    {
+        List<GOAP_Worldstate> result;
+
+        //Check goals top to bottom, to see which need to be fulfilled
+        for(int i = 0; i < character.goals.Count; i++)
+        {
+            List<GOAP_Worldstate> goal = character.goals[i];
+            if(GOAP_Planner.instance.IsGoalSatisfied(FetchWorldState(), new HashSet<GOAP_Worldstate>(goal)))
+            {
+
+            }
+        }
+
+        //if none of the goals needed to be fulfilled, instead check the quests
+        if(result == null)
+        {
+
+        }
+
+        return node;
     }
 
     // Update is called once per frame
@@ -64,49 +84,57 @@ public class GOAP_Agent
             if (allowedToPlan)
             {
                 View.PrintMessage("Planning");
+                
+                goal = ChooseGoal();
+                if (goal != null)
+                {
 
-                activeQuest = CheckForQuests();
-                if (activeQuest == null) goal = standardGoal;
-                else goal = activeQuest.RequiredStates;
-                Queue<GOAP_Action> newPlan;
-                //Fetch a new Plan from the planner
-                if (character.availableActions != PlannableActions.None)
-                {
-                    newPlan = GOAP_Planner.instance.Plan(this, goal, FetchWorldState(), character.availableActions);
-                }
-                else
-                {
-                    newPlan = GOAP_Planner.instance.Plan(this, goal, FetchWorldState());
-                }
-                if (newPlan != null)
-                {
-                    if(activeQuest != null)
+                    Queue<GOAP_Action> newPlan;
+                    //Fetch a new Plan from the planner
+                    if (character.availableActions != PlannableActions.None)
                     {
-                        Debug.Log("<color=#0000cc>" + character.characterName + "</color> chose Quest " + activeQuest.id);
+                        newPlan = GOAP_Planner.instance.Plan(this, , FetchWorldState(), character.availableActions);
+                    }
+                    else
+                    {
+                        newPlan = GOAP_Planner.instance.Plan(this, goal, FetchWorldState());
+                    }
+                    
+                    allowedToPlan = false;
+                    timeSincePlanned = 0.0f;
 
-                        if(!GOAP_QuestBoard.instance.ChooseQuest(activeQuest))
+                    if (newPlan != null)
+                    {
+                        if (activeQuest != null)
+                        {
+                            Debug.Log("<color=#0000cc>" + character.characterName + "</color> chose Quest " + activeQuest.id);
+
+                            if (!GOAP_QuestBoard.instance.ChooseQuest(activeQuest))
+                            {
+                                activeQuest = null;
+                                currentActions.Clear();
+                                currentState = FSM_State.IDLE;
+                            }
+                        }
+                        //do what the plan says!
+                        currentActions = newPlan;
+                        currentState = FSM_State.PERFORMACTION;
+                    }
+                    else
+                    {
+                        //try again? or something...
+                        Debug.Log("No plan?");
+                        if (activeQuest != null)
                         {
                             activeQuest = null;
-                            currentActions.Clear();
                             currentState = FSM_State.IDLE;
                         }
                     }
-                    //do what the plan says!
-                    currentActions = newPlan;
-                    currentState = FSM_State.PERFORMACTION;
                 }
                 else
                 {
-                    //try again? or something...
-                    Debug.Log("No plan?");
-                    if (activeQuest != null)
-                    {
-                        activeQuest = null;
-                        currentState = FSM_State.IDLE;
-                    }
+
                 }
-                allowedToPlan = false;
-                timeSincePlanned = 0.0f;
             }
             else
             {
@@ -243,8 +271,8 @@ public class GOAP_Agent
     public string PrintGoal()
     {
         string msg = "";
-        if (goal.Count < 1) return "None";
-        foreach(GOAP_Worldstate state in goal)
+        if (goal.required.Count < 1) return "None";
+        foreach(GOAP_Worldstate state in goal.required)
         {
             msg += state.ToString() + "\n";
         }

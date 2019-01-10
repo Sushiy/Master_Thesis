@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Action_BakeBread : GOAP_Action
+public class Action_MakeBread : GOAP_Action
 {
-    public Action_BakeBread()
+    public Action_MakeBread()
     {
         Init();
-        actionID = "BakeBread";
+        actionID = "MakeBread";
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Flour);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Water);
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Bread);
