@@ -2,40 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GOAP_Quest
+public struct QuestData
 {
-    private static int count = 0;
-    public int id;
-    GOAP_Agent owner;
-    public GOAP_Agent Owner
+    public GOAP_Agent owner;
+    public HashSet<GOAP_Worldstate> requiredStates;
+
+    public HashSet<GOAP_Worldstate> providedStates;
+    public void Init()
     {
-        get { return owner; }
+        requiredStates = new HashSet<GOAP_Worldstate>();
+        providedStates = new HashSet<GOAP_Worldstate>();
     }
-    HashSet<GOAP_Worldstate> requiredStates;
-    public HashSet<GOAP_Worldstate> RequiredStates
+    public QuestData(GOAP_Agent owner)
     {
-        get { return requiredStates; }
-    }
-    HashSet<GOAP_Worldstate> providedStates;
-    public HashSet<GOAP_Worldstate> ProvidedStates
-    {
-        get { return providedStates; }
-    }
-    public GOAP_Quest(GOAP_Agent agent)
-    {
-        id = count++;
-        owner = agent;
+        this.owner = owner;
         requiredStates = new HashSet<GOAP_Worldstate>();
         providedStates = new HashSet<GOAP_Worldstate>();
     }
 
-    public GOAP_Quest(GOAP_Agent owner, IEnumerable<GOAP_Worldstate> required, IEnumerable<GOAP_Worldstate> provided)
-    {
-        id = count++;
-        this.owner = owner;
-        requiredStates = new HashSet<GOAP_Worldstate>(required);
-        providedStates = new HashSet<GOAP_Worldstate>(provided);
-    }
     public void ClearRequired()
     {
         requiredStates.Clear();
@@ -54,23 +38,62 @@ public class GOAP_Quest
     {
         providedStates.Add(state);
     }
+}
+
+public class GOAP_Quest
+{
+    private static int count = 0;
+    public int id;
+
+    private QuestData questData;
+
+    public GOAP_Agent Owner
+    {
+        get { return questData.owner; }
+    }
+    
+    public HashSet<GOAP_Worldstate> RequiredStates
+    {
+        get { return questData.requiredStates; }
+    }
+    
+    public HashSet<GOAP_Worldstate> ProvidedStates
+    {
+        get { return questData.providedStates; }
+    }
+    public GOAP_Quest(QuestData data)
+    {
+        questData = data;
+        id = count++;
+    }
+
+    public GOAP_Quest(GOAP_Agent agent, IEnumerable<GOAP_Worldstate> required, IEnumerable<GOAP_Worldstate> provided)
+    {
+        id = count++;
+        questData = new QuestData
+        {
+            owner = agent,
+            requiredStates = new HashSet<GOAP_Worldstate>(required),
+            providedStates = new HashSet<GOAP_Worldstate>(provided)
+        };
+    }
 
     public void Complete()
     {
-        owner.postedQuest = null;
+        Owner.postedQuest = null;
     }
 
     public override string ToString()
     {
-        string quest = "QUEST " + id + ": " + owner.Character.characterName + " needs someone to complete:";
-        foreach (GOAP_Worldstate state in requiredStates)
+        string quest = "QUEST " + id + ": " + Owner.Character.characterName + " needs someone to complete:";
+        foreach (GOAP_Worldstate state in ProvidedStates)
         {
             quest += " " + state.ToString() + ";";
         }
-        if(providedStates != null && providedStates.Count > 0)
+        if(ProvidedStates != null && ProvidedStates.Count > 0)
         {
             quest += " \nIf necessary, he can provide:";
-            foreach (GOAP_Worldstate state in providedStates)
+            foreach (GOAP_Worldstate state in ProvidedStates)
             {
                 quest += " " + state.ToString() + ";";
             }

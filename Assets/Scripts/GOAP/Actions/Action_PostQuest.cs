@@ -4,17 +4,18 @@ using UnityEngine;
 
 public class Action_PostQuest : GOAP_Action
 {
-    GOAP_Quest quest;
+    QuestData questData;
     public Action_PostQuest()
     {
         Init();
         workCost = 10f;
         actionID = "PostQuest";
+        questData.Init();
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
     {
-        if (quest == null) quest = new GOAP_Quest(agent);
+        if (questData.owner != agent) questData.owner = agent;
         return true;
     }
 
@@ -39,14 +40,14 @@ public class Action_PostQuest : GOAP_Action
         
         if(completed)
         {
-            agent.postedQuest = quest;
-            GOAP_QuestBoard.instance.AddQuest(quest);
+            agent.postedQuest = new GOAP_Quest(questData);
+            GOAP_QuestBoard.instance.AddQuest(agent.postedQuest);
         }
         return completed;
     }
 
     public void AddQuestWorldstate(GOAP_Worldstate state)
     {
-        quest.AddRequired(state);
+        questData.AddRequired(state);
     }
 }

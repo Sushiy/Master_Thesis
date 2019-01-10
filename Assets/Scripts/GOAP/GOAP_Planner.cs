@@ -357,7 +357,7 @@ public class GOAP_Planner : MonoBehaviour
         string message = "<color=#00AA00>ActionQueue:</color> ";
         Node current = start;
         bool needsQuest = false;
-        GOAP_Quest quest = new GOAP_Quest(agent);
+        QuestData questData = new QuestData(agent);
 
         while (current.parent != null)
         {
@@ -374,10 +374,10 @@ public class GOAP_Planner : MonoBehaviour
 
                 if (!needsQuest)
                 {
-                    quest.ClearProvided();
+                    questData.ClearProvided();
                     foreach (GOAP_Worldstate state in current.action.SatisfyWorldstates)
                     {
-                        quest.AddProvided(state);
+                        questData.AddProvided(state);
                     }
                 }          
             }
@@ -387,10 +387,10 @@ public class GOAP_Planner : MonoBehaviour
                 queue.Clear();
                 queue.Enqueue(new Action_PostQuest());
                 message += " -> <color=#CC0000> QUEST: " + current.action.ActionID + "</color>";
-                quest.ClearRequired();
+                questData.ClearRequired();
                 foreach (GOAP_Worldstate state in current.action.SatisfyWorldstates)
                 {
-                    quest.AddRequired(state);
+                    questData.AddRequired(state);
                 }
                 needsQuest = true;
             }
@@ -411,8 +411,8 @@ public class GOAP_Planner : MonoBehaviour
 
         if (needsQuest)
         {
-            agent.postedQuest = quest;
-            GOAP_QuestBoard.instance.AddQuest(quest);
+            agent.postedQuest = new GOAP_Quest(questData);
+            GOAP_QuestBoard.instance.AddQuest(agent.postedQuest);
         }
         return queue;
     }
