@@ -10,7 +10,7 @@ public enum WorldStateKey
     bIsHungry,
     bIsHealthy,
     bIsTired,
-
+    bHasStockpiledRessources
 }
 
 [System.Serializable]
@@ -37,7 +37,11 @@ public struct GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
 
     public bool Equals(GOAP_Worldstate other)
     {
-        return other.key == key && other.value == value;
+        if(IsUniqueState())
+            return other.key == this.key;
+        else
+            return other.key == this.key && other.value == this.value;
+
     }
 
     public override bool Equals(object obj)
@@ -48,7 +52,7 @@ public struct GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
         }
 
         GOAP_Worldstate objectToCompareWith = (GOAP_Worldstate)obj;
-        return objectToCompareWith.key == key && objectToCompareWith.value == value;
+        return Equals(objectToCompareWith);
     }
 
     /// <summary>
@@ -58,7 +62,7 @@ public struct GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
     /// <returns></returns>
     public override int GetHashCode()
     {
-        int calculation = (int)key + (IsUniqueState() ? 0 : value);
+        int calculation = (int)key.GetHashCode() * (IsUniqueState() ? 1 : value.GetHashCode());
         return calculation;
     }
 

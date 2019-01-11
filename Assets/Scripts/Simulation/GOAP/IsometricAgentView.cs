@@ -25,7 +25,13 @@ public class IsometricAgentView : MonoBehaviour, IGOAP_AgentView
 
     public void MoveTo(Vector3 position)
     {
-        transform.position += (position - transform.position).normalized * speed * Time.deltaTime;
+        Vector3 targetVector = (position - transform.position);
+        targetVector.y = 0;
+        transform.position += targetVector.normalized * speed * Time.deltaTime;
+        if(targetVector.sqrMagnitude > 0)
+        {
+            transform.rotation = Quaternion.LookRotation(-targetVector);
+        }
     }
 
     public void PrintMessage(string message)
@@ -36,5 +42,18 @@ public class IsometricAgentView : MonoBehaviour, IGOAP_AgentView
     public IActionTarget GetActionTargetSelf()
     {
         return selfActionTarget;
+    }
+
+    public void VisualizeAction(GOAP_Action action)
+    {
+        if(action == null)
+        {
+            //Idle
+            transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
+        }
+        if(action.ActionID == "Sleep")
+        {
+            transform.eulerAngles = new Vector3(90, transform.eulerAngles.y, 0);
+        }
     }
 }

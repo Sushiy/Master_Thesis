@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Action_GatherFirewood : GOAP_Action
+public class Action_EatFood : GOAP_Action
 {
-    public Action_GatherFirewood()
+    public Action_EatFood()
     {
         Init();
-        actionID = "GatherWood";
-        workCost = 40f;
-        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Wood);
+        actionID = "EatFood";
+        workCost = 5f;
+        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Bread);
+        AddSatisfyWorldState(WorldStateKey.bIsHungry, false);
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
@@ -27,9 +28,11 @@ public class Action_GatherFirewood : GOAP_Action
         StartPerform(agent);
         UpdateWorkTime(deltaTime);
 
-        if(completed)
+        if (completed)
         {
-            agent.Character.UpdateInventory(ItemType.Wood, true, 3);
+            agent.Character.UpdateInventory(ItemType.Bread, false);
+            agent.Character.Eat();
+            CompletePerform(agent);
         }
         return completed;
     }

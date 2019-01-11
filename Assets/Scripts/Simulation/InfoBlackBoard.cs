@@ -15,6 +15,9 @@ public class InfoBlackBoard : MonoBehaviour
     public GameObjectActionTarget[] woodWorkshopLocations;
     public GameObjectActionTarget[] smithingWorkshopLocations;
     public GameObjectActionTarget[] mineIronLocations;
+    public GameObjectActionTarget[] farmingLocations;
+    public GameObjectActionTarget[] millingLocations;
+
 
     // Use this for initialization
     void Awake()

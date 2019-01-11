@@ -84,11 +84,16 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
 
         Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is performing: " + actionID + " Cost is: " + ActionCost + ((requiredSkill == null ) ? "" : " reduced by:" + requiredSkill.id.ToString()) );
         agent.View.PrintMessage(ActionID);
+    }
+
+    protected void CompletePerform(GOAP_Agent agent)
+    {
         foreach (GOAP_Worldstate state in satisfyWorldstates)
         {
             agent.ChangeCurrentWorldState(state);
         }
     }
+
     protected void UpdateWorkTime(float deltaTime)
     {
         alphaWorkTime += deltaTime;

@@ -7,13 +7,14 @@ public enum PlannableActions
     None = 0,
     ChopTree = 1 << 0,
     ChopWood = 1 << 1,
-    GatherFirewood = 1 << 2,
-    GetAxe = 1 << 3,
-    MakeAxe = 1 << 4,
-    MakeBread = 1 << 5,
-    BuyItem = 1 << 6,
-    MineIron = 1 << 7,
-    MakePickaxe = 1 << 8,
+    GetAxe = 1 << 2,
+    MakeAxe = 1 << 3,
+    MakeBread = 1 << 4,
+    BuyItem = 1 << 5,
+    MineIron = 1 << 6,
+    MakePickaxe = 1 << 7,
+    Farm = 1 << 8,
+    MakeFlour = 1 << 9,
 }
 
 public class GOAP_Planner : MonoBehaviour
@@ -47,17 +48,30 @@ public class GOAP_Planner : MonoBehaviour
         }
     }
 
+    public void InstantiateBaseAction<T>(ref HashSet<GOAP_Action> set) where T : GOAP_Action, new()
+    {
+        set.Add(new T());
+    }
+
     public void GetActionSet(PlannableActions plannableActions, ref HashSet<GOAP_Action> set)
     {
+        //BASE ACTION
+        InstantiateBaseAction<Action_EatFood>(ref set);
+        InstantiateBaseAction<Action_GatherFirewood>(ref set);
+        InstantiateBaseAction<Action_Sleep>(ref set);
+        InstantiateBaseAction<Action_GetWater>(ref set);
+
+        //Extra Actions
         InstantiateAction<Action_ChopTree>(plannableActions, ref set);
         InstantiateAction<Action_ChopWood>(plannableActions, ref set);
-        InstantiateAction<Action_GatherFirewood>(plannableActions, ref set);
         InstantiateAction<Action_GetAxe>(plannableActions, ref set);
         InstantiateAction<Action_MakeAxe>(plannableActions, ref set);
         InstantiateAction<Action_MakeBread>(plannableActions, ref set);
         InstantiateAction<Action_BuyItem>(plannableActions, ref set);
         InstantiateAction<Action_MineIron>(plannableActions, ref set);
         InstantiateAction<Action_MakePickaxe>(plannableActions, ref set);
+        InstantiateAction<Action_Farm>(plannableActions, ref set);
+        InstantiateAction<Action_MakeFlour>(plannableActions, ref set);
 
 
         string msg = "<b>Initializing ActionSet \nAvailable Actions:</b>\n";
@@ -120,8 +134,15 @@ public class GOAP_Planner : MonoBehaviour
 
         List<Node> openSet = new List<Node>(); //This is a List so it can be sorted
 
+        Node goalNode = GetGoalNode(currentWorldState, goal);
+        //If the goal is already fulfilled, return the goal
+        if(goalNode.required.Count == 0)
+        {
+            return goalNode;
+        }
         //Add the goal as first node
-        openSet.Add(GetStartNode(currentWorldState, goal));
+        openSet.Add(goalNode);
+
 
         int graphDepth = 0;
         //Reverse A*
@@ -136,7 +157,7 @@ public class GOAP_Planner : MonoBehaviour
             {
                 foreach (GOAP_Worldstate state in current.required)
                 {
-                    msg += state.key.ToString() + ",";
+                    msg += state.key.ToString() + "|" + state.value.ToString() + ",";
                 }
                 if (current.isSkilled)
                     plannerLog += makeIndent(graphDepth) + "-><color=#00CC00>ClosedSet Updated</color> (" + current.estimatedPathCost + "); ";
@@ -160,26 +181,75 @@ public class GOAP_Planner : MonoBehaviour
                 if (availableActions[i].Equals(current.action)) continue; //Dont do the same action twice
 
                 Node neighbor = (availableActions[i].ActionID == "BuyItem") ? GenerateBuyNode(current, currentWorldState,agent) : GetValidNeighborNode(current, availableActions[i], currentWorldState, agent);
-                if(neighbor != null && !openSet.Contains(neighbor))
+                if(neighbor != null)
                 {
                     foundValidNeighbor = true;
-                    openSet.Add(neighbor);
-                    //Debug Log to visualize the process
-                    if (writePlannerLog)
+                    int indexOfSameState = openSet.IndexOf(neighbor);
+                    if (indexOfSameState != -1)
                     {
-                        msg = "";
-                        foreach (GOAP_Worldstate state in neighbor.required)
+                        if (openSet[indexOfSameState].estimatedPathCost > neighbor.estimatedPathCost)
                         {
-                            msg += state.key.ToString() + "|" + state.value.ToString() + ",";
+                            
+                            openSet.Remove(openSet[indexOfSameState]);
+                            
+                            openSet.Add(neighbor);
+                            if (writePlannerLog)
+                            {
+                                msg = "";
+                                foreach (GOAP_Worldstate state in neighbor.required)
+                                {
+                                    msg += state.key.ToString() + "|" + state.value.ToString() + ",";
+                                }
+                                if (neighbor.isSkilled)
+                                    plannerLog += makeIndent(graphDepth) + "-><color=#CCCC00>OpenSet Replaced</color> (" + neighbor.estimatedPathCost + "); ";
+                                else
+                                    plannerLog += makeIndent(graphDepth) + "-><color=#00CCCC>OpenSet Replaced</color> (" + neighbor.estimatedPathCost + "); ";
+                                if (msg.Equals("")) msg = "empty";
+                                plannerLog += "(" + msg + ") ";
+                                if (neighbor.action != null) plannerLog += "Action: " + neighbor.action.ActionID;
+                                plannerLog += "\n";
+                            }
                         }
-                        if (neighbor.isSkilled)
-                            plannerLog += makeIndent(graphDepth) + "-><color=#CCCC00>OpenSet Updated</color> (" + neighbor.estimatedPathCost + "); ";
                         else
-                            plannerLog += makeIndent(graphDepth) + "-><color=#00CCCC>OpenSet Updated</color> (" + neighbor.estimatedPathCost + "); ";
-                        if (msg.Equals("")) msg = "empty";
-                        plannerLog += "(" + msg + ") ";
-                        if (neighbor.action != null) plannerLog += "Action: " + neighbor.action.ActionID;
-                        plannerLog += "\n";
+                        {
+                            if (writePlannerLog)
+                            {
+                                msg = "";
+                                foreach (GOAP_Worldstate state in neighbor.required)
+                                {
+                                    msg += state.key.ToString() + "|" + state.value.ToString() + ",";
+                                }
+                                if (neighbor.isSkilled)
+                                    plannerLog += makeIndent(graphDepth) + "-><color=#CC0000>OpenSet Not Replaced</color> (" + neighbor.estimatedPathCost + "); ";
+                                else
+                                    plannerLog += makeIndent(graphDepth) + "-><color=#00CCCC>OpenSet Not Replaced</color> (" + neighbor.estimatedPathCost + "); ";
+                                if (msg.Equals("")) msg = "empty";
+                                plannerLog += "(" + msg + ") ";
+                                if (neighbor.action != null) plannerLog += "Action: " + neighbor.action.ActionID;
+                                plannerLog += "\n";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        openSet.Add(neighbor);
+                        //Debug Log to visualize the process
+                        if (writePlannerLog)
+                        {
+                            msg = "";
+                            foreach (GOAP_Worldstate state in neighbor.required)
+                            {
+                                msg += state.key.ToString() + "|" + state.value.ToString() + ",";
+                            }
+                            if (neighbor.isSkilled)
+                                plannerLog += makeIndent(graphDepth) + "-><color=#CCCC00>OpenSet Updated</color> (" + neighbor.estimatedPathCost + "); ";
+                            else
+                                plannerLog += makeIndent(graphDepth) + "-><color=#00CCCC>OpenSet Updated</color> (" + neighbor.estimatedPathCost + "); ";
+                            if (msg.Equals("")) msg = "empty";
+                            plannerLog += "(" + msg + ") ";
+                            if (neighbor.action != null) plannerLog += "Action: " + neighbor.action.ActionID;
+                            plannerLog += "\n";
+                        }
                     }
                 }
             }
@@ -224,7 +294,7 @@ public class GOAP_Planner : MonoBehaviour
     }
 
     //Combine Current and Goal Worldstate to see if a plan needs to be made in order to fulfill this goal
-    private Node GetStartNode(HashSet<GOAP_Worldstate> currentWorldState, List<GOAP_Worldstate> goalWorldState)
+    private Node GetGoalNode(HashSet<GOAP_Worldstate> currentWorldState, List<GOAP_Worldstate> goalWorldState)
     {
         HashSet<GOAP_Worldstate> newRequired = new HashSet<GOAP_Worldstate>(goalWorldState);
         string msg = "StartNode:";
@@ -450,7 +520,16 @@ public class GOAP_Planner : MonoBehaviour
 
         public bool Equals(Node other)
         {
-            return other.GetHashCode().Equals(GetHashCode());
+            bool sameRequiredStates = true;
+            foreach(GOAP_Worldstate state in required)
+            {
+                if(!other.required.Contains(state))
+                {
+                    sameRequiredStates = false;
+                    break;
+                }
+            }
+            return sameRequiredStates;
         }
 
         public override bool Equals(object obj)

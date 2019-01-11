@@ -41,6 +41,7 @@ public class Action_ChopTree : GOAP_Action
                 Debug.Log("<color=#cc0000>" + agent.Character.characterName + "s Axe broke.</color>");
                 agent.Character.UpdateInventory(ItemType.Axe, false);
             }
+            CompletePerform(agent);
         }
         return completed;
     }

@@ -38,6 +38,7 @@ public class Action_MakeAxe : GOAP_Action
             agent.Character.UpdateInventory(ItemType.Wood, false);
             agent.Character.UpdateInventory(ItemType.Iron, false);
             agent.Character.UpdateInventory(ItemType.Axe, true);
+            CompletePerform(agent);
         }
         return completed;
     }

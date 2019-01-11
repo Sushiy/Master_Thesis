@@ -38,6 +38,7 @@ public class Action_MakePickaxe : GOAP_Action
             agent.Character.UpdateInventory(ItemType.Wood, false);
             agent.Character.UpdateInventory(ItemType.Iron, false);
             agent.Character.UpdateInventory(ItemType.Pickaxe, true);
+            CompletePerform(agent);
         }
         return completed;
     }

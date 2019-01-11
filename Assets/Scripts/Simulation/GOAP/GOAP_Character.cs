@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 
 public class GOAP_Character : MonoBehaviour
@@ -9,7 +10,9 @@ public class GOAP_Character : MonoBehaviour
 
     public List<GOAP_Skill> skills;
 
-    public List<List<GOAP_Worldstate>> goals;
+    public List<GOAP_Worldstate> goals;
+
+    public List<ItemType> itemStockPilePriorities;
 
     Inventory inventory;
     public Inventory Inventory
@@ -26,18 +29,19 @@ public class GOAP_Character : MonoBehaviour
 
     [Header("HealthData")]
 
-    //All three values are measured from 1-100
-    float food;
+    //All three values are measured from 1-12
+    public float food = 40;
     float hungerSpeed = 1f;
-    float sleep;
+    public float sleep = 120;
     float tiredSpeed = 1f;
     float health;
 
     public void UpdateHealthData(float deltaTime)
     {
-        if (food < 0)
+        if (food <= 0)
         {
-            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is starving");
+            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is hungry");
+            agent.ChangeCurrentWorldState(WorldStateKey.bIsHungry, true);
             food = 0;
         }
         else
@@ -45,15 +49,25 @@ public class GOAP_Character : MonoBehaviour
             food -= deltaTime * hungerSpeed;
         }
 
-        if (sleep < 0)
+        if (sleep <= 0)
         {
-            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is sleep apprived");
+            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is tired");
+            agent.ChangeCurrentWorldState(WorldStateKey.bIsTired, true);
             sleep = 0;
         }
         else
         {
             sleep -= deltaTime * tiredSpeed;
         }
+    }
+
+    public void Eat()
+    {
+        food = 40;
+    }
+    public void Sleep()
+    {
+        sleep = 120;
     }
 
     private void Awake()
@@ -92,7 +106,7 @@ public class GOAP_Character : MonoBehaviour
             if(inventory.AddItem(id, count))
             {
                 agent.ChangeCurrentWorldState(new GOAP_Worldstate(WorldStateKey.eHasItem, (int)id));
-                Debug.Log("Added " + id.ToString() + "(" + (int)id + ")" + " to " + characterName);
+                //Debug.Log("Added " + id.ToString() + "(" + (int)id + ")" + " to " + characterName);
             }
         }
         else

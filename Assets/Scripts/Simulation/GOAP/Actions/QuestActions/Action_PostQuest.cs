@@ -8,7 +8,7 @@ public class Action_PostQuest : GOAP_Action
     public Action_PostQuest()
     {
         Init();
-        workCost = 10f;
+        workCost = 30f;
         actionID = "PostQuest";
         questData.Init();
     }

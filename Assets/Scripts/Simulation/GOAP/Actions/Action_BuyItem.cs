@@ -42,6 +42,7 @@ public class Action_BuyItem : GOAP_Action
         if(completed)
         {
             agent.Character.UpdateInventory(wantedItem, true);
+            CompletePerform(agent);
         }
         return completed;
     }

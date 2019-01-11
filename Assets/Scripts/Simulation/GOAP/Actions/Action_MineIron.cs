@@ -39,6 +39,7 @@ public class Action_MineIron : GOAP_Action
             {
                 agent.Character.UpdateInventory(ItemType.Pickaxe, false);
             }
+            CompletePerform(agent);
         }
         return completed;
     }

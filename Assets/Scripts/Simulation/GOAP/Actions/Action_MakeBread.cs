@@ -34,6 +34,7 @@ public class Action_MakeBread : GOAP_Action
             agent.Character.UpdateInventory(ItemType.Flour, false);
             agent.Character.UpdateInventory(ItemType.Water, false);
             agent.Character.UpdateInventory(ItemType.Bread, true);
+            CompletePerform(agent);
         }
         return completed;
     }
