@@ -34,6 +34,7 @@ public class InfoBlackBoard : MonoBehaviour
         float minDistance = Mathf.Infinity;
         foreach(IActionTarget t in transforms)
         {
+            if (t == null) continue;
             float distance = Vector3.Distance(t.GetPosition(), position);
             if (distance < minDistance)
             {
