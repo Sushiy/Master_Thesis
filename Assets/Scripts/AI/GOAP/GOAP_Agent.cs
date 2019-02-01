@@ -30,9 +30,12 @@ public class GOAP_Agent
         get { return character; }
     }
 
-    public float planningWaitTimer = 3.0f;
+    float planningWaitTimer = 2.0f;
     private float timeSincePlanned = 0.0f;
-    bool allowedToPlan = true;
+    public bool AllowedToPlan
+    {
+        get { return timeSincePlanned >= planningWaitTimer; }
+    }
     bool actionCompleted = true;
 
     public GOAP_Quest postedQuest = null;
@@ -78,6 +81,7 @@ public class GOAP_Agent
         }
         Debug.Log(msg);
 
+        /*
         //if none of the goals needed to be fulfilled, instead check the quests
         if(result == null)
         {
@@ -86,6 +90,7 @@ public class GOAP_Agent
             if(activeQuest != null)
                 result = new List<GOAP_Worldstate>(activeQuest.RequiredStates);
         }
+        */
 
         return result;
     }
@@ -95,7 +100,7 @@ public class GOAP_Agent
     {
         if (currentState == FSM_State.IDLE && postedQuest == null)
         {
-            if (allowedToPlan)
+            if (AllowedToPlan)
             {
                 View.PrintMessage("Planning");
                 if (goal != null)
@@ -111,7 +116,6 @@ public class GOAP_Agent
                         newPlan = GOAP_Planner.instance.Plan(this, goal, FetchWorldState());
                     }
                     
-                    allowedToPlan = false;
                     timeSincePlanned = 0.0f;
 
                     if (newPlan != null)
@@ -152,8 +156,6 @@ public class GOAP_Agent
             {
                 View.PrintMessage("Idle");
                 timeSincePlanned += deltaTime;
-                if (timeSincePlanned > planningWaitTimer)
-                    allowedToPlan = true;
             }
         }
 
@@ -260,13 +262,6 @@ public class GOAP_Agent
         return result;
     }
 
-    private IEnumerator DelayPlanning()
-    {
-        allowedToPlan = false;
-        yield return new WaitForSeconds(planningWaitTimer);
-        allowedToPlan = true;
-    }
-
     private HashSet<GOAP_Worldstate> FetchWorldState()
     {
         return currentWorldstates;
@@ -331,5 +326,16 @@ public class GOAP_Agent
         }
 
         return msg;
+    }
+
+    public void ResetPlanningTimer()
+    {
+        timeSincePlanned = 0f;
+    }
+
+    public void UpdateActionQueue(Queue<GOAP_Action> actionQueue)
+    {
+        //TODO: I would like to enqueue the whole queue instead of replacing it
+        currentActions = actionQueue;
     }
 }

@@ -60,6 +60,7 @@ public class GOAP_Planner : MonoBehaviour
         InstantiateBaseAction<Action_GatherFirewood>(ref set);
         InstantiateBaseAction<Action_Sleep>(ref set);
         InstantiateBaseAction<Action_GetWater>(ref set);
+        InstantiateBaseAction<Action_CheckForQuest>(ref set);
 
         //Extra Actions
         InstantiateAction<Action_ChopTree>(plannableActions, ref set);
@@ -260,7 +261,7 @@ public class GOAP_Planner : MonoBehaviour
                 //Debug Log to visualize the process
                 if (writePlannerLog)
                 {
-                    msg = "Quest:";
+                    msg = "";
                     foreach (GOAP_Worldstate state in questNode.required)
                     {
                         msg += state.key.ToString() + "|" + state.value.ToString() + ",";
@@ -316,9 +317,6 @@ public class GOAP_Planner : MonoBehaviour
     {
         bool isValidAction = false;
 
-        //If the actions proceduralConditions are not met, we can't perform it anyways
-        if (!action.CheckProceduralConditions(agent)) return null;
-
         HashSet<GOAP_Worldstate> newRequired = new HashSet<GOAP_Worldstate>(activeNode.required);
         //Actions need to fulfill at least one required Worldstate to result in a valid neighbor
         foreach (GOAP_Worldstate state in activeNode.required)
@@ -330,6 +328,10 @@ public class GOAP_Planner : MonoBehaviour
             }
         }
 
+        if (!isValidAction) return null;
+        //If the actions proceduralConditions are not met, we can't perform it anyways
+        if (!action.CheckProceduralConditions(agent)) return null;
+
         //add the actions own required worldstates to the Node
         foreach (GOAP_Worldstate state in action.RequiredWorldstates)
         {
@@ -339,8 +341,6 @@ public class GOAP_Planner : MonoBehaviour
             }
         }
 
-        if (!isValidAction) return null;
-        
         //Apply skillmodification onto the neighbor if it is valid
         float skillModifier = 1f;
         bool isSkilled = true;

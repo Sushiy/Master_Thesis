@@ -18,7 +18,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     {
         get { return secondsToWorkCostRation * workCost; }
     }
-    private float alphaWorkTime = 0.0f;
+    protected float alphaWorkTime = 0.0f;
     protected bool isStartingWork
     {
         get { return alphaWorkTime == 0f; }

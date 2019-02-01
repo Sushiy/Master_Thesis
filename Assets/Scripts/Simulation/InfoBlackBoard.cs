@@ -44,7 +44,24 @@ public class InfoBlackBoard : MonoBehaviour
         }
         return closest;
     }
-    
+
+    public IActionTarget FindClosestAvailable(IActionTarget[] transforms, Vector3 position)
+    {
+        IActionTarget closest = null;
+        float minDistance = Mathf.Infinity;
+        foreach (IActionTarget t in transforms)
+        {
+            if (t == null|| !t.IsAvailable()) continue;
+            float distance = Vector3.Distance(t.GetPosition(), position);
+            if (distance < minDistance)
+            {
+                closest = t;
+                minDistance = distance;
+            }
+        }
+        return closest;
+    }
+
     private float DistanceToClosest(IActionTarget[] transforms, Vector3 position)
     {
         return Vector3.Distance(FindClosest(transforms,position).GetPosition(), position);

@@ -7,7 +7,7 @@ public enum Skills
     WoodCutting = 0,
     Smithing = 1,
     Fighting = 2,
-    Baking = 3
+    Cooking = 3
 }
 
 [System.Serializable]

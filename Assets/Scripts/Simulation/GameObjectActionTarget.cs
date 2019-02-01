@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class GameObjectActionTarget : MonoBehaviour, IActionTarget
 {
-    public Vector3 GetPosition()
+    public virtual bool IsAvailable()
+    {
+        return true;
+    }
+
+    public virtual Vector3 GetPosition()
     {
         return transform.position;
     }

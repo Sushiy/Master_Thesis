@@ -11,7 +11,7 @@ public class Action_MakeBread : GOAP_Action
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Flour);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Water);
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Bread);
-        requiredSkill = new GOAP_Skill(Skills.Baking, 3);
+        requiredSkill = new GOAP_Skill(Skills.Cooking, 3);
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)

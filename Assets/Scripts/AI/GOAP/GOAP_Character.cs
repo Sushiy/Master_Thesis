@@ -38,24 +38,24 @@ public class GOAP_Character : MonoBehaviour
 
     public void UpdateHealthData(float deltaTime)
     {
-        if (food <= 0)
+        if (food < 0)
         {
             Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is hungry");
             agent.ChangeCurrentWorldState(WorldStateKey.bIsHungry, true);
             food = 0;
         }
-        else
+        else if(food > 0)
         {
             food -= deltaTime * hungerSpeed;
         }
 
-        if (sleep <= 0)
+        if (sleep < 0)
         {
             Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is tired");
             agent.ChangeCurrentWorldState(WorldStateKey.bIsTired, true);
             sleep = 0;
         }
-        else
+        else if (sleep > 0)
         {
             sleep -= deltaTime * tiredSpeed;
         }
