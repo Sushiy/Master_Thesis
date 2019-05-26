@@ -23,6 +23,7 @@ public class GOAP_Planner : MonoBehaviour
     [HideInInspector]
     public PlannableActions globalKnowledgePlannableActions;
     private HashSet<GOAP_Action> globalKnowledgeAvailableActions;
+    public float heuristicFactor = 2f;
 
     public bool writePlannerLog = true;
     string plannerLog = "";
@@ -365,7 +366,7 @@ public class GOAP_Planner : MonoBehaviour
         //Change the skillmodifier on the action 
         action.ApplySkillModifier(skillModifier);
 
-        return new Node(activeNode, newRequired, action, newRequired.Count + action.ActionCost + activeNode.estimatedPathCost, isSkilled);
+        return new Node(activeNode, newRequired, action, newRequired.Count * heuristicFactor + action.ActionCost + activeNode.estimatedPathCost, isSkilled);
     }
 
     private Node GenerateBuyNode(Node activeNode, HashSet<GOAP_Worldstate> planningWorldState, GOAP_Agent agent)
@@ -390,8 +391,8 @@ public class GOAP_Planner : MonoBehaviour
 
         if (!isValidAction) return null;
 
-        float estimatedQuestCost = action.ActionCost * activeNode.required.Count;
-        return new Node(activeNode, newRequired, action, estimatedQuestCost + activeNode.estimatedPathCost, true);
+        float estimatedBuyCost = action.ActionCost * activeNode.required.Count;
+        return new Node(activeNode, newRequired, action, estimatedBuyCost + activeNode.estimatedPathCost, true);
     }
 
     //Generate a quest for the current Node, because it is somehow unsolvable
