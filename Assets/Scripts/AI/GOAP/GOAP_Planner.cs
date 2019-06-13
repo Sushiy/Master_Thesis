@@ -91,24 +91,29 @@ public class GOAP_Planner : MonoBehaviour
 
     public Queue<GOAP_Action> Plan(GOAP_Agent agent, List<GOAP_Worldstate> goal, HashSet<GOAP_Worldstate> currentWorldState, HashSet<GOAP_Action> availableActions)
     {
-        Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> started planning.");
-        plannerLog = "";
+        plannerLog = "<color=#0000cc> <b>PLANNING</b>: " + agent.Character.characterName + "</color>\n";
 
         //Search for a valid plan
         Node startNode = WhileBuild(goal, new List<GOAP_Action>(availableActions), currentWorldState, agent);
+        plannerLog += "\n";
 
         //Return null if you couldn't find a plan!
         if (startNode == null)
         {
-            Debug.Log("<color=#ff0000>Couldn't find actions fulfilling " + agent.Character.characterName + "s goal.</color>");
+            plannerLog += "<color=#cc0000>Couldn't find actions fulfilling " + agent.Character.characterName + "s goal.</color>\n";
+
+            Debug.Log(plannerLog);
             return null;
         }
         //Also return null, if the startnode is the goalNode
-        if (startNode.action == null)
+        if (startNode.action == null && agent.activeQuest == null)
         {
+            plannerLog += "Plan has already been fulfilled.\n";
+
+            Debug.Log(plannerLog);
             return null;
         }
-        Debug.Log(plannerLog);
+        plannerLog += "<color=#00cc00>" + agent.Character.characterName + "found plan:</color>\n";
 
         //Otherwise return the queue
         return MakeQueue(startNode, agent);
@@ -140,8 +145,11 @@ public class GOAP_Planner : MonoBehaviour
         //If the goal is already fulfilled, return the goal
         if(goalNode.required.Count == 0)
         {
+            plannerLog += "Goal was already fulfilled\n";
             return goalNode;
         }
+
+        plannerLog += "Starting reverse planning: \n\n";
         //Add the goal as first node
         openSet.Add(goalNode);
 
@@ -159,7 +167,7 @@ public class GOAP_Planner : MonoBehaviour
             {
                 foreach (GOAP_Worldstate state in current.required)
                 {
-                    msg += state.key.ToString() + "|" + state.value.ToString() + ",";
+                    msg += state.ToString() + ",";
                 }
                 if (current.isSkilled)
                     plannerLog += makeIndent(graphDepth) + "-><color=#00CC00>ClosedSet Updated</color> (" + current.estimatedPathCost + "); ";
@@ -200,7 +208,7 @@ public class GOAP_Planner : MonoBehaviour
                                 msg = "";
                                 foreach (GOAP_Worldstate state in neighbor.required)
                                 {
-                                    msg += state.key.ToString() + "|" + state.value.ToString() + ",";
+                                    msg += state.ToString() + ",";
                                 }
                                 if (neighbor.isSkilled)
                                     plannerLog += makeIndent(graphDepth) + "-><color=#CCCC00>OpenSet Replaced</color> (" + neighbor.estimatedPathCost + "); ";
@@ -219,7 +227,7 @@ public class GOAP_Planner : MonoBehaviour
                                 msg = "";
                                 foreach (GOAP_Worldstate state in neighbor.required)
                                 {
-                                    msg += state.key.ToString() + "|" + state.value.ToString() + ",";
+                                    msg += state.ToString() + ",";
                                 }
                                 if (neighbor.isSkilled)
                                     plannerLog += makeIndent(graphDepth) + "-><color=#CC0000>OpenSet Not Replaced</color> (" + neighbor.estimatedPathCost + "); ";
@@ -241,7 +249,7 @@ public class GOAP_Planner : MonoBehaviour
                             msg = "";
                             foreach (GOAP_Worldstate state in neighbor.required)
                             {
-                                msg += state.key.ToString() + "|" + state.value.ToString() + ",";
+                                msg += state.ToString() + ",";
                             }
                             if (neighbor.isSkilled)
                                 plannerLog += makeIndent(graphDepth) + "-><color=#CCCC00>OpenSet Updated</color> (" + neighbor.estimatedPathCost + "); ";
@@ -265,7 +273,7 @@ public class GOAP_Planner : MonoBehaviour
                     msg = "";
                     foreach (GOAP_Worldstate state in questNode.required)
                     {
-                        msg += state.key.ToString() + "|" + state.value.ToString() + ",";
+                        msg += state.ToString() + ",";
                     }
                     plannerLog += makeIndent(graphDepth) + "-><color=#660000>OpenSet Updated</color> (" + questNode.estimatedPathCost + "); ";
                     if (msg.Equals("")) msg = "empty";
@@ -299,17 +307,16 @@ public class GOAP_Planner : MonoBehaviour
     private Node GetGoalNode(HashSet<GOAP_Worldstate> currentWorldState, List<GOAP_Worldstate> goalWorldState)
     {
         HashSet<GOAP_Worldstate> newRequired = new HashSet<GOAP_Worldstate>(goalWorldState);
-        string msg = "StartNode:";
+        plannerLog += "Found Goal:\n";
         foreach (GOAP_Worldstate state in goalWorldState)
         {
-            msg += "\n" + state.ToString() + ":";
+            plannerLog += state.ToString() + "\n";
             if (currentWorldState.Contains(state))
             {
                 newRequired.Remove(state);
-                msg += " already satisfied";
             }
         }
-        Debug.Log(msg);
+        plannerLog += "\n";
         return new Node(null, newRequired, null, 0, true);
     }
 
@@ -403,7 +410,7 @@ public class GOAP_Planner : MonoBehaviour
         action.CheckProceduralConditions(agent);
         foreach(GOAP_Worldstate state in activeNode.required)
         {
-            Debug.Log("Adding state " + state.key + "|" + state.value + " to quest");
+            Debug.Log("Adding state " + state.ToString() + " to quest");
             action.AddQuestWorldstate(state);
         }
         float estimatedQuestCost = action.ActionCost * activeNode.required.Count;
@@ -467,7 +474,8 @@ public class GOAP_Planner : MonoBehaviour
         }
 
         message += "|";
-        Debug.Log(message);
+        plannerLog += message;
+        Debug.Log(plannerLog);
 
         if (needsQuest)
         {

@@ -82,7 +82,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         //Only do this, when once at the beginning of the action
         if (alphaWorkTime != 0f) return;
 
-        Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is performing: " + actionID + " Cost is: " + ActionCost + ((requiredSkill == null ) ? "" : " reduced by:" + requiredSkill.id.ToString()) );
+        Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterName + "</color>:" + actionID + "(" + ActionCost + ((requiredSkill == null ) ? ")" : (" reduced by:" + requiredSkill.id.ToString()) + ")") );
         agent.View.PrintMessage(ActionID);
     }
 

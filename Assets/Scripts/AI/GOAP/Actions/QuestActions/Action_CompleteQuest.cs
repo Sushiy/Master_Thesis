@@ -33,8 +33,8 @@ public class Action_CompleteQuest : GOAP_Action
         if(completed)
         {
             TradeQuestItems(agent);
-
-            agent.activeQuest.Complete();
+            
+            GOAP_QuestBoard.instance.CompleteQuest(agent.activeQuest.id);
             agent.activeQuest = null;
         }
 

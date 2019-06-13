@@ -15,11 +15,11 @@ public class GOAP_QuestBoardWindow : EditorWindow
     {
         GUILayout.Label("Open Quests", EditorStyles.boldLabel);
         if (GOAP_QuestBoard.instance == null) return;
-        for (int i = 0; i < GOAP_QuestBoard.instance.quests.Count; i++)
+        foreach(KeyValuePair<int, GOAP_Quest> quest in GOAP_QuestBoard.instance.quests)
         {
-            if (GUILayout.Button(GOAP_QuestBoard.instance.quests[i].ToString()))
+            if (GUILayout.Button(quest.ToString()))
             {
-                GOAP_QuestBoard.instance.CompleteQuest(i);
+                GOAP_QuestBoard.instance.CompleteQuest(quest.Key);
             }
         }
     }

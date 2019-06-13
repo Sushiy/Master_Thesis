@@ -18,8 +18,10 @@ public class Action_CheckForQuest : GOAP_Action
     public override bool CheckProceduralConditions(GOAP_Agent agent)
     {
         //Check if there is at least one unchecked Quest on the questboard
-        chosenQuest = agent.CheckForQuests();
-        Debug.Log("No quests available");
+        if(chosenQuest == null)
+            chosenQuest = agent.CheckForQuests();
+        if(chosenQuest == null)
+            Debug.Log("No quests available");
         if(target == null)
             target = InfoBlackBoard.instance.questBoardLocation;
         return (chosenQuest != null);
@@ -36,17 +38,23 @@ public class Action_CheckForQuest : GOAP_Action
         alphaWorkTime = 0.5f;
 
         if (!agent.AllowedToPlan) return false;
-        
+        Debug.Log("Performing CheckQuest");
         //Try to plan for the chosen quest
+        agent.activeQuest = chosenQuest;
         Queue<GOAP_Action> actionQueue = GOAP_Planner.instance.Plan(agent, new List<GOAP_Worldstate>(chosenQuest.RequiredStates), agent.currentWorldstates);
         agent.ResetPlanningTimer();
         
         if (actionQueue != null && actionQueue.Count > 0)
         {
-            //if a valid plan was found, add it to the actionQueue 
-            agent.activeQuest = chosenQuest;
+            //if a valid plan was found, add it to the actionQueue
+            Debug.Log("Found a valid Plan for Quest " + chosenQuest.id);
             agent.UpdateActionQueue(actionQueue);
             return true;
+        }
+        else
+        {
+            Debug.Log("Didn't find a valid Plan for Quest " + chosenQuest.id);
+            agent.activeQuest = null;
         }
 
         chosenQuest = agent.CheckForQuests();

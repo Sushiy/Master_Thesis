@@ -38,6 +38,16 @@ public struct QuestData
     {
         providedStates.Add(state);
     }
+
+    public string RequiredToString()
+    {
+        string msg = "";
+        foreach(GOAP_Worldstate state in requiredStates)
+        {
+            msg += state.ToString() + ", ";
+        }
+        return msg;
+    }
 }
 
 public class GOAP_Quest
@@ -86,7 +96,7 @@ public class GOAP_Quest
     public override string ToString()
     {
         string quest = "QUEST " + id + ": " + Owner.Character.characterName + " needs someone to complete:";
-        foreach (GOAP_Worldstate state in ProvidedStates)
+        foreach (GOAP_Worldstate state in RequiredStates)
         {
             quest += " " + state.ToString() + ";";
         }

@@ -27,7 +27,7 @@ public class Action_WaitForQuest : GOAP_Action
         {
             if(isStartingWork)
             {
-                Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is performing: " + actionID);
+                Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterName + "</color>: WaitForQuest");
                 agent.View.PrintMessage(ActionID);
                 UpdateWorkTime(deltaTime);
             }

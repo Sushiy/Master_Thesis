@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -4270,7 +4270,7 @@ MonoBehaviour:
   mineIronLocations:
   - {fileID: 1343367345}
   farmingLocations:
-  - {fileID: 0}
+  - {fileID: 1263114934}
   millingLocations:
   - {fileID: 3981253}
 --- !u!4 &284275237
@@ -29675,9 +29675,11 @@ MonoBehaviour:
     value: 0
   - key: 5
     value: 0
+  - key: 2
+    value: 1
   itemStockPilePriorities: 
   availableActions: 784
-  startingInventory: 02010000
+  startingInventory: 0201000000020000000200000002000000020000000200000002000000020000
   food: 40
   sleep: 120
 --- !u!4 &1778827024

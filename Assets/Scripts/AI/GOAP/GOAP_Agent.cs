@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 enum FSM_State
@@ -60,7 +61,7 @@ public class GOAP_Agent
     public List<GOAP_Worldstate> ChooseGoal()
     {
         List<GOAP_Worldstate> result = null;
-        string msg = (character.characterName + " is checking his goals:\n");
+        string msg = "<color=#0000cc><b>CHECKING GOALS</b>:" + character.characterName + "</color>\n";
         
         //Check goals top to bottom, to see which need to be fulfilled
         for (int i = 0; i < character.goals.Count; i++)
@@ -81,7 +82,7 @@ public class GOAP_Agent
         }
         Debug.Log(msg);
 
-        /*
+        
         //if none of the goals needed to be fulfilled, instead check the quests
         if(result == null)
         {
@@ -90,7 +91,6 @@ public class GOAP_Agent
             if(activeQuest != null)
                 result = new List<GOAP_Worldstate>(activeQuest.RequiredStates);
         }
-        */
 
         return result;
     }
@@ -124,12 +124,12 @@ public class GOAP_Agent
                         {
                             Debug.Log("<color=#0000cc>" + character.characterName + "</color> chose Quest " + activeQuest.id);
 
-                            if (!GOAP_QuestBoard.instance.ChooseQuest(activeQuest))
-                            {
-                                activeQuest = null;
-                                currentActions.Clear();
-                                currentState = FSM_State.IDLE;
-                            }
+                            //if (!GOAP_QuestBoard.instance.ChooseQuest(activeQuest))
+                            //{
+                            //    activeQuest = null;
+                            //    currentActions.Clear();
+                            //    currentState = FSM_State.IDLE;
+                            //}
                         }
                         //do what the plan says!
                         currentActions = newPlan;
@@ -155,7 +155,6 @@ public class GOAP_Agent
             else
             {
                 View.PrintMessage("Idle");
-                timeSincePlanned += deltaTime;
             }
         }
 
@@ -218,6 +217,7 @@ public class GOAP_Agent
                 currentState = FSM_State.PERFORMACTION;
             }
         }
+        timeSincePlanned += deltaTime;
     }
 
     private void CancelPlan()
@@ -227,6 +227,7 @@ public class GOAP_Agent
 
     public GOAP_Quest CheckForQuests()
     {
+        Debug.Log("Checking for Quests");
         if(GOAP_QuestBoard.instance.quests.Count == 0)
         {
             checkedQuestIds.Clear();
@@ -236,27 +237,28 @@ public class GOAP_Agent
         //First go through all questIds we have tried to plan for before and see if they are even still available
         //I use a quick check here, that only deletes ids that are lower than the lowest quest on the board
         //This is basically just garbagecollection
+        int minKey = GOAP_QuestBoard.instance.quests.First().Key;
         for (int i = 0; i < checkedQuestIds.Count; i++)
         {
             //The lowest quest has the lowest id
-            if(GOAP_QuestBoard.instance.quests[0].id > checkedQuestIds[i])
+            if(minKey > checkedQuestIds[i])
             {
                 checkedQuestIds.Remove(checkedQuestIds[i]);
             }
         }
 
-        foreach (GOAP_Quest quest in GOAP_QuestBoard.instance.quests)
+        foreach (KeyValuePair<int, GOAP_Quest> quest in GOAP_QuestBoard.instance.quests)
         {
             //if we don't own this quest, lets try to plan for it
-            if (quest.Owner != this)
+            if (quest.Value.Owner != this)
             {
-                result = quest;
+                result = quest.Value;
                 break;
             }
         }
         if (result != null)
         {
-            Debug.Log("<color=#0000cc>" + character.characterName + "</color> tries to plan for Quest " + result.id);
+            Debug.Log("<color=#0000cc>" + character.characterName + "</color> chose to plan for Quest " + result.id);
         }
         checkedQuestIds.Add(result.id);
         return result;
