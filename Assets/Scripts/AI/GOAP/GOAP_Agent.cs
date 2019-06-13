@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -31,8 +31,8 @@ public class GOAP_Agent
         get { return character; }
     }
 
-    float planningWaitTimer = 2.0f;
-    private float timeSincePlanned = 0.0f;
+    float planningWaitTimer = 5.0f;
+    public float timeSincePlanned = 0.0f;
     public bool AllowedToPlan
     {
         get { return timeSincePlanned >= planningWaitTimer; }
@@ -86,10 +86,17 @@ public class GOAP_Agent
         //if none of the goals needed to be fulfilled, instead check the quests
         if(result == null)
         {
-            Debug.Log(character.characterName + " has fulfilled all of his goals.");
             activeQuest = CheckForQuests();
             if(activeQuest != null)
+            {
+                Debug.Log(character.characterName + " has fulfilled all of his goals. But found a quest");
                 result = new List<GOAP_Worldstate>(activeQuest.RequiredStates);
+            }
+            else
+            {
+                Debug.Log(character.characterName + " has fulfilled all of his goals. No quest");
+                timeSincePlanned = 0.0f;
+            }
         }
 
         return result;

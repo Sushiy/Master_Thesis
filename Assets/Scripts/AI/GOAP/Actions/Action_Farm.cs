@@ -35,6 +35,11 @@ public class Action_Farm : GOAP_Action
 
         if (completed)
         {
+            if (Random.value < 0.3f)
+            {
+                Debug.Log("<color=#cc0000>" + agent.Character.characterName + "s Hoe broke.</color>");
+                agent.Character.UpdateInventory(ItemType.Hoe, false);
+            }
             agent.Character.UpdateInventory(ItemType.Wheat, true, 4);
             CompletePerform(agent);
         }

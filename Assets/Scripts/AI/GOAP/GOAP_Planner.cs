@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -297,6 +297,7 @@ public class GOAP_Planner : MonoBehaviour
         {
             if (!currentWorldState.Contains(state))
             {
+                //TODO: FIXTHIS
                 return false;
             }
         }

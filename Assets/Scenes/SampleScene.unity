@@ -1316,8 +1316,6 @@ MonoBehaviour:
     value: 0
   - key: 5
     value: 0
-  - key: 2
-    value: 1
   itemStockPilePriorities: 02000000000000000001000001010000
   availableActions: 74
   startingInventory: 01010000
@@ -29229,8 +29227,6 @@ MonoBehaviour:
     value: 0
   - key: 5
     value: 0
-  - key: 2
-    value: 1
   itemStockPilePriorities: 0000000001000000
   availableActions: 519
   startingInventory: 
@@ -29870,11 +29866,9 @@ MonoBehaviour:
     value: 0
   - key: 5
     value: 0
-  - key: 2
-    value: 1
   itemStockPilePriorities: 
   availableActions: 784
-  startingInventory: 0201000000020000000200000002000000020000000200000002000000020000
+  startingInventory: 000200000002000000020000
   food: 40
   sleep: 120
 --- !u!4 &1778827024
