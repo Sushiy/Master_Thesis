@@ -39,7 +39,11 @@ public class GOAP_Agent
     }
     bool actionCompleted = true;
 
-    public GOAP_Quest postedQuest = null;
+    public List<int> postedQuestIDs = null;
+    public List<int> completedQuestIDs = null;
+    
+    public Dictionary<int, Queue<GOAP_Action>> questPlans;
+
     public GOAP_Quest activeQuest = null;
 
     private IGOAP_AgentView view;
@@ -57,12 +61,17 @@ public class GOAP_Agent
         currentWorldstates = new List<GOAP_Worldstate>();
         checkedQuestIds = new List<int>();
 
+        postedQuestIDs = new List<int>();
+        completedQuestIDs = new List<int>();
+
+        questPlans = new Dictionary<int, Queue<GOAP_Action>>();
+
     }
     public List<GOAP_Worldstate> ChooseGoal()
     {
         List<GOAP_Worldstate> result = null;
         string msg = "<color=#0000cc><b>CHECKING GOALS</b>:" + character.characterName + "</color>\n";
-        
+
         //Check goals top to bottom, to see which need to be fulfilled
         for (int i = 0; i < character.goals.Count; i++)
         {
@@ -105,7 +114,7 @@ public class GOAP_Agent
     // Update is called once per frame
     public void Update(float deltaTime)
     {
-        if (currentState == FSM_State.IDLE && postedQuest == null)
+        if (currentState == FSM_State.IDLE)
         {
             if (AllowedToPlan)
             {
@@ -127,17 +136,6 @@ public class GOAP_Agent
 
                     if (newPlan != null)
                     {
-                        if (activeQuest != null)
-                        {
-                            //Debug.Log("<color=#0000cc>" + character.characterName + "</color> chose Quest " + activeQuest.id);
-
-                            //if (!GOAP_QuestBoard.instance.ChooseQuest(activeQuest))
-                            //{
-                            //    activeQuest = null;
-                            //    currentActions.Clear();
-                            //    currentState = FSM_State.IDLE;
-                            //}
-                        }
                         //do what the plan says!
                         currentActions = newPlan;
                         currentState = FSM_State.PERFORMACTION;
@@ -156,7 +154,21 @@ public class GOAP_Agent
                 }
                 else
                 {
-                    goal = ChooseGoal();
+                    //Before checking goals, check if any of your quests have been completed
+                    if (completedQuestIDs.Count > 0)
+                    {
+                        //choose the first one and go
+                        int id = completedQuestIDs[0];
+                        currentActions = questPlans[id];
+                        questPlans.Remove(id);
+                        completedQuestIDs.Remove(id);
+                        currentState = FSM_State.PERFORMACTION;
+                    }
+                    else
+                    {
+                        goal = ChooseGoal();
+                    }
+
                 }
 
             }
@@ -173,7 +185,11 @@ public class GOAP_Agent
             {
                 if (currentActions.Count > 0)
                 {
-                    activeAction = currentActions.Dequeue();
+                    //Remove the old active action
+                    if(activeAction != null)
+                        currentActions.Dequeue();
+                    //Get the new active action
+                    activeAction = currentActions.Peek();
                     actionCompleted = false;
                 }
                 else
@@ -302,6 +318,7 @@ public class GOAP_Agent
         }
         //Debug.Log(PrintCurrentStates());
     }
+
     public void RemoveCurrentWorldState(ItemType type)
     {
         GOAP_Worldstate state = new GOAP_Worldstate(WorldStateKey.eHasItem, (int)type);
@@ -347,5 +364,12 @@ public class GOAP_Agent
     {
         //TODO: I would like to enqueue the whole queue instead of replacing it
         currentActions = actionQueue;
+    }
+
+    public void SaveQuestPlan(int questID)
+    {
+        questPlans.Add(questID, currentActions);
+        currentActions.Clear();
+        activeAction = null;
     }
 }

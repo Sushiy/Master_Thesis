@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Action_WaitForQuest : GOAP_Action
 {
+    int questID;
     public Action_WaitForQuest()
     {
         Init();
@@ -23,22 +25,29 @@ public class Action_WaitForQuest : GOAP_Action
 
     public override bool Perform(GOAP_Agent agent, float deltaTime)
     {
-        if (agent.postedQuest != null)
+        if(isStartingWork)
         {
-            if(isStartingWork)
+            Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterName + "</color>: WaitForQuest");
+            agent.View.PrintMessage(ActionID);
+            UpdateWorkTime(deltaTime);
+            questID = agent.postedQuestIDs.Last();
+
+            //Move this plan to questPlans.
+            agent.SaveQuestPlan(questID);
+        }
+
+        if(agent.completedQuestIDs.Contains(questID))
+        {
+            //Finish Quest
+            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "s</color> Quest was completed!");
+            foreach (GOAP_Worldstate state in SatisfyWorldstates)
             {
-                Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterName + "</color>: WaitForQuest");
-                agent.View.PrintMessage(ActionID);
-                UpdateWorkTime(deltaTime);
+                agent.ChangeCurrentWorldState(state);
             }
-            return false;
+            return true;
         }
-        Debug.Log("<color=#0000cc>" + agent.Character.characterName + "s</color> Quest was completed!");
-        foreach (GOAP_Worldstate state in SatisfyWorldstates)
-        {
-            agent.ChangeCurrentWorldState(state);
-        }
-        return true;
+
+        return false;
     }
 
     public void AddQuestWorldstate(GOAP_Worldstate state)

@@ -90,7 +90,11 @@ public class GOAP_Quest
 
     public void Complete()
     {
-        Owner.postedQuest = null;
+        if(Owner.postedQuestIDs.Contains(id))
+        {
+            Owner.completedQuestIDs.Add(id);
+            Owner.postedQuestIDs.Remove(id);
+        }
     }
 
     public override string ToString()

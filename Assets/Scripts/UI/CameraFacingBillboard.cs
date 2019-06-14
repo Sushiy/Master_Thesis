@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CameraFacingBillboard : MonoBehaviour
 {
-    public Camera camera;
+    public new Camera camera;
 
     private void Awake()
     {
