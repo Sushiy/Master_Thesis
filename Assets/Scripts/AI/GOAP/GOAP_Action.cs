@@ -6,8 +6,8 @@ using UnityEngine;
 //This class contains all info on individual actions. Most of all it holds the required and satisfyWorldstate fields, which are needed for planning.
 public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
 {
-    private HashSet<GOAP_Worldstate> requiredWorldstates;
-    private HashSet<GOAP_Worldstate> satisfyWorldstates;
+    private List<GOAP_Worldstate> requiredWorldstates;
+    private List<GOAP_Worldstate> satisfyWorldstates;
 
     protected float workCost = 1f;
     protected float coinCost = 0f;
@@ -69,8 +69,8 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
 
     protected void Init()
     {
-        requiredWorldstates = new HashSet<GOAP_Worldstate>();
-        satisfyWorldstates = new HashSet<GOAP_Worldstate>();
+        requiredWorldstates = new List<GOAP_Worldstate>();
+        satisfyWorldstates = new List<GOAP_Worldstate>();
     }
   
 
@@ -181,7 +181,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         return other.actionID.Equals(actionID);
     }
 
-    public HashSet<GOAP_Worldstate> RequiredWorldstates
+    public List<GOAP_Worldstate> RequiredWorldstates
     {
         get
         {
@@ -189,7 +189,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         }
     }
 
-    public HashSet<GOAP_Worldstate> SatisfyWorldstates
+    public List<GOAP_Worldstate> SatisfyWorldstates
     {
         get
         {

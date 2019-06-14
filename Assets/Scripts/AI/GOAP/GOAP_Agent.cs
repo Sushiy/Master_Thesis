@@ -18,7 +18,7 @@ public class GOAP_Agent
 
     public List<int> checkedQuestIds;
 
-    public HashSet<GOAP_Worldstate> currentWorldstates;
+    public List<GOAP_Worldstate> currentWorldstates;
 
     public PlannableActions actions;
 
@@ -54,7 +54,7 @@ public class GOAP_Agent
         this.view = view;
 
         currentActions = new Queue<GOAP_Action>();
-        currentWorldstates = new HashSet<GOAP_Worldstate>();
+        currentWorldstates = new List<GOAP_Worldstate>();
         checkedQuestIds = new List<int>();
 
     }
@@ -129,7 +129,7 @@ public class GOAP_Agent
                     {
                         if (activeQuest != null)
                         {
-                            Debug.Log("<color=#0000cc>" + character.characterName + "</color> chose Quest " + activeQuest.id);
+                            //Debug.Log("<color=#0000cc>" + character.characterName + "</color> chose Quest " + activeQuest.id);
 
                             //if (!GOAP_QuestBoard.instance.ChooseQuest(activeQuest))
                             //{
@@ -149,6 +149,7 @@ public class GOAP_Agent
                         if (activeQuest != null)
                         {
                             activeQuest = null;
+                            goal = null;
                             currentState = FSM_State.IDLE;
                         }
                     }
@@ -198,7 +199,7 @@ public class GOAP_Agent
                 }
                 else
                 {
-                    Debug.Log("<color=#0000cc>" + character.characterName + "</color> cannot perform + <color=#cc0000>" + activeAction.ActionID + "</color> anymore.");
+                    Debug.Log("<color=#0000cc>" + character.characterName + "</color> cannot perform <color=#cc0000>" + activeAction.ActionID + "</color> anymore.");
                     activeAction = null;
                     currentActions.Clear();
                     currentState = FSM_State.IDLE;
@@ -266,12 +267,12 @@ public class GOAP_Agent
         if (result != null)
         {
             Debug.Log("<color=#0000cc>" + character.characterName + "</color> chose to plan for Quest " + result.id);
+            checkedQuestIds.Add(result.id);
         }
-        checkedQuestIds.Add(result.id);
         return result;
     }
 
-    private HashSet<GOAP_Worldstate> FetchWorldState()
+    private List<GOAP_Worldstate> FetchWorldState()
     {
         return currentWorldstates;
     }
