@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Action_WaitForQuest : GOAP_Action
 {
-    int questID;
+    int questID = -1;
     public Action_WaitForQuest()
     {
         Init();
@@ -27,19 +27,28 @@ public class Action_WaitForQuest : GOAP_Action
     {
         if(isStartingWork)
         {
-            Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterName + "</color>: WaitForQuest");
-            agent.View.PrintMessage(ActionID);
-            UpdateWorkTime(deltaTime);
-            questID = agent.postedQuestIDs.Last();
+            if(questID < 0)
+            {
+                questID = agent.postedQuestIDs.Last();
+                agent.View.PrintMessage(ActionID);
+                Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterName + "</color>: WaitForQuest " + questID);
 
-            //Move this plan to questPlans.
-            agent.SaveQuestPlan(questID);
+                //Move this plan to questPlans.
+                agent.SaveQuestPlan(questID);
+                return true;
+            }
+            else
+            {
+                Debug.Log("<color=#0000cc><b>Restarting</b>: " + agent.Character.characterName + "</color>: WaitForQuest" + questID);
+                UpdateWorkTime(deltaTime);
+            }
         }
 
         if(agent.completedQuestIDs.Contains(questID))
         {
             //Finish Quest
             Debug.Log("<color=#0000cc>" + agent.Character.characterName + "s</color> Quest was completed!");
+            agent.completedQuestIDs.Remove(questID);
             foreach (GOAP_Worldstate state in SatisfyWorldstates)
             {
                 agent.ChangeCurrentWorldState(state);

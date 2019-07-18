@@ -29868,7 +29868,7 @@ MonoBehaviour:
     value: 0
   itemStockPilePriorities: 
   availableActions: 784
-  startingInventory: 000200000002000000020000
+  startingInventory: 
   food: 40
   sleep: 120
 --- !u!4 &1778827024

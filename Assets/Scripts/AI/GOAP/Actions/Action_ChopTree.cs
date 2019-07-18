@@ -16,16 +16,20 @@ public class Action_ChopTree : GOAP_Action
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
     {
+        //When should he really check for the conditions?
+        return true;
+        /*
         target = InfoBlackBoard.instance.FindClosest(InfoBlackBoard.instance.chopTreeLocations, agent.View.GetPosition()); //TODO: This isnt technically correct
         if (target != null)
             return true;
         else
             return false;
+            */
     }
 
     public override bool RequiresInRange()
     {
-        return true;
+        return false;
     }
 
     public override bool Perform(GOAP_Agent agent, float deltaTime)

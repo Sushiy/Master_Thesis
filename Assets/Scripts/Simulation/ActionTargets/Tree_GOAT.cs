@@ -43,7 +43,7 @@ public class Tree_GOAT : GameObjectActionTarget
         {
             return true;
         }
-        return false;
+        return true;
     }
 
     void SetGrowthState(int i)

@@ -117,6 +117,19 @@ public class GOAP_Planner : MonoBehaviour
         }
         plannerLog += "<color=#00cc00>" + agent.Character.characterName + "found plan:</color>\n";
 
+        bool isCharacterGoal = true;
+        foreach(GOAP_Worldstate goalState in goal)
+        {
+            if (!agent.Character.goals.Contains(goalState))
+            {
+                isCharacterGoal = false;
+            }
+        }
+
+        if(isCharacterGoal)
+        {
+            //Remove the goal from the agents checked goals
+        }
         //Otherwise return the queue
         return MakeQueue(startNode, agent);
     }
@@ -139,8 +152,6 @@ public class GOAP_Planner : MonoBehaviour
     {
         Node current = null;
 
-        List<Node> closedSet = new List<Node>(); //List for performance and uniqueness
-
         List<Node> openSet = new List<Node>(); //This is a List so it can be sorted
 
         Node goalNode = GetGoalNode(currentWorldState, goal);
@@ -160,30 +171,33 @@ public class GOAP_Planner : MonoBehaviour
         //Reverse A*
         while(openSet.Count > 0)
         {
+            //Sort the open set by pathcosts and pick the best node
             openSet.Sort();
             current = openSet[0];
 
-            //Debug Log to visualize the process
-            string msg = "";
-            if (writePlannerLog)
-            {
-                foreach (GOAP_Worldstate state in current.required)
-                {
-                    msg += state.ToString() + ",";
-                }
-                plannerLog += makeIndent(graphDepth) + "-><color=#00CC00>ClosedSet Updated</color> (" + current.estimatedPathCost + "); ";
-                if (msg.Equals("")) msg = "empty";
-                plannerLog += "(" + msg + ")";
-                if (current.action != null) plannerLog += "Action: " + current.action.ActionID;
-                plannerLog += "\n";
-            }
-
             if (current.required.Count == 0)
             {
+                plannerLog += makeIndent(graphDepth) + "-><color=#00CC00>Planning Completed with:</color> " + current.ToString() + "\n";
                 return current;
             }
+
+            //Debug Log to visualize the process
+            if (writePlannerLog)
+            {
+                plannerLog += "\n Planning at depth" + graphDepth;
+                
+                plannerLog += "\n<color=#CCCC00>OpenSet(" + openSet.Count+ "): </color>";
+                for (int i = 0; i < openSet.Count; i++)
+                {
+                    plannerLog += "\n " + openSet[i].ToString() ;
+                }
+
+                plannerLog += "\n\n";
+
+                plannerLog += makeIndent(graphDepth) + "-><color=#00CC00>Best Node Chosen:</color> " + current.ToString() + "\n";
+            }
             openSet.Remove(current);
-            closedSet.Add(current);
+
             bool foundValidNeighbor = false;
             for (int i = 0; i < availableActions.Count; i++)
             {
@@ -193,84 +207,57 @@ public class GOAP_Planner : MonoBehaviour
                 if(neighbor != null)
                 {
                     foundValidNeighbor = true;
-                    int indexOfSameState = openSet.IndexOf(neighbor);
-                    if (indexOfSameState != -1)
+                    int indexOfNodeWithSameState = openSet.IndexOf(neighbor);
+                    if (indexOfNodeWithSameState != -1)
                     {
-                        if (openSet[indexOfSameState].estimatedPathCost > neighbor.estimatedPathCost)
+                        string tmp = openSet[indexOfNodeWithSameState].ToString();
+                        //if there is already another node with the same resulting planningworldstate, check which has the lower pathcost
+                        if (openSet[indexOfNodeWithSameState].estimatedPathCost > neighbor.estimatedPathCost)
                         {
-                            
-                            openSet.Remove(openSet[indexOfSameState]);
-                            
+                            //if the new node has a lower pathcost, pick that
+                            openSet.Remove(openSet[indexOfNodeWithSameState]);                            
                             openSet.Add(neighbor);
+
                             if (writePlannerLog)
                             {
-                                msg = "";
-                                foreach (GOAP_Worldstate state in neighbor.required)
-                                {
-                                    msg += state.ToString() + ",";
-                                }
-                                plannerLog += makeIndent(graphDepth) + "-><color=#CCCC00>OpenSet Replaced</color> (" + neighbor.estimatedPathCost + "); ";
-                                if (msg.Equals("")) msg = "empty";
-                                plannerLog += "(" + msg + ") ";
-                                if (neighbor.action != null) plannerLog += "Action: " + neighbor.action.ActionID;
-                                plannerLog += "\n";
+                                plannerLog += makeIndent(graphDepth) + "-><color=#CCCC00>OpenSet Replaced</color>  " + tmp + "with" + neighbor.ToString() + "\n";
                             }
                         }
                         else
                         {
+                            //if the new node has a higher pathcost, don't do anything
                             if (writePlannerLog)
                             {
-                                msg = "";
-                                foreach (GOAP_Worldstate state in neighbor.required)
-                                {
-                                    msg += state.ToString() + ",";
-                                }
-                                plannerLog += makeIndent(graphDepth) + "-><color=#CC0000>OpenSet Not Replaced</color> (" + neighbor.estimatedPathCost + "); ";
-                                if (msg.Equals("")) msg = "empty";
-                                plannerLog += "(" + msg + ") ";
-                                if (neighbor.action != null) plannerLog += "Action: " + neighbor.action.ActionID;
-                                plannerLog += "\n";
+                                plannerLog += makeIndent(graphDepth) + "-><color=#CC0000>OpenSet Not Replaced</color>  " + tmp + "with" + neighbor.ToString() + "\n";
                             }
+                            neighbor = null;
                         }
                     }
                     else
                     {
                         openSet.Add(neighbor);
+                        if(neighbor.action.ActionID == "GatherWood")
+                        {
+                            int a = 0;
+                            a += 1;
+                        }
                         //Debug Log to visualize the process
                         if (writePlannerLog)
                         {
-                            msg = "";
-                            foreach (GOAP_Worldstate state in neighbor.required)
-                            {
-                                msg += state.ToString() + ",";
-                            }
-                            plannerLog += makeIndent(graphDepth) + "-><color=#CCCC00>OpenSet Updated</color> (" + neighbor.estimatedPathCost + "); ";
-                            if (msg.Equals("")) msg = "empty";
-                            plannerLog += "(" + msg + ") ";
-                            if (neighbor.action != null) plannerLog += "Action: " + neighbor.action.ActionID;
-                            plannerLog += "\n";
+                            plannerLog += makeIndent(graphDepth) + "-><color=#CCCC00>OpenSet Updated</color>  " + neighbor.ToString() + "\n";
                         }
                     }
                 }
             }
             if(!foundValidNeighbor && current != goalNode)
             {
-                plannerLog += "No valide neigbor found:\n";
+                plannerLog += "No valid neigbor found:\n";
                 Node questNode = GenerateQuestNode(current, currentWorldState, agent);
                 openSet.Add(questNode);
                 //Debug Log to visualize the process
                 if (writePlannerLog)
                 {
-                    msg = "";
-                    foreach (GOAP_Worldstate state in questNode.required)
-                    {
-                        msg += state.ToString() + ",";
-                    }
-                    plannerLog += makeIndent(graphDepth) + "-><color=#660000>OpenSet Updated</color> (" + questNode.estimatedPathCost + "); ";
-                    if (msg.Equals("")) msg = "empty";
-                    plannerLog += "(" + msg + ") ";
-                    if (questNode.action != null) plannerLog += "Action: " + questNode.action.ActionID;
-                    plannerLog += "\n";
+                    plannerLog += makeIndent(graphDepth) + "-><color=#660000>OpenSet Updated</color>  " + questNode.ToString() + "\n";
                 }
             }
             graphDepth++;
@@ -321,7 +308,7 @@ public class GOAP_Planner : MonoBehaviour
     //Try to apply the action onto the activeNode to see if it results in a valid neighbor
     private Node GetValidNeighborNode(Node activeNode, GOAP_Action action, List<GOAP_Worldstate> planningWorldState, GOAP_Agent agent)
     {
-        bool isValidAction = false;
+        bool isUsefulAction = false;
 
         List<GOAP_Worldstate> newRequired = new List<GOAP_Worldstate>(activeNode.required);
         //Actions need to fulfill at least one required Worldstate to result in a valid neighbor
@@ -330,11 +317,12 @@ public class GOAP_Planner : MonoBehaviour
             if (action.SatisfyWorldstates.Contains(state))
             {
                 newRequired.Remove(state);
-                isValidAction = true;
+                isUsefulAction = true;
             }
         }
 
-        if (!isValidAction) return null;
+        //if this action does not help the plan, return null
+        if (!isUsefulAction) return null;
         //If the actions proceduralConditions are not met, we can't perform it anyways
         if (!action.CheckProceduralConditions(agent)) return null;
 
@@ -367,7 +355,7 @@ public class GOAP_Planner : MonoBehaviour
         }
 
         //Change the skillmodifier on the action 
-        action.ApplySkillModifier(skillModifier);
+        //action.ApplySkillModifier(skillModifier);
 
         return new Node(activeNode, newRequired, action, newRequired.Count * heuristicFactor + action.ActionCost + activeNode.estimatedPathCost);
     }
@@ -406,7 +394,7 @@ public class GOAP_Planner : MonoBehaviour
         action.CheckProceduralConditions(agent);
         foreach(GOAP_Worldstate state in activeNode.required)
         {
-            Debug.Log("Adding state " + state.ToString() + " to quest");
+            //Debug.Log("Adding state " + state.ToString() + " to quest");
             action.AddQuestWorldstate(state);
         }
         float estimatedQuestCost = action.ActionCost * activeNode.required.Count;
@@ -489,6 +477,12 @@ public class GOAP_Planner : MonoBehaviour
 
         public bool Equals(Node other)
         {
+            //Equalize through states only
+
+            //First check the number of states
+            if (required.Count != other.required.Count) return false;
+
+            //Then check if the other state contains all the same states this one does
             bool sameRequiredStates = true;
             foreach(GOAP_Worldstate state in required)
             {
@@ -522,6 +516,22 @@ public class GOAP_Planner : MonoBehaviour
             if (action != null)
                 calculation += action.ActionID.GetHashCode();
             return calculation ;
+        }
+
+        public override string ToString()
+        {
+            string msg = "";
+            msg += "(Required:";
+            for(int i = 0; i < required.Count; i++)
+            {
+                msg += required[i].ToString() + ",";
+            }
+            if(required.Count < 0)
+            {
+                msg += "empty";
+            }
+            msg += "; Action:" + (action!= null? action.ActionID : "none") + ";Cost:" + estimatedPathCost + ")";
+            return msg;
         }
     }
 }

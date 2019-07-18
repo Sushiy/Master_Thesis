@@ -13,10 +13,10 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     protected float coinCost = 0f;
     protected float range = 1.0f;
 
-    private float secondsToWorkCostRation = 0.1f; // How much Time should pass for 1 workCost: 0.1f/1f
+    private float secondsToWorkCostRatio = 0.1f; // How much Time should pass for 1 workCost: 0.1f/1f
     private float workTime
     {
-        get { return secondsToWorkCostRation * workCost; }
+        get { return secondsToWorkCostRatio * workCost; }
     }
     protected float alphaWorkTime = 0.0f;
     protected bool isStartingWork
@@ -156,10 +156,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     }
     protected void AddRequiredWorldState(WorldStateKey key, int value, IActionTarget target = null)
     {
-        GOAP_Worldstate state;
-        state.key = key;
-        state.target = target;
-        state.value = value;
+        GOAP_Worldstate state = new GOAP_Worldstate(key, value, target);
         requiredWorldstates.Add(state);
     }
     protected void AddSatisfyWorldState(WorldStateKey key, bool value, IActionTarget target = null)
@@ -168,10 +165,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     }
     protected void AddSatisfyWorldState(WorldStateKey key, int value, IActionTarget target = null)
     {
-        GOAP_Worldstate state;
-        state.key = key;
-        state.target = target;
-        state.value = value;
+        GOAP_Worldstate state = new GOAP_Worldstate(key, value, target);
         satisfyWorldstates.Add(state);
     }
 
