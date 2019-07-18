@@ -12,15 +12,30 @@ public class GOAP_CharacterEditor : Editor
         GOAP_Character character = (GOAP_Character)target;
         EditorGUILayout.PrefixLabel("Allowed Actions");
         character.availableActions = (PlannableActions)EditorGUILayout.EnumFlagsField(((GOAP_Character)target).availableActions);
-        EditorGUILayout.PrefixLabel("Current Worldstate", EditorStyles.boldLabel);
         if(character.agent != null)
         {
+            GUILayout.BeginHorizontal();
             GUILayout.BeginVertical();
+            EditorGUILayout.LabelField("Current Worldstate", EditorStyles.boldLabel);
             foreach (GOAP_Worldstate state in character.agent.currentWorldstates)
             {
                 GUILayout.Label(state.ToString());
             }
             GUILayout.EndVertical();
+
+            GUILayout.BeginVertical();
+            EditorGUILayout.LabelField("Current PostedQuestIDs", EditorStyles.boldLabel);
+            foreach (int id in character.agent.postedQuestIDs)
+            {
+                GUILayout.Label(id.ToString());
+            }
+            EditorGUILayout.LabelField("Current CompletedQuestIDs", EditorStyles.boldLabel);
+            foreach (int id in character.agent.completedQuestIDs)
+            {
+                GUILayout.Label(id.ToString());
+            }
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
         }
         if (GUILayout.Button("Edit Character"))
         {

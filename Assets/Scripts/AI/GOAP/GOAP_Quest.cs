@@ -5,19 +5,19 @@ using UnityEngine;
 public struct QuestData
 {
     public GOAP_Agent owner;
-    public HashSet<GOAP_Worldstate> requiredStates;
+    public List<GOAP_Worldstate> requiredStates;
 
-    public HashSet<GOAP_Worldstate> providedStates;
+    public List<GOAP_Worldstate> providedStates;
     public void Init()
     {
-        requiredStates = new HashSet<GOAP_Worldstate>();
-        providedStates = new HashSet<GOAP_Worldstate>();
+        requiredStates = new List<GOAP_Worldstate>();
+        providedStates = new List<GOAP_Worldstate>();
     }
     public QuestData(GOAP_Agent owner)
     {
         this.owner = owner;
-        requiredStates = new HashSet<GOAP_Worldstate>();
-        providedStates = new HashSet<GOAP_Worldstate>();
+        requiredStates = new List<GOAP_Worldstate>();
+        providedStates = new List<GOAP_Worldstate>();
     }
 
     public void ClearRequired()
@@ -62,12 +62,12 @@ public class GOAP_Quest
         get { return questData.owner; }
     }
     
-    public HashSet<GOAP_Worldstate> RequiredStates
+    public List<GOAP_Worldstate> RequiredStates
     {
         get { return questData.requiredStates; }
     }
     
-    public HashSet<GOAP_Worldstate> ProvidedStates
+    public List<GOAP_Worldstate> ProvidedStates
     {
         get { return questData.providedStates; }
     }
@@ -83,14 +83,18 @@ public class GOAP_Quest
         questData = new QuestData
         {
             owner = agent,
-            requiredStates = new HashSet<GOAP_Worldstate>(required),
-            providedStates = new HashSet<GOAP_Worldstate>(provided)
+            requiredStates = new List<GOAP_Worldstate>(required),
+            providedStates = new List<GOAP_Worldstate>(provided)
         };
     }
 
     public void Complete()
     {
-        Owner.postedQuest = null;
+        if(Owner.postedQuestIDs.Contains(id))
+        {
+            Owner.completedQuestIDs.Add(id);
+            Owner.postedQuestIDs.Remove(id);
+        }
     }
 
     public override string ToString()

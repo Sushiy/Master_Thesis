@@ -40,8 +40,9 @@ public class Action_PostQuest : GOAP_Action
         
         if(completed)
         {
-            agent.postedQuest = new GOAP_Quest(questData);
-            GOAP_QuestBoard.instance.AddQuest(agent.postedQuest);
+            GOAP_Quest q = new GOAP_Quest(questData);
+            agent.postedQuestIDs.Add(q.id);
+            GOAP_QuestBoard.instance.AddQuest(q);
         }
         return completed;
     }
