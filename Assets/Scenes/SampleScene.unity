@@ -7843,6 +7843,51 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 2805d907acbc3df4f95128fbe793752c,
     type: 3}
   m_PrefabInternal: {fileID: 1893913164}
+--- !u!1 &524538978
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 524538979}
+  - component: {fileID: 524538980}
+  m_Layer: 0
+  m_Name: Mushrooms
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &524538979
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 524538978}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 9.24, y: 0.28, z: -1.85}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 622003902}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &524538980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 524538978}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94e43a3e10f63ca4ba6cc861a1da474e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mushroomPrefabs: []
+  mushroomStandardSize: 0
+  spawnRadius: 5
+  spawnInterval: 2
+  maxSpawnCount: 3
 --- !u!1 &527049845
 GameObject:
   m_ObjectHideFlags: 0
@@ -13917,6 +13962,7 @@ Transform:
   m_Children:
   - {fileID: 1686445523}
   - {fileID: 1851283265}
+  - {fileID: 524538979}
   m_Father: {fileID: 382127521}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -36241,7 +36287,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1851283264}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.09, y: 0.52, z: -1.94}
+  m_LocalPosition: {x: 8.09, y: 0.261, z: -1.94}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 622003902}
