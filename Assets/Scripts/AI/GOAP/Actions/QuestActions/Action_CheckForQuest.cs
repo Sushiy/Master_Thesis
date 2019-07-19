@@ -41,7 +41,7 @@ public class Action_CheckForQuest : GOAP_Action
         Debug.Log("Performing CheckQuest");
         //Try to plan for the chosen quest
         agent.activeQuest = chosenQuest;
-        Queue<GOAP_Action> actionQueue = GOAP_Planner.instance.Plan(agent, new List<GOAP_Worldstate>(chosenQuest.RequiredStates), agent.currentWorldstates);
+        Queue<GOAP_Action> actionQueue = GOAP_Planner.instance.Plan(agent, new List_GOAP_Worldstate(chosenQuest.RequiredStates), agent.currentWorldstates);
         agent.ResetPlanningTimer();
         
         if (actionQueue != null && actionQueue.Count > 0)

@@ -5,19 +5,19 @@ using UnityEngine;
 public struct QuestData
 {
     public GOAP_Agent owner;
-    public List<GOAP_Worldstate> requiredStates;
+    public List_GOAP_Worldstate requiredStates;
 
-    public List<GOAP_Worldstate> providedStates;
+    public List_GOAP_Worldstate providedStates;
     public void Init()
     {
-        requiredStates = new List<GOAP_Worldstate>();
-        providedStates = new List<GOAP_Worldstate>();
+        requiredStates = new List_GOAP_Worldstate();
+        providedStates = new List_GOAP_Worldstate();
     }
     public QuestData(GOAP_Agent owner)
     {
         this.owner = owner;
-        requiredStates = new List<GOAP_Worldstate>();
-        providedStates = new List<GOAP_Worldstate>();
+        requiredStates = new List_GOAP_Worldstate();
+        providedStates = new List_GOAP_Worldstate();
     }
 
     public void ClearRequired()
@@ -62,12 +62,12 @@ public class GOAP_Quest
         get { return questData.owner; }
     }
     
-    public List<GOAP_Worldstate> RequiredStates
+    public List_GOAP_Worldstate RequiredStates
     {
         get { return questData.requiredStates; }
     }
     
-    public List<GOAP_Worldstate> ProvidedStates
+    public List_GOAP_Worldstate ProvidedStates
     {
         get { return questData.providedStates; }
     }
@@ -77,14 +77,14 @@ public class GOAP_Quest
         id = count++;
     }
 
-    public GOAP_Quest(GOAP_Agent agent, IEnumerable<GOAP_Worldstate> required, IEnumerable<GOAP_Worldstate> provided)
+    public GOAP_Quest(GOAP_Agent agent, List_GOAP_Worldstate required, List_GOAP_Worldstate provided)
     {
         id = count++;
         questData = new QuestData
         {
             owner = agent,
-            requiredStates = new List<GOAP_Worldstate>(required),
-            providedStates = new List<GOAP_Worldstate>(provided)
+            requiredStates = new List_GOAP_Worldstate(required),
+            providedStates = new List_GOAP_Worldstate(provided)
         };
     }
 
