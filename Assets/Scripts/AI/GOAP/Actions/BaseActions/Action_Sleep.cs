@@ -27,7 +27,6 @@ public class Action_Sleep : GOAP_Action
     {
         StartPerform(agent);
         UpdateWorkTime(deltaTime);
-        agent.View.VisualizeAction(this);
         if (completed)
         {
             agent.Character.Sleep();

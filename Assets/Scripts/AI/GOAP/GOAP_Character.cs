@@ -27,6 +27,8 @@ public class GOAP_Character : MonoBehaviour
 
     public GOAP_Agent agent;
 
+    public GameObjectActionTarget home;
+
     [Header("HealthData")]
 
     //All three values are measured from 1-12

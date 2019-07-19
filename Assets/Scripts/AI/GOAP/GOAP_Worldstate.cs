@@ -14,7 +14,7 @@ public enum WorldStateKey
 }
 
 [System.Serializable]
-public struct GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
+public class GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
 {
     //from the above list
     public WorldStateKey key;

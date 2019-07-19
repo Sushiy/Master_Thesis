@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class Action_PostQuest : GOAP_Action
 {
+    public int questID
+    {
+        private set;
+        get;        
+    }
     QuestData questData;
     public Action_PostQuest()
     {
@@ -42,6 +47,7 @@ public class Action_PostQuest : GOAP_Action
         {
             GOAP_Quest q = new GOAP_Quest(questData);
             agent.postedQuestIDs.Add(q.id);
+            questID = q.id;
             GOAP_QuestBoard.instance.AddQuest(q);
         }
         return completed;

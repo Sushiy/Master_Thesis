@@ -118,12 +118,13 @@ public class GOAP_Planner : MonoBehaviour
         plannerLog += "<color=#00cc00>" + agent.Character.characterName + "found plan:</color>\n";
 
         bool isCharacterGoal = true;
-        foreach(GOAP_Worldstate goalState in goal)
+        for(int i = 0; i < goal.Count; i++)
         {
-            if (!agent.Character.goals.Contains(goalState))
+            if (!agent.Character.goals.Contains(goal[i]))
             {
                 isCharacterGoal = false;
             }
+
         }
 
         if(isCharacterGoal)
@@ -324,7 +325,7 @@ public class GOAP_Planner : MonoBehaviour
         //if this action does not help the plan, return null
         if (!isUsefulAction) return null;
         //If the actions proceduralConditions are not met, we can't perform it anyways
-        if (!action.CheckProceduralConditions(agent)) return null;
+        //if (!action.CheckProceduralConditions(agent)) return null;
 
         //add the actions own required worldstates to the Node
         foreach (GOAP_Worldstate state in action.RequiredWorldstates)
@@ -423,7 +424,7 @@ public class GOAP_Planner : MonoBehaviour
 
         if(agent.activeQuest != null)
         {
-            Action_CompleteQuest completeQuest = new Action_CompleteQuest();
+            Action_CompleteQuest completeQuest = new Action_CompleteQuest(agent.activeQuest.id);
             completeQuest.SetActionTarget(agent.activeQuest.Owner);
             queue.Enqueue(completeQuest);
             message += " -> " + completeQuest.ActionID;

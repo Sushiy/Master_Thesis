@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,7 +10,6 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     private List<GOAP_Worldstate> satisfyWorldstates;
 
     protected float workCost = 1f;
-    protected float coinCost = 0f;
     protected float range = 1.0f;
 
     private float secondsToWorkCostRatio = 0.1f; // How much Time should pass for 1 workCost: 0.1f/1f
@@ -30,13 +29,6 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         get
         {
             return workCost;
-        }
-    }
-    public float CoinCost
-    {
-        get
-        {
-            return coinCost;
         }
     }
     [HideInInspector]
@@ -106,7 +98,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     //Check conditions that might change or need additional computation (like reachability)
     public abstract bool CheckProceduralConditions(GOAP_Agent agent);
 
-    //Returns true if the requirements are still satisfied, false if they are not
+    //Returns true if the requirements are satisfied, false if they are not
     public bool CheckRequirements(GOAP_Agent agent)
     {
         if(CheckProceduralConditions(agent))
@@ -128,13 +120,6 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     {
         this.workCost *= skillModifier;
     }
-
-    /*
-    public void SetCoinCost(float coinCost)
-    {
-        this.coinCost = coinCost;
-    }
-    */
 
     public abstract bool RequiresInRange();
 

@@ -7,13 +7,15 @@ enum FSM_State
 {
     IDLE,
     PERFORMACTION,
-    MOVETO
+    MOVETO,
+    WAITFORCALL
 }
 
 public class GOAP_Agent
 {
     FSM_State currentState = FSM_State.IDLE;
-    
+    FSM_State stateBeforeWait = FSM_State.IDLE;
+
     public List<GOAP_Worldstate> goal;
 
     public List<GOAP_Worldstate> checkedCharacterGoals;
@@ -41,23 +43,29 @@ public class GOAP_Agent
     }
     bool actionCompleted = true;
 
+    float waitForCallTimer = 4.0f; //seconds to wait before moving again after being called
+    float timeWaitingForCall = 0.0f;
+
+    float callInterval = 4.0f; //seconds between calls
+    float timeSinceCall = 0.0f;
+
     public List<int> postedQuestIDs = null;
     public List<int> completedQuestIDs = null;
     
     public Dictionary<int, Queue<GOAP_Action>> questPlans;
 
     public GOAP_Quest activeQuest = null;
-
-    private IGOAP_AgentView view;
+    
     public IGOAP_AgentView View
     {
-        get { return view; }
+        private set;
+        get;
     }
 
     public GOAP_Agent(GOAP_Character character, IGOAP_AgentView view)
     {
         this.character = character;
-        this.view = view;
+        this.View = view;
 
         checkedCharacterGoals = new List<GOAP_Worldstate>();
 
@@ -114,12 +122,12 @@ public class GOAP_Agent
             activeQuest = CheckForQuests();
             if(activeQuest != null)
             {
-                Debug.Log(character.characterName + " has fulfilled all of his goals. But found a quest");
+                Debug.Log("<color=#0000cc>" + character.characterName + "</color> has fulfilled all of his goals. But found a quest");
                 result = new List<GOAP_Worldstate>(activeQuest.RequiredStates);
             }
             else
             {
-                Debug.Log(character.characterName + " has fulfilled all of his goals. No quest");
+                Debug.Log("<color=#0000cc>" + character.characterName + "</color> has fulfilled all of his goals. No quest");
                 timeSincePlanned = 0.0f;
             }
         }
@@ -130,145 +138,265 @@ public class GOAP_Agent
     // Update is called once per frame
     public void Update(float deltaTime)
     {
-        if (currentState == FSM_State.IDLE)
+        switch(currentState)
         {
-            if (AllowedToPlan)
-            {
-                View.PrintMessage("Planning");
-                if (goal != null)
-                {
-                    Queue<GOAP_Action> newPlan;
-                    //Fetch a new Plan from the planner
-                    if (character.availableActions != PlannableActions.None)
-                    {
-                        newPlan = GOAP_Planner.instance.Plan(this, goal, FetchWorldState(), character.availableActions);
-                    }
-                    else
-                    {
-                        newPlan = GOAP_Planner.instance.Plan(this, goal, FetchWorldState());
-                    }
-                    
-                    timeSincePlanned = 0.0f;
+            case FSM_State.IDLE:
+                IdleUpdate(deltaTime);
+                break;
+            case FSM_State.MOVETO:
+                MoveToUpdate(deltaTime);
+                break;
+            case FSM_State.PERFORMACTION:
+                PerformUpdate(deltaTime);
+                break;
+            case FSM_State.WAITFORCALL:
+                WaitForCallUpdate(deltaTime);
+                break;
+        }
+    }
 
-                    if (newPlan != null)
+    private void ChangeState(FSM_State newState)
+    {
+        //EndStateActions
+        switch (currentState)
+        {
+            case FSM_State.IDLE:
+                break;
+            case FSM_State.MOVETO:
+                break;
+            case FSM_State.PERFORMACTION:
+                break;
+            case FSM_State.WAITFORCALL:
+                break;
+        }
+
+        //StartStateActions
+        switch (newState)
+        {
+            case FSM_State.IDLE:
+                timeSincePlanned = 0.0f;
+                break;
+            case FSM_State.MOVETO:
+                break;
+            case FSM_State.PERFORMACTION:
+                break;
+            case FSM_State.WAITFORCALL:
+                if (currentState != FSM_State.WAITFORCALL)
+                {
+                    stateBeforeWait = currentState;
+                }
+                timeWaitingForCall = 0.0f;
+                break;
+        }
+
+        currentState = newState;
+    }
+
+
+    private void IdleUpdate(float deltaTime)
+    {
+        if (AllowedToPlan)
+        {
+            View.PrintMessage("Planning");
+
+            //First check if any of your posted quests are already done so you can remove them
+            List<int> alreadySolvedQuests = new List<int>();
+            for(int i = 0; i < postedQuestIDs.Count; i++)
+            {
+                bool alreadySolved = true;
+                for (int state = 0; state < GOAP_QuestBoard.instance.quests[postedQuestIDs[i]].RequiredStates.Count; state++)
+                {
+                    if (!currentWorldstates.Contains(GOAP_QuestBoard.instance.quests[postedQuestIDs[i]].RequiredStates[state]))
                     {
-                        //do what the plan says!
-                        currentActions = newPlan;
-                        currentState = FSM_State.PERFORMACTION;
+                        alreadySolved = false;
                     }
-                    else
-                    {
-                        //try again? or something...
-                        Debug.Log("No plan?");
-                        if (activeQuest != null)
-                        {
-                            activeQuest = null;
-                            goal = null;
-                            currentState = FSM_State.IDLE;
-                        }
-                    }
+                }
+
+                if(alreadySolved)
+                {
+                    Debug.Log("<color=#0000cc>" + character.characterName + "</color>s Quest " + postedQuestIDs[i] + " was already solved.");
+                    alreadySolvedQuests.Add(postedQuestIDs[i]);
+                }
+            }
+
+            for(int i = 0; i < alreadySolvedQuests.Count; i++)
+            {
+                GOAP_QuestBoard.instance.CompleteQuest(alreadySolvedQuests[i]);
+            }
+
+            if (goal != null)
+            {
+                Queue<GOAP_Action> newPlan;
+                //Fetch a new Plan from the planner
+                if (character.availableActions != PlannableActions.None)
+                {
+                    newPlan = GOAP_Planner.instance.Plan(this, goal, FetchWorldState(), character.availableActions);
                 }
                 else
                 {
-                    //Before checking goals, check if any of your quests have been completed
-                    if (completedQuestIDs.Count > 0)
+                    newPlan = GOAP_Planner.instance.Plan(this, goal, FetchWorldState());
+                }
+
+                timeSincePlanned = 0.0f;
+
+                if (newPlan != null)
+                {
+                    //do what the plan says!
+                    currentActions = newPlan;
+                    actionCompleted = true;
+                    ChangeState(FSM_State.PERFORMACTION);
+                }
+                else
+                {
+                    //try again? or something...
+                    Debug.Log("No plan?");
+                    if (activeQuest != null)
                     {
-                        //choose the first one and go
-                        int id = completedQuestIDs[0];
+                        activeQuest = null;
+                        goal = null;
+                        ChangeState(FSM_State.IDLE);
+                    }
+                }
+            }
+            else
+            {
+                //Before checking goals, check if any of your quests have been completed
+                if (completedQuestIDs.Count > 0)
+                {
+                    //choose the first one and go
+                    int id = completedQuestIDs[0];
+                    if(questPlans.ContainsKey(id))
+                    {
                         currentActions = new Queue<GOAP_Action>(questPlans[id]);
                         questPlans.Remove(id);
-                        currentState = FSM_State.PERFORMACTION;
+                        ChangeState(FSM_State.PERFORMACTION);
                         Debug.Log("<color=#0000cc>" + character.characterName + "</color> has completed quests to finish. It includes " + currentActions.Count + " actions and starts with " + currentActions.Peek());
                     }
                     else
                     {
-                        goal = ChooseGoal();
+                        string msg = "";
+                        foreach(int key in questPlans.Keys)
+                        {
+                            msg += key + ",";
+                        }
+                        Debug.LogError("<color=#0000cc>" + character.characterName + "</color> tried to continue Quest " + id + " but didnt find a corresponding plan.\nExisting plans:" + msg);
                     }
-
-                }
-
-            }
-            else
-            {
-                View.PrintMessage("Idle");
-            }
-        }
-
-        else if (currentState == FSM_State.PERFORMACTION)
-        {
-            //Get the next currentAction
-            if (actionCompleted)
-            {
-                if (currentActions.Count > 1 || (currentActions.Count > 0 && activeAction == null))
-                {
-                    //Remove the old active action
-                    if(activeAction != null)
-                        currentActions.Dequeue();
-                    //Get the new active action
-                    activeAction = currentActions.Peek();
-                    actionCompleted = false;
                 }
                 else
                 {
-                    activeAction = null;
+                    if(postedQuestIDs.Count == 0)
+                    {
+                        checkedCharacterGoals.Clear();
+                    }
+                    goal = ChooseGoal();
                 }
 
             }
 
-            if (activeAction != null)
+        }
+        else
+        {
+            View.PrintMessage("Idle");
+        }
+        timeSincePlanned += deltaTime;
+    }
+
+    private void PerformUpdate(float deltaTime)
+    {
+        //Get the next currentAction
+        if (actionCompleted)
+        {
+            if (currentActions.Count > 1 || (currentActions.Count > 0 && activeAction == null))
             {
-                if (activeAction.CheckRequirements(this))
-                {
+                //Remove the old active action
+                if (activeAction != null)
+                    currentActions.Dequeue();
+                //Get the new active action
+                activeAction = currentActions.Peek();
+                actionCompleted = false;
+            }
+            else
+            {
+                activeAction = null;
+            }
+
+        }
+
+        if (activeAction != null)
+        {
+            if (activeAction.CheckRequirements(this))
+            {
                     if (!activeAction.IsInRange(this))
                     {
-                        currentState = FSM_State.MOVETO;
+                        ChangeState(FSM_State.MOVETO);
                         View.PrintMessage("MoveTo " + activeAction.ActionID);
                     }
                     else
                     {
                         actionCompleted = activeAction.Perform(this, deltaTime);
+                        View.VisualizeAction(activeAction);
                     }
-                }
-                else
-                {
-                    Debug.Log("<color=#0000cc>" + character.characterName + "</color> cannot perform <color=#cc0000>" + activeAction.ActionID + "</color> anymore.");
-                    activeAction = null;
-                    currentActions.Clear();
-                    currentState = FSM_State.IDLE;
-                }
-
             }
             else
             {
-                Debug.Log("<color=#0000cc>" + character.characterName + "</color> doesn't have any actions left anymore.");
-                goal = null;
-                currentState = FSM_State.IDLE;
+                Debug.Log("<color=#0000cc>" + character.characterName + "</color> cannot perform <color=#cc0000>" + activeAction.ActionID + "</color> anymore.");
+                CancelPlan();
             }
-        }
 
-        else if (currentState == FSM_State.MOVETO)
+        }
+        else
         {
-            //Move to the target!
-            if (!activeAction.IsInRange(this))
-            {
-                view.MoveTo(activeAction.ActionTarget.GetPosition());
-            }
-            else
-            {
-                currentState = FSM_State.PERFORMACTION;
-            }
+            Debug.Log("<color=#0000cc>" + character.characterName + "</color> doesn't have any actions left anymore.");
+            goal = null;
+            ChangeState(FSM_State.IDLE);
         }
-        timeSincePlanned += deltaTime;
     }
 
-    private void CancelPlan()
+    private void MoveToUpdate(float deltaTime)
     {
+        //Move to the target!
+        if (!activeAction.IsInRange(this))
+        {
+            if(timeSinceCall >= callInterval)
+            {
+                activeAction.ActionTarget.Call(View.GetPosition());
+            }
+            else
+            {
+                timeSinceCall += deltaTime;
+            }
+            View.MoveTo(activeAction.ActionTarget.GetPosition());
+        }
+        else
+        {
+            ChangeState(FSM_State.PERFORMACTION);
+        }
+    }
 
+    private void WaitForCallUpdate(float deltaTime)
+    {
+        if(timeWaitingForCall >= waitForCallTimer)
+        {
+            currentState = stateBeforeWait;
+        }
+        View.PrintMessage("Called(" + timeWaitingForCall.ToString("F2") + "/" + waitForCallTimer.ToString("F2") + ") " + stateBeforeWait.ToString() );
+        timeWaitingForCall += deltaTime;
+    }
+
+
+    public void CancelPlan()
+    {
+        if(activeQuest != null)
+        {
+            checkedQuestIds.Remove(activeQuest.id);
+        }
+        activeAction = null;
+        currentActions.Clear();
+        ChangeState(FSM_State.IDLE);
     }
 
     public GOAP_Quest CheckForQuests()
     {
-        Debug.Log("Checking for Quests");
         if(GOAP_QuestBoard.instance.quests.Count == 0)
         {
             checkedQuestIds.Clear();
@@ -335,7 +463,6 @@ public class GOAP_Agent
             Debug.Log(Character.name + " <color=#cc0000>Add state:</color> " + newState.ToString());
             currentWorldstates.Add(newState);
         }
-        //Debug.Log(PrintCurrentStates());
     }
 
     public void RemoveCurrentWorldState(ItemType type)
@@ -366,10 +493,10 @@ public class GOAP_Agent
 
     public string PrintCurrentStates()
     {
-        string msg = "Current Worldstates\n";
+        string msg = Character.name + " Current Worldstates\n";
         foreach (GOAP_Worldstate state in currentWorldstates)
         {
-            msg += state.key.ToString() + "|" + state.value.ToString() + "\n";
+            msg += state.ToString() + "\n";
         }
 
         return msg;
@@ -393,5 +520,20 @@ public class GOAP_Agent
         currentActions.Clear();
         activeAction = null;
         goal = null;
+    }
+
+    public void Called(Vector3 callerPosition)
+    {
+        ChangeState(FSM_State.WAITFORCALL);
+        View.TurnTo(callerPosition);
+    }
+
+    public void ReceiveQuestCompletion(int questID)
+    { 
+        if(currentState == FSM_State.WAITFORCALL)
+        {
+            currentState = stateBeforeWait;
+        }
+        GOAP_QuestBoard.instance.CompleteQuest(questID);
     }
 }

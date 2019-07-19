@@ -5,7 +5,8 @@ using UnityEngine;
 
 public class Action_WaitForQuest : GOAP_Action
 {
-    int questID = -1;
+    int ownQuestID = -1;
+    int originalQuestID = -1;
     public Action_WaitForQuest()
     {
         Init();
@@ -27,33 +28,46 @@ public class Action_WaitForQuest : GOAP_Action
     {
         if(isStartingWork)
         {
-            if(questID < 0)
+            if(ownQuestID < 0)
             {
-                questID = agent.postedQuestIDs.Last();
+                ownQuestID = agent.postedQuestIDs.Last();
                 agent.View.PrintMessage(ActionID);
-                Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterName + "</color>: WaitForQuest " + questID);
+                Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterName + "</color>: WaitForQuest " + ownQuestID);
 
                 //Move this plan to questPlans.
-                agent.SaveQuestPlan(questID);
+                agent.SaveQuestPlan(ownQuestID);
+                if(agent.activeQuest != null)
+                    originalQuestID = agent.activeQuest.id;
                 return true;
             }
             else
             {
-                Debug.Log("<color=#0000cc><b>Restarting</b>: " + agent.Character.characterName + "</color>: WaitForQuest" + questID);
-                UpdateWorkTime(deltaTime);
+                    Debug.Log("<color=#0000cc><b>Restarting</b>: " + agent.Character.characterName + "</color>: WaitForQuest " + ownQuestID);
+                    UpdateWorkTime(deltaTime);
             }
         }
 
-        if(agent.completedQuestIDs.Contains(questID))
+        if(agent.completedQuestIDs.Contains(ownQuestID))
         {
             //Finish Quest
-            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "s</color> Quest was completed!");
-            agent.completedQuestIDs.Remove(questID);
-            foreach (GOAP_Worldstate state in SatisfyWorldstates)
+            if(originalQuestID == -1 || GOAP_QuestBoard.instance.quests.Keys.Contains(originalQuestID))
             {
-                agent.ChangeCurrentWorldState(state);
+                if(originalQuestID != -1)
+                    agent.activeQuest = GOAP_QuestBoard.instance.quests[originalQuestID];
+                Debug.Log("<color=#0000cc>" + agent.Character.characterName + "s</color> Quest " + ownQuestID + " was completed!");
+                agent.completedQuestIDs.Remove(ownQuestID);
+                foreach (GOAP_Worldstate state in SatisfyWorldstates)
+                {
+                    agent.ChangeCurrentWorldState(state);
+                }
+                return true;
             }
-            return true;
+            else
+            {
+                Debug.Log("<color=#0000cc><b>Canceling</b>: " + agent.Character.characterName + "</color>: WaitForQuest " + ownQuestID);
+                agent.CancelPlan();
+                return false;
+            }
         }
 
         return false;

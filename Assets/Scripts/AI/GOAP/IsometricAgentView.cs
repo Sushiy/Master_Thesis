@@ -48,12 +48,20 @@ public class IsometricAgentView : MonoBehaviour, IGOAP_AgentView
     {
         if(action == null)
         {
-            //Idle
             transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
         }
-        if(action.ActionID == "Sleep")
+        else if(action.ActionID == "Sleep")
         {
             transform.eulerAngles = new Vector3(90, transform.eulerAngles.y, 0);
         }
+        else
+        {
+        }
+    }
+
+    public void TurnTo(Vector3 position)
+    {
+        transform.LookAt(position);
+        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
     }
 }

@@ -11,7 +11,6 @@ public class Action_BuyItem : GOAP_Action
     {
         Init();
         workCost = 10f;
-        coinCost = 10f;
         actionID = "BuyItem";
     }
 

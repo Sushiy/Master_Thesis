@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class Action_CompleteQuest : GOAP_Action
 {
+    int questID = -1;
     GOAP_Agent otherAgent;
-    public Action_CompleteQuest()
+    public Action_CompleteQuest(int questID)
     {
         Init();
         workCost = 1f;
         actionID = "CompleteQuest";
+        this.questID = questID;
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
@@ -26,15 +28,14 @@ public class Action_CompleteQuest : GOAP_Action
     {
         if(isStartingWork)
         {
-            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is completing Quest " + agent.activeQuest.id);
+            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is completing Quest " + questID);
         }
 
         UpdateWorkTime(deltaTime);
         if(completed)
         {
             TradeQuestItems(agent);
-            
-            GOAP_QuestBoard.instance.CompleteQuest(agent.activeQuest.id);
+            otherAgent.ReceiveQuestCompletion(questID);
             agent.activeQuest = null;
         }
 
@@ -43,7 +44,8 @@ public class Action_CompleteQuest : GOAP_Action
 
     public void TradeQuestItems(GOAP_Agent agent)
     {
-        foreach(GOAP_Worldstate questState in agent.activeQuest.RequiredStates)
+        GOAP_Quest q = GOAP_QuestBoard.instance.quests[questID];
+        foreach(GOAP_Worldstate questState in q.RequiredStates)
         {
             if(questState.key == WorldStateKey.eHasItem)
             {

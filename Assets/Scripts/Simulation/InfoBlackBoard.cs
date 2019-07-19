@@ -17,6 +17,7 @@ public class InfoBlackBoard : MonoBehaviour
     public GameObjectActionTarget[] mineIronLocations;
     public GameObjectActionTarget[] farmingLocations;
     public GameObjectActionTarget[] millingLocations;
+    public GameObjectActionTarget[] gatherWoodLocations;
 
 
     // Use this for initialization

@@ -13,4 +13,9 @@ public class GameObjectActionTarget : MonoBehaviour, IActionTarget
     {
         return transform.position;
     }
+
+    public virtual void Call(Vector3 callerPosition)
+    {
+
+    }
 }

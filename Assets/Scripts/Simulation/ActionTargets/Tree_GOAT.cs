@@ -5,7 +5,8 @@ using UnityEngine;
 public class Tree_GOAT : GameObjectActionTarget
 {
     const int MAXGROWTHSTATE = 5;
-    const float GROWTHTIME = 200f; // time it takes to increase growthstate
+    const float GROWTHTIME = 60f; // time it takes to increase growthstate
+    float randGrowthTime;
     //State of growth from 1-5
     int currentGrowthState = MAXGROWTHSTATE;
 
@@ -29,7 +30,7 @@ public class Tree_GOAT : GameObjectActionTarget
         if (currentGrowthState != MAXGROWTHSTATE)
         {
             growthTimeAlpha += Time.deltaTime;
-            if (growthTimeAlpha >= GROWTHTIME)
+            if (growthTimeAlpha >= randGrowthTime)
             {
                 growthTimeAlpha = 0f;
                 SetGrowthState(currentGrowthState + 1);
@@ -49,6 +50,7 @@ public class Tree_GOAT : GameObjectActionTarget
     void SetGrowthState(int i)
     {
         currentGrowthState = i;
+        randGrowthTime = GROWTHTIME * Random.Range(0.5f, 1.5f);
         transform.localScale = i * originalScale / MAXGROWTHSTATE;
     }
 
