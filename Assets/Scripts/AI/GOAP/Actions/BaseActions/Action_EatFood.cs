@@ -10,7 +10,7 @@ public class Action_EatFood : GOAP_Action
         actionID = "EatFood";
         workCost = 5f;
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Bread);
-        AddSatisfyWorldState(WorldStateKey.bIsHungry, false);
+        AddSatisfyWorldState(WorldStateKey.bHasEaten, true);
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)

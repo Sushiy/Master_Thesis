@@ -83,7 +83,7 @@ public class GOAP_Planner : MonoBehaviour
         {
             msg += action.ActionID + "\n";
         }
-        Debug.Log(msg);
+        //Debug.Log(msg);
     }
 
     public bool IsActionAvailable(PlannableActions plannableActions, PlannableActions action)
@@ -91,7 +91,7 @@ public class GOAP_Planner : MonoBehaviour
         return (plannableActions & action) != PlannableActions.None;
     }
 
-    public Queue<GOAP_Action> Plan(GOAP_Agent agent, List<GOAP_Worldstate> goal, List<GOAP_Worldstate> currentWorldState, List<GOAP_Action> availableActions)
+    public Queue<GOAP_Action> Plan(GOAP_Agent agent, List_GOAP_Worldstate goal, List_GOAP_Worldstate currentWorldState, List<GOAP_Action> availableActions)
     {
         plannerLog = "<color=#0000cc> <b>PLANNING</b>: " + agent.Character.characterName + "</color>\n";
 
@@ -117,31 +117,17 @@ public class GOAP_Planner : MonoBehaviour
         }
         plannerLog += "<color=#00cc00>" + agent.Character.characterName + "found plan:</color>\n";
 
-        bool isCharacterGoal = true;
-        for(int i = 0; i < goal.Count; i++)
-        {
-            if (!agent.Character.goals.Contains(goal[i]))
-            {
-                isCharacterGoal = false;
-            }
-
-        }
-
-        if(isCharacterGoal)
-        {
-            //Remove the goal from the agents checked goals
-        }
         //Otherwise return the queue
         return MakeQueue(startNode, agent);
     }
 
     //Get the agents goal and try to find a plan for it
-    public Queue<GOAP_Action> Plan(GOAP_Agent agent, List<GOAP_Worldstate> goal, List<GOAP_Worldstate> currentWorldState)
+    public Queue<GOAP_Action> Plan(GOAP_Agent agent, List_GOAP_Worldstate goal, List_GOAP_Worldstate currentWorldState)
     {
         return Plan(agent, goal, currentWorldState, globalKnowledgeAvailableActions);
     }
 
-    public Queue<GOAP_Action> Plan(GOAP_Agent agent, List<GOAP_Worldstate> goal, List<GOAP_Worldstate> currentWorldState, PlannableActions plannableActions)
+    public Queue<GOAP_Action> Plan(GOAP_Agent agent, List_GOAP_Worldstate goal, List_GOAP_Worldstate currentWorldState, PlannableActions plannableActions)
     {
         List<GOAP_Action> availableActions = new List<GOAP_Action>();
         GetActionSet(plannableActions, ref availableActions);
@@ -149,7 +135,7 @@ public class GOAP_Planner : MonoBehaviour
     }
 
     //Perform A* reverse pathfinding search to get a plan
-    private Node WhileBuild(List<GOAP_Worldstate> goal, List<GOAP_Action> availableActions, List<GOAP_Worldstate> currentWorldState, GOAP_Agent agent)
+    private Node WhileBuild(List_GOAP_Worldstate goal, List<GOAP_Action> availableActions, List_GOAP_Worldstate currentWorldState, GOAP_Agent agent)
     {
         Node current = null;
 
@@ -268,38 +254,26 @@ public class GOAP_Planner : MonoBehaviour
         return null;
     }
 
-    public bool IsGoalSatisfied(List<GOAP_Worldstate> currentWorldState, List<GOAP_Worldstate> goalWorldState)
+    public bool IsGoalSatisfied(List_GOAP_Worldstate currentWorldState, GOAP_Worldstate goalWorldState)
     {
         //First, check if we have not already reached the goal, by checking it against our currentWorldstate
-
-        foreach (GOAP_Worldstate state in goalWorldState)
-        {
-            int i = currentWorldState.IndexOf(state);
-            if (i == -1)
-            {
-                return false;
-            }
-            else
-            {
-                if (currentWorldState[i].value != state.value)
-                    return false;
-            }
-        }
+        
+        if (!currentWorldState.ContainsExactly(goalWorldState))
+            return false;
         return true;
     }
 
     //Combine Current and Goal Worldstate to see if a plan needs to be made in order to fulfill this goal
-    private Node GetGoalNode(List<GOAP_Worldstate> currentWorldState, List<GOAP_Worldstate> goalWorldState)
+    private Node GetGoalNode(List_GOAP_Worldstate currentWorldState, List_GOAP_Worldstate goalWorldState)
     {
-        List<GOAP_Worldstate> newRequired = new List<GOAP_Worldstate>(goalWorldState);
+        List_GOAP_Worldstate newRequired = new List_GOAP_Worldstate(goalWorldState);
         plannerLog += "Found Goal:\n";
-        foreach (GOAP_Worldstate state in goalWorldState)
+        for (int state = 0; state < goalWorldState.Count; state++)
         {
-            plannerLog += state.ToString() + "\n";
-            int i = currentWorldState.IndexOf(state);
-            if (i != -1 && currentWorldState[i].value == state.value)
-            {
-                newRequired.Remove(state);
+            plannerLog += goalWorldState[state].ToString() + "\n";
+            if(currentWorldState.ContainsExactly(goalWorldState[state]))
+            { 
+                newRequired.Remove(goalWorldState[state]);
             }
         }
         plannerLog += "\n";
@@ -307,15 +281,16 @@ public class GOAP_Planner : MonoBehaviour
     }
 
     //Try to apply the action onto the activeNode to see if it results in a valid neighbor
-    private Node GetValidNeighborNode(Node activeNode, GOAP_Action action, List<GOAP_Worldstate> planningWorldState, GOAP_Agent agent)
+    private Node GetValidNeighborNode(Node activeNode, GOAP_Action action, List_GOAP_Worldstate planningWorldState, GOAP_Agent agent)
     {
         bool isUsefulAction = false;
 
-        List<GOAP_Worldstate> newRequired = new List<GOAP_Worldstate>(activeNode.required);
+        List_GOAP_Worldstate newRequired = new List_GOAP_Worldstate(activeNode.required);
+
         //Actions need to fulfill at least one required Worldstate to result in a valid neighbor
         foreach (GOAP_Worldstate state in activeNode.required)
         {
-            if (action.SatisfyWorldstates.Contains(state))
+            if (action.SatisfyWorldstates.ContainsExactly(state))
             {
                 newRequired.Remove(state);
                 isUsefulAction = true;
@@ -330,7 +305,7 @@ public class GOAP_Planner : MonoBehaviour
         //add the actions own required worldstates to the Node
         foreach (GOAP_Worldstate state in action.RequiredWorldstates)
         {
-            if (!planningWorldState.Contains(state))
+            if (!planningWorldState.ContainsExactly(state))
             {
                 newRequired.Add(state);
             }
@@ -361,9 +336,9 @@ public class GOAP_Planner : MonoBehaviour
         return new Node(activeNode, newRequired, action, newRequired.Count * heuristicFactor + action.ActionCost + activeNode.estimatedPathCost);
     }
 
-    private Node GenerateBuyNode(Node activeNode, List<GOAP_Worldstate> planningWorldState, GOAP_Agent agent)
+    private Node GenerateBuyNode(Node activeNode, List_GOAP_Worldstate planningWorldState, GOAP_Agent agent)
     {
-        List<GOAP_Worldstate> newRequired = new List<GOAP_Worldstate>(activeNode.required);
+        List_GOAP_Worldstate newRequired = new List_GOAP_Worldstate(activeNode.required);
         Action_BuyItem action = new Action_BuyItem();
         action.CheckProceduralConditions(agent);
 
@@ -388,9 +363,9 @@ public class GOAP_Planner : MonoBehaviour
     }
 
     //Generate a quest for the current Node, because it is somehow unsolvable
-    private Node GenerateQuestNode(Node activeNode, List<GOAP_Worldstate> planningWorldState, GOAP_Agent agent)
+    private Node GenerateQuestNode(Node activeNode, List_GOAP_Worldstate planningWorldState, GOAP_Agent agent)
     {
-        List<GOAP_Worldstate> newRequired = new List<GOAP_Worldstate>();
+        List_GOAP_Worldstate newRequired = new List_GOAP_Worldstate();
         Action_PostQuest action = new Action_PostQuest();
         action.CheckProceduralConditions(agent);
         foreach(GOAP_Worldstate state in activeNode.required)
@@ -450,10 +425,10 @@ public class GOAP_Planner : MonoBehaviour
     {
         public Node parent;
         public float estimatedPathCost;
-        public List<GOAP_Worldstate> required;
+        public List_GOAP_Worldstate required;
         public GOAP_Action action;
 
-        public Node(Node parent, List<GOAP_Worldstate> required, GOAP_Action action, float estimatedPathCost)
+        public Node(Node parent, List_GOAP_Worldstate required, GOAP_Action action, float estimatedPathCost)
         {
             this.parent = parent;
             this.estimatedPathCost = estimatedPathCost;
@@ -487,7 +462,7 @@ public class GOAP_Planner : MonoBehaviour
             bool sameRequiredStates = true;
             foreach(GOAP_Worldstate state in required)
             {
-                if(!other.required.Contains(state))
+                if(!other.required.ContainsExactly(state))
                 {
                     sameRequiredStates = false;
                     break;

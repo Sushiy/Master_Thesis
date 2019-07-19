@@ -54,7 +54,7 @@ public class Action_WaitForQuest : GOAP_Action
             {
                 if(originalQuestID != -1)
                     agent.activeQuest = GOAP_QuestBoard.instance.quests[originalQuestID];
-                Debug.Log("<color=#0000cc>" + agent.Character.characterName + "s</color> Quest " + ownQuestID + " was completed!");
+                Debug.Log("<color=#0000cc>" + agent.Character.characterName + "s</color> Quest " + ownQuestID + " was completed!" + ((originalQuestID > -1)? "\nThis was a solution for Quest " + originalQuestID : ""));
                 agent.completedQuestIDs.Remove(ownQuestID);
                 foreach (GOAP_Worldstate state in SatisfyWorldstates)
                 {
