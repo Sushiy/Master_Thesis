@@ -270,7 +270,7 @@ public class GOAP_Agent
                         currentActions = new Queue<GOAP_Action>(questPlans[id]);
                         questPlans.Remove(id);
                         ChangeState(FSM_State.PERFORMACTION);
-                        Debug.Log("<color=#0000cc>" + character.characterName + "</color> has completed quests to finish. It includes " + currentActions.Count + " actions and starts with " + currentActions.Peek());
+                        Debug.Log("<color=#0000cc>" + character.characterName + "</color> has completed Quest " + id +  " to finish. It includes " + currentActions.Count + " actions and starts with " + currentActions.Peek());
                     }
                     else
                     {
@@ -392,6 +392,7 @@ public class GOAP_Agent
         }
         activeAction = null;
         currentActions.Clear();
+        actionCompleted = true;
         ChangeState(FSM_State.IDLE);
     }
 
@@ -450,13 +451,11 @@ public class GOAP_Agent
 
     public void ChangeCurrentWorldState(GOAP_Worldstate newState)
     {
-        //If the newState is a uniqueState and its key is already in the currentstate, we will update its value, by removing and readding (the value is not part of the hashcode for unique states)
-        if (newState.IsUniqueState() && currentWorldstates.Contains(newState))
+        if(newState.IsUniqueState() && newState.value == 0)
         {
-            Debug.Log(Character.name + " <color=#cc0000>Change state:</color> " + newState.ToString());
-            currentWorldstates.Remove(newState);
-            currentWorldstates.Add(newState);
+            RemoveCurrentWorldState(newState);
         }
+
         //Otherwise, if it is not a uniquestate and also the newstate is not contained in the currentworldstate, add it
         else if (!currentWorldstates.Contains(newState))
         {

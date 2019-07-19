@@ -43,7 +43,7 @@ public class GOAP_Character : MonoBehaviour
         if (food < 0)
         {
             Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is hungry");
-            agent.ChangeCurrentWorldState(WorldStateKey.bIsHungry, true);
+            agent.ChangeCurrentWorldState(WorldStateKey.bHasEaten, false);
             food = 0;
         }
         else if(food > 0)
@@ -54,7 +54,7 @@ public class GOAP_Character : MonoBehaviour
         if (sleep < 0)
         {
             Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is tired");
-            agent.ChangeCurrentWorldState(WorldStateKey.bIsTired, true);
+            agent.ChangeCurrentWorldState(WorldStateKey.bHasSlept, false);
             sleep = 0;
         }
         else if (sleep > 0)

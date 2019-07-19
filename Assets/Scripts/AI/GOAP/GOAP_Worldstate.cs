@@ -7,9 +7,9 @@ public enum WorldStateKey
     eHasItem = 0,
     bAttackingTarget = 1,
     bHasWorked,
-    bIsHungry,
+    bHasEaten,
     bIsHealthy,
-    bIsTired,
+    bHasSlept,
     bHasStockpiledRessources
 }
 
@@ -89,7 +89,7 @@ public class GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
         if(key == WorldStateKey.eHasItem)
             return key.ToString() + ":" + ((ItemType)value).ToString();
         else
-            return key.ToString() + ":" + value.ToString();
+            return key.ToString();
     }
 
     public bool IsUniqueState()

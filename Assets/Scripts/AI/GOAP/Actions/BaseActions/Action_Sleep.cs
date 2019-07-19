@@ -10,7 +10,7 @@ public class Action_Sleep : GOAP_Action
         Init();
         actionID = "Sleep";
         workCost = 60f;
-        AddSatisfyWorldState(WorldStateKey.bIsTired, false);
+        AddSatisfyWorldState(WorldStateKey.bHasSlept, true);
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)

@@ -1313,9 +1313,9 @@ MonoBehaviour:
     level: 4
   goals:
   - key: 3
-    value: 0
+    value: 1
   - key: 5
-    value: 0
+    value: 1
   itemStockPilePriorities: 02000000000000000001000001010000
   availableActions: 1098
   startingInventory: 01010000
