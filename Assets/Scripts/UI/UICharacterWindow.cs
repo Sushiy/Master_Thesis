@@ -22,6 +22,11 @@ public class UICharacterWindow : BasicWindow
     [Header("GOAP")]
     public TextMeshProUGUI currentGoal;
     public TextMeshProUGUI currentAction;
+    public TextMeshProUGUI currentWorldstate;
+
+    [Header("Quests")]
+    public TextMeshProUGUI postedQuests;
+    public TextMeshProUGUI completedQuests;
 
     private void Awake()
     {
@@ -32,11 +37,14 @@ public class UICharacterWindow : BasicWindow
         instance = this;
         inventoryItems = new List<GameObject>();
 
-        for (int i = 0; i < 16; i++)
+        if(inventoryContentPanel != null)
         {
-            GameObject itemPanel = GameObject.Instantiate(inventoryContentPrefab, inventoryContentPanel);
-            itemPanel.SetActive(false);
-            inventoryItems.Add(itemPanel);
+            for (int i = 0; i < 16; i++)
+            {
+                GameObject itemPanel = GameObject.Instantiate(inventoryContentPrefab, inventoryContentPanel);
+                itemPanel.SetActive(false);
+                inventoryItems.Add(itemPanel);
+            }
         }
         gameObject.SetActive(false);
     }
@@ -70,20 +78,53 @@ public class UICharacterWindow : BasicWindow
     {
         ClearInventoryPanel();
         title.text = character.characterName;
-        for (int i = 0; i < character.skills.Count; i++)
+
+        if(skills != null && skills.Length > 0)
         {
-            skills[i].text = character.skills[i].id.ToString() + ": " + character.skills[i].level;
+            for (int i = 0; i < character.skills.Count; i++)
+            {
+                skills[i].text = character.skills[i].id.ToString() + ": " + character.skills[i].level;
+            }
+        }
+        if(inventoryContentPanel != null)
+        {
+            int index = 0;
+            foreach (KeyValuePair<ItemType, int> item in character.Inventory.Items)
+            {
+                inventoryItems[index].SetActive(true);
+                inventoryItems[index].GetComponent<TextMeshProUGUI>().text = item.Key.ToString() + ":" + item.Value;
+                index++;
+            }
         }
 
-        int index = 0;
-        foreach (KeyValuePair<ItemType, int> item in character.Inventory.Items)
+        currentGoal.text = "Goal: " + character.agent.PrintGoal();
+        currentAction.text = "Action:" + ((character.agent.activeAction != null) ? character.agent.activeAction.ActionID : "None");
+
+        if(currentWorldstate != null)
         {
-            inventoryItems[index].SetActive(true);
-            inventoryItems[index].GetComponent<TextMeshProUGUI>().text = item.Key.ToString() + ":" + item.Value;
-            index++;
+            currentWorldstate.text = "Worldstate:\n";
+            for(int i = 0; i < character.agent.currentWorldstates.Count; i++)
+            {
+                currentWorldstate.text += "- " + character.agent.currentWorldstates[i].ToString() + "\n";
+            }
         }
 
-        currentGoal.text = character.agent.PrintGoal();
-        currentAction.text = (character.agent.activeAction != null) ? character.agent.activeAction.ToString() : "None";
+        if(postedQuests != null)
+        {
+            postedQuests.text = "Posted Quests:\n";
+            for(int i = 0; i < character.agent.postedQuestIDs.Count; i++)
+            {
+                postedQuests.text += "- " + GOAP_QuestBoard.instance.quests[character.agent.postedQuestIDs[i]].ToString() + "\n";
+            }
+        }
+
+        if (completedQuests != null)
+        {
+            completedQuests.text = "Completed Quests:\n";
+            for (int i = 0; i < character.agent.completedQuestIDs.Count; i++)
+            {
+                completedQuests.text += "- " + GOAP_QuestBoard.instance.quests[character.agent.completedQuestIDs[i]].ToString() + "\n";
+            }
+        }
     }
 }

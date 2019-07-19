@@ -33,6 +33,7 @@ public class MushroomSpawner : MonoBehaviour
 
     void SpawnRandomMushrooms()
     {
+        if (mushroomPrefabs.Length == 0) return;
         GameObject prefab = mushroomPrefabs[Random.Range(0, mushroomPrefabs.Length - 1)];
 
         Vector3 offset = Random.insideUnitCircle * spawnRadius;

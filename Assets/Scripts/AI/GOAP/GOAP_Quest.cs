@@ -41,12 +41,7 @@ public struct QuestData
 
     public string RequiredToString()
     {
-        string msg = "";
-        foreach(GOAP_Worldstate state in requiredStates)
-        {
-            msg += state.ToString() + ", ";
-        }
-        return msg;
+        return requiredStates.ToString();
     }
 }
 
@@ -97,23 +92,22 @@ public class GOAP_Quest
         }
     }
 
-    public override string ToString()
+    public string ToLongString()
     {
         string quest = "QUEST " + id + ": " + Owner.Character.characterName + " needs someone to complete:";
-        foreach (GOAP_Worldstate state in RequiredStates)
-        {
-            quest += " " + state.ToString() + ";";
-        }
+        quest += RequiredStates.ToString();
         if(ProvidedStates != null && ProvidedStates.Count > 0)
         {
             quest += " \nIf necessary, he can provide:";
-            foreach (GOAP_Worldstate state in ProvidedStates)
-            {
-                quest += " " + state.ToString() + ";";
-            }
+            quest += ProvidedStates.ToString();
             quest += "\n and will pay you handsomly.";
         }
         quest += "\n I will pay you handsomely.";
         return quest;
+    }
+
+    public override string ToString()
+    {
+        return "ID " + id + ":" + RequiredStates.ToString();
     }
 }

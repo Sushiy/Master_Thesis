@@ -498,10 +498,7 @@ public class GOAP_Planner : MonoBehaviour
         {
             string msg = "";
             msg += "(Required:";
-            for(int i = 0; i < required.Count; i++)
-            {
-                msg += required[i].ToString() + ",";
-            }
+            required.ToString();
             if(required.Count < 0)
             {
                 msg += "empty";
