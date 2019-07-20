@@ -137,11 +137,16 @@ public class GOAP_Planner : MonoBehaviour
     //Perform A* reverse pathfinding search to get a plan
     private Node WhileBuild(List_GOAP_Worldstate goal, List<GOAP_Action> availableActions, List_GOAP_Worldstate currentWorldState, GOAP_Agent agent)
     {
+        PlanInfo planInfo = agent.planMemory[agent.planMemory.Count - 1];
+        int currentNodeID = 0;
+
         Node current = null;
 
         List<Node> openSet = new List<Node>(); //This is a List so it can be sorted
 
         Node goalNode = GetGoalNode(currentWorldState, goal);
+        goalNode.id = currentNodeID;
+        planInfo.AddNode(goalNode.id, -1, goalNode.required.ToString(), "None", 0f);
         //If the goal is already fulfilled, return the goal
         if(goalNode.required.Count == 0)
         {
@@ -160,7 +165,32 @@ public class GOAP_Planner : MonoBehaviour
         {
             //Sort the open set by pathcosts and pick the best node
             openSet.Sort();
+            string last = "";
+            if (current!= null)
+            {
+                 last = current.ToString();
+            }
             current = openSet[0];
+
+            //Debug Log to visualize the process
+            string openSetString = "";
+            for (int i = 0; i < openSet.Count; i++)
+            {
+                openSetString += "\n- " + openSet[i].ToString();
+            }
+            if (writePlannerLog)
+            {
+                plannerLog += "\n Planning at depth" + graphDepth;
+                
+                plannerLog += "\n<color=#CCCC00>OpenSet(" + openSet.Count + "): </color>";
+                plannerLog += openSetString;
+
+                plannerLog += "\n\n";
+
+                plannerLog += makeIndent(graphDepth) + "-><color=#00CC00>Best Node Chosen:</color> " + current.ToString() + "\n";
+            }
+
+            planInfo.AddIteration(graphDepth, "Current:\n- " + last.ToString(), "OpenSet(" + openSet.Count + "):" + openSetString, current.ToString());
 
             if (current.required.Count == 0)
             {
@@ -168,21 +198,6 @@ public class GOAP_Planner : MonoBehaviour
                 return current;
             }
 
-            //Debug Log to visualize the process
-            if (writePlannerLog)
-            {
-                plannerLog += "\n Planning at depth" + graphDepth;
-                
-                plannerLog += "\n<color=#CCCC00>OpenSet(" + openSet.Count+ "): </color>";
-                for (int i = 0; i < openSet.Count; i++)
-                {
-                    plannerLog += "\n " + openSet[i].ToString() ;
-                }
-
-                plannerLog += "\n\n";
-
-                plannerLog += makeIndent(graphDepth) + "-><color=#00CC00>Best Node Chosen:</color> " + current.ToString() + "\n";
-            }
             openSet.Remove(current);
 
             bool foundValidNeighbor = false;
@@ -193,6 +208,7 @@ public class GOAP_Planner : MonoBehaviour
                 Node neighbor = (availableActions[i].ActionID == "BuyItem") ? GenerateBuyNode(current, currentWorldState,agent) : GetValidNeighborNode(current, availableActions[i], currentWorldState, agent);
                 if(neighbor != null)
                 {
+                    neighbor.id = currentNodeID++;
                     foundValidNeighbor = true;
                     int indexOfNodeWithSameState = openSet.IndexOf(neighbor);
                     if (indexOfNodeWithSameState != -1)
@@ -240,6 +256,7 @@ public class GOAP_Planner : MonoBehaviour
             {
                 plannerLog += "No valid neigbor found:\n";
                 Node questNode = GenerateQuestNode(current, currentWorldState, agent);
+                questNode.id = currentNodeID++;
                 openSet.Add(questNode);
                 //Debug Log to visualize the process
                 if (writePlannerLog)
@@ -423,6 +440,7 @@ public class GOAP_Planner : MonoBehaviour
     
     private class Node : System.IComparable<Node>, System.IEquatable<Node>
     {
+        public int id;
         public Node parent;
         public float estimatedPathCost;
         public List_GOAP_Worldstate required;
@@ -496,12 +514,15 @@ public class GOAP_Planner : MonoBehaviour
 
         public override string ToString()
         {
-            string msg = "";
-            msg += "(Required:";
-            required.ToString();
+            string msg = "Node" + id;
+            msg += "(Required(" + required.Count + "):";
             if(required.Count < 0)
             {
                 msg += "empty";
+            }
+            else
+            {
+                msg += required.ToString();
             }
             msg += "; Action:" + (action!= null? action.ActionID : "none") + ";Cost:" + estimatedPathCost + ")";
             return msg;

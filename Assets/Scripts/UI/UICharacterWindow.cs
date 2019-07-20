@@ -16,7 +16,7 @@ public class UICharacterWindow : BasicWindow
     [Header("GOAPBasics")]
     public TextMeshProUGUI currentGoal; //Can be a quest
     public TextMeshProUGUI currentAction;
-    public TextMeshProUGUI currentWorldstate;
+    public TextMeshProUGUI currentAgentState;
 
     [Header("CharacterBasics")]
     public Slider hungrySlider;
@@ -30,6 +30,10 @@ public class UICharacterWindow : BasicWindow
     private int activeTab = 0;
 
     [Header("GOAPTab")]
+    public GameObject planMemoryPanelPrefab;
+    public TextMeshProUGUI currentPlan;
+    public RectTransform planMemoryParent;
+    public TextMeshProUGUI currentWorldstate;
 
     [Header("QuestTab")]
     public TextMeshProUGUI postedQuests;
@@ -40,7 +44,6 @@ public class UICharacterWindow : BasicWindow
     public RectTransform inventoryContentPanel;
     public GameObject inventoryContentPrefab;
     private List<GameObject> inventoryItems;
-
 
     private void Awake()
     {
@@ -70,6 +73,10 @@ public class UICharacterWindow : BasicWindow
 
     public void ShowWindow(GOAP_Character character)
     {
+        if (this.character != character)
+        {
+            ClearPlanMemory();
+        }
         this.character = character;
         UpdateWindow();
         ShowWindow();
@@ -90,17 +97,29 @@ public class UICharacterWindow : BasicWindow
 
     private void UpdateWindow()
     {
-        ClearInventoryPanel();
         title.text = character.characterName;
 
-        if(skills != null && skills.Length > 0)
+        //GOAP basic
+        currentGoal.text = "Goal: " + character.agent.PrintGoal();
+        currentAction.text = "Action: " + ((character.agent.activeAction != null) ? character.agent.activeAction.ActionID : "None");
+        currentAgentState.text = "State: " + character.agent.PrintCurrentState();
+
+        //Character basic
+        hungrySlider.value = character.food / 100f;
+        tiredSlider.value = character.sleep / 100f;
+        lonelySlider.value = character.social / 100f;
+
+        //Character Tab
+        ClearInventoryPanel();
+
+        if (skills != null && skills.Length > 0)
         {
             for (int i = 0; i < character.skills.Count; i++)
             {
                 skills[i].text = character.skills[i].id.ToString() + ": " + character.skills[i].level;
             }
         }
-        if(inventoryContentPanel != null)
+        if (inventoryContentPanel != null)
         {
             int index = 0;
             foreach (KeyValuePair<ItemType, int> item in character.Inventory.Items)
@@ -111,19 +130,8 @@ public class UICharacterWindow : BasicWindow
             }
         }
 
-        currentGoal.text = "Goal: " + character.agent.PrintGoal();
-        currentAction.text = "Action:" + ((character.agent.activeAction != null) ? character.agent.activeAction.ActionID : "None");
-
-        if(currentWorldstate != null)
-        {
-            currentWorldstate.text = "Worldstate:\n";
-            for(int i = 0; i < character.agent.currentWorldstates.Count; i++)
-            {
-                currentWorldstate.text += "- " + character.agent.currentWorldstates[i].ToString() + "\n";
-            }
-        }
-
-        if(postedQuests != null)
+        //QuestTab
+        if (postedQuests != null)
         {
             postedQuests.text = "";
             for(int i = 0; i < character.agent.postedQuestIDs.Count; i++)
@@ -140,6 +148,39 @@ public class UICharacterWindow : BasicWindow
                 completedQuests.text += "- " + GOAP_QuestBoard.instance.quests[character.agent.completedQuestIDs[i]].ToString() + "\n";
             }
         }
+
+        //GOAP Tab
+
+        if(character.agent.activePlanInfo != null)
+        {
+            PlanInfo plan = character.agent.planMemory[(int)character.agent.activePlanInfo];
+            currentPlan.text = "Plan " + plan.PlanID + "; Goal: " + plan.goalInfo + "\n" + plan.actionQueueInfo;
+            
+        }
+        else
+        {
+            currentPlan.text = "None";
+        }
+        if (planMemoryParent != null)
+        {
+            if (planMemoryParent.childCount < character.agent.planMemory.Count)
+            {
+                for (int i = planMemoryParent.childCount; i < character.agent.planMemory.Count; i++)
+                {
+                    AddPlan(character.agent.planMemory[i]);
+                }
+            }
+        }
+
+        if (currentWorldstate != null)
+        {
+            currentWorldstate.text = "Worldstate:\n";
+            for (int i = 0; i < character.agent.currentWorldstates.Count; i++)
+            {
+                currentWorldstate.text += "- " + character.agent.currentWorldstates[i].ToString() + "\n";
+            }
+        }
+
     }
 
     public void SetActiveTab(int newActiveTab)
@@ -148,5 +189,28 @@ public class UICharacterWindow : BasicWindow
 
         contentTabs[activeTab].SetAsLastSibling();
 
+    }
+
+    public void ShowPlan()
+    {
+        if (character.agent.activePlanInfo != null)
+        {
+            UIPlandetailWindow.instance.ShowWindow(character.agent.planMemory[(int)character.agent.activePlanInfo]);
+        }
+    }
+
+    private void AddPlan(PlanInfo planinfo)
+    {
+        PlanMemoryContentPanel plan = Instantiate(planMemoryPanelPrefab, planMemoryParent).GetComponent<PlanMemoryContentPanel>();
+        plan.SetContent(planinfo);
+    }
+
+    private void ClearPlanMemory()
+    {
+        PlanMemoryContentPanel[] plans = planMemoryParent.GetComponentsInChildren<PlanMemoryContentPanel>();
+        for (int i = 0; i < plans.Length; i++)
+        {
+            Destroy(plans[i].gameObject);
+        }
     }
 }

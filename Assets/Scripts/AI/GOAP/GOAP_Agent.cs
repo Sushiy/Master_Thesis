@@ -63,6 +63,9 @@ public class GOAP_Agent
         get;
     }
 
+    public List<PlanInfo> planMemory;
+    public int? activePlanInfo;
+
     public GOAP_Agent(GOAP_Character character, IGOAP_AgentView view)
     {
         this.character = character;
@@ -80,6 +83,7 @@ public class GOAP_Agent
         questPlans = new Dictionary<int, Queue<GOAP_Action>>();
         activeGoal = new List_GOAP_Worldstate();
 
+        planMemory = new List<PlanInfo>();
     }
     public void ChooseGoal()
     {
@@ -243,6 +247,7 @@ public class GOAP_Agent
         {
             Queue<GOAP_Action> newPlan;
             //Fetch a new Plan from the planner
+            planMemory.Add(new PlanInfo(PrintGoal(), Character.characterName, activeQuest != null ? activeQuest.id : -1));
             newPlan = GOAP_Planner.instance.Plan(this, activeGoal, currentWorldstates, character.availableActions);
 
             timeSincePlanned = 0.0f;
@@ -252,10 +257,13 @@ public class GOAP_Agent
                 //do what the plan says!
                 currentActions = newPlan;
                 actionCompleted = true;
+                planMemory[planMemory.Count - 1].ApprovePlan(planMemory.Count - 1, PrintActionQueue());
+                activePlanInfo = planMemory.Count - 1;
                 ChangeState(FSM_State.PERFORMACTION);
             }
             else
             {
+                planMemory.RemoveAt(planMemory.Count - 1);
                 //try again? or something...
                 Debug.Log("No plan?");
                 if (activeQuest != null)
@@ -395,7 +403,7 @@ public class GOAP_Agent
         {
             currentState = stateBeforeWait;
         }
-        View.PrintMessage("Called(" + timeWaitingForCall.ToString("F2") + "/" + waitForCallTimer.ToString("F2") + ") " + stateBeforeWait.ToString() );
+        View.PrintMessage("Called");
         timeWaitingForCall += deltaTime;
     }
 
@@ -406,6 +414,7 @@ public class GOAP_Agent
         {
             checkedQuestIds.Remove(activeQuest.id);
         }
+        activePlanInfo = null;
         activeAction = null;
         currentActions.Clear();
         actionCompleted = true;
@@ -531,7 +540,7 @@ public class GOAP_Agent
         return msg;
     }
 
-    public string PrintCurrentStates()
+    public string PrintCurrentWorldstates()
     {
         string msg = Character.name + " Current Worldstates\n";
         foreach (GOAP_Worldstate state in currentWorldstates)
@@ -587,5 +596,24 @@ public class GOAP_Agent
             }
         }
         return true;
+    }
+
+    public string PrintActionQueue()
+    {
+        string s = "";
+        
+        foreach(GOAP_Action action in currentActions)
+        {
+            s += " -> " + action.ActionID;
+        }
+
+        s += " |";
+
+        return s;
+    }
+
+    public string PrintCurrentState()
+    {
+        return currentState.ToString();
     }
 }

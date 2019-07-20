@@ -44,6 +44,7 @@ public class Action_WaitForQuest : GOAP_Action
             {
                     Debug.Log("<color=#0000cc><b>Restarting</b>: " + agent.Character.characterName + "</color>: WaitForQuest " + ownQuestID);
                     UpdateWorkTime(deltaTime);
+                    agent.activePlanInfo = agent.planMemory.FindIndex(x => x.questID == ownQuestID);
             }
         }
 
