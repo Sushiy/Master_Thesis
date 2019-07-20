@@ -520,6 +520,14 @@ public class GOAP_Agent
         {
             msg += state.ToString() + "\n";
         }
+        if(activeQuest != null)
+        {
+            msg += "(Quest " + activeQuest.id + ")";
+        }
+        else
+        {
+            msg += "(Personal)";
+        }
         return msg;
     }
 

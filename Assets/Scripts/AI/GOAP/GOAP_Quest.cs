@@ -108,6 +108,6 @@ public class GOAP_Quest
 
     public override string ToString()
     {
-        return "ID " + id + ":" + RequiredStates.ToString();
+        return "ID " + id + ": " + RequiredStates.ToString();
     }
 }

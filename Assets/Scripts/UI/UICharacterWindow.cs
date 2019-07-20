@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using TMPro;
 
 public class UICharacterWindow : BasicWindow
@@ -12,21 +12,35 @@ public class UICharacterWindow : BasicWindow
 
     [Header("General")]
     public TextMeshProUGUI title;
-    public TextMeshProUGUI[] skills;
 
-    [Header("Inventory")]
-    public Transform inventoryContentPanel;
-    public GameObject inventoryContentPrefab;
-    private List<GameObject> inventoryItems;
-
-    [Header("GOAP")]
-    public TextMeshProUGUI currentGoal;
+    [Header("GOAPBasics")]
+    public TextMeshProUGUI currentGoal; //Can be a quest
     public TextMeshProUGUI currentAction;
     public TextMeshProUGUI currentWorldstate;
 
-    [Header("Quests")]
+    [Header("CharacterBasics")]
+    public Slider hungrySlider;
+    public Slider tiredSlider;
+    public Slider lonelySlider;
+
+    [Space]
+
+    public RectTransform contentParent;
+    public RectTransform[] contentTabs;
+    private int activeTab = 0;
+
+    [Header("GOAPTab")]
+
+    [Header("QuestTab")]
     public TextMeshProUGUI postedQuests;
     public TextMeshProUGUI completedQuests;
+
+    [Header("CharacterTab")]
+    public TextMeshProUGUI[] skills;
+    public RectTransform inventoryContentPanel;
+    public GameObject inventoryContentPrefab;
+    private List<GameObject> inventoryItems;
+
 
     private void Awake()
     {
@@ -111,7 +125,7 @@ public class UICharacterWindow : BasicWindow
 
         if(postedQuests != null)
         {
-            postedQuests.text = "Posted Quests:\n";
+            postedQuests.text = "";
             for(int i = 0; i < character.agent.postedQuestIDs.Count; i++)
             {
                 postedQuests.text += "- " + GOAP_QuestBoard.instance.quests[character.agent.postedQuestIDs[i]].ToString() + "\n";
@@ -120,11 +134,19 @@ public class UICharacterWindow : BasicWindow
 
         if (completedQuests != null)
         {
-            completedQuests.text = "Completed Quests:\n";
+            completedQuests.text = "";
             for (int i = 0; i < character.agent.completedQuestIDs.Count; i++)
             {
                 completedQuests.text += "- " + GOAP_QuestBoard.instance.quests[character.agent.completedQuestIDs[i]].ToString() + "\n";
             }
         }
+    }
+
+    public void SetActiveTab(int newActiveTab)
+    {
+        activeTab = newActiveTab;
+
+        contentTabs[activeTab].SetAsLastSibling();
+
     }
 }
