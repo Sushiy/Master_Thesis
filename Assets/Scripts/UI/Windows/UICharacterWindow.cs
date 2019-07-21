@@ -145,7 +145,15 @@ public class UICharacterWindow : BasicWindow
             completedQuests.text = "";
             for (int i = 0; i < character.agent.completedQuestIDs.Count; i++)
             {
-                completedQuests.text += "- " + GOAP_QuestBoard.instance.quests[character.agent.completedQuestIDs[i]].ToString() + "\n";
+                int key = character.agent.completedQuestIDs[i];
+                if (GOAP_QuestBoard.instance.questArchive.ContainsKey(key))
+                {
+                    completedQuests.text += "- " + GOAP_QuestBoard.instance.questArchive[key].ToString() + "\n";
+                }
+                else
+                {
+                    Debug.LogError("Quest " + key + " is not in questArchive");
+                }
             }
         }
 
@@ -153,8 +161,15 @@ public class UICharacterWindow : BasicWindow
 
         if(character.agent.activePlanInfo != null)
         {
-            PlanInfo plan = character.agent.planMemory[(int)character.agent.activePlanInfo];
-            currentPlan.text = "Plan " + plan.PlanID + "; Goal: " + plan.goalInfo + "\n" + plan.actionQueueInfo;
+            if((int)character.agent.activePlanInfo >= 0 && (int)character.agent.activePlanInfo < character.agent.planMemory.Count)
+            {
+                PlanInfo plan = character.agent.planMemory[(int)character.agent.activePlanInfo];
+                currentPlan.text = "Plan " + plan.PlanID + "; Goal: " + plan.goalInfo + "\n" + plan.actionQueueInfo;
+            }
+            else
+            {
+                Debug.LogError("Active plan id: " + (int)character.agent.activePlanInfo + " is beyond planmemory count");
+            }
             
         }
         else

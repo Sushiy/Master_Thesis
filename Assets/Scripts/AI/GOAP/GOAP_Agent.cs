@@ -64,7 +64,7 @@ public class GOAP_Agent
     }
 
     public List<PlanInfo> planMemory;
-    public int? activePlanInfo;
+    public int? activePlanInfo = null;
 
     public GOAP_Agent(GOAP_Character character, IGOAP_AgentView view)
     {
@@ -247,7 +247,7 @@ public class GOAP_Agent
         {
             Queue<GOAP_Action> newPlan;
             //Fetch a new Plan from the planner
-            planMemory.Add(new PlanInfo(PrintGoal(), Character.characterName, activeQuest != null ? activeQuest.id : -1));
+            planMemory.Add(new PlanInfo(PrintGoal(), Character.characterName));
             newPlan = GOAP_Planner.instance.Plan(this, activeGoal, currentWorldstates, character.availableActions);
 
             timeSincePlanned = 0.0f;
@@ -259,6 +259,7 @@ public class GOAP_Agent
                 actionCompleted = true;
                 planMemory[planMemory.Count - 1].ApprovePlan(planMemory.Count - 1, PrintActionQueue());
                 activePlanInfo = planMemory.Count - 1;
+                if (activePlanInfo == -1) Debug.LogError(character.characterName + " ActivePlanIndex: -1");
                 ChangeState(FSM_State.PERFORMACTION);
             }
             else
@@ -372,6 +373,7 @@ public class GOAP_Agent
         {
             Debug.Log("<color=#0000cc>" + character.characterName + "</color> doesn't have any actions left anymore.");
             activeGoal.Clear();
+            activePlanInfo = null;
             ChangeState(FSM_State.IDLE);
         }
     }

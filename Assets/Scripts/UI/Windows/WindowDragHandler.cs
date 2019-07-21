@@ -20,6 +20,7 @@ public class WindowDragHandler : EventTrigger
     {
         dragging = true;
         clickOffset = new Vector2(Input.mousePosition.x - transform.position.x, Input.mousePosition.y - transform.position.y);
+        transform.SetAsLastSibling();
     }
 
     public override void OnPointerUp(PointerEventData eventData)

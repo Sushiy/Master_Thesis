@@ -8,6 +8,8 @@ public struct QuestData
     public List_GOAP_Worldstate requiredStates;
 
     public List_GOAP_Worldstate providedStates;
+
+    public float reward;
     public void Init()
     {
         requiredStates = new List_GOAP_Worldstate();
@@ -18,6 +20,7 @@ public struct QuestData
         this.owner = owner;
         requiredStates = new List_GOAP_Worldstate();
         providedStates = new List_GOAP_Worldstate();
+        reward = 0;
     }
 
     public void ClearRequired()
@@ -49,6 +52,11 @@ public class GOAP_Quest
 {
     private static int count = 0;
     public int id;
+
+    public float Reward
+    {
+        get { return questData.reward; }
+    }
 
     private QuestData questData;
 
@@ -89,6 +97,10 @@ public class GOAP_Quest
         {
             Owner.completedQuestIDs.Add(id);
             Owner.postedQuestIDs.Remove(id);
+        }
+        else
+        {
+            Debug.LogError("Quest is no longer posted");
         }
     }
 

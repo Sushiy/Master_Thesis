@@ -47,19 +47,23 @@ public class PlanInfo
 
     //includes states and targetQuest/personal/village
     public string goalInfo;
-    public int questID;
+    public int questID = -1; //id of your own quest for this if it includes one
 
     public string characterName;
 
     public string actionQueueInfo;
 
-    public PlanInfo(string goalInfo, string characterName, int questID = -1)
+    public PlanInfo(string goalInfo, string characterName)
     {
         this.goalInfo = goalInfo;
         this.characterName = characterName;
-        this.questID = questID;
         nodes = new List<NodeInfo>();
         iterations = new List<IterationInfo>();
+    }
+
+    public void SetQuestID(int questID)
+    {
+        this.questID = questID;
     }
 
     //Only valid plans get an id

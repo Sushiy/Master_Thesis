@@ -17,6 +17,10 @@ public class ClickHandler : MonoBehaviour
                 {
                     UICharacterWindow.instance.ShowWindow(hitInfo.collider.gameObject.GetComponent<GOAP_Character>());
                 }
+                if (hitInfo.collider.CompareTag("QuestBoard"))
+                {
+                    QuestboardWindow.instance.ShowWindow();
+                }
             }
         }
     }
