@@ -59,7 +59,7 @@ public class GOAP_Planner : MonoBehaviour
     {
         //BASE ACTION
         InstantiateBaseAction<Action_EatFood>(ref set);
-        InstantiateBaseAction<Action_GatherFirewood>(ref set);
+        InstantiateBaseAction<Action_GatherDeadwood>(ref set);
         InstantiateBaseAction<Action_Sleep>(ref set);
         InstantiateBaseAction<Action_GetWater>(ref set);
         InstantiateBaseAction<Action_CheckForQuest>(ref set);

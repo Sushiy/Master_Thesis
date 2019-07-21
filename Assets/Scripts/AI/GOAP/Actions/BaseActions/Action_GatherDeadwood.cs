@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Action_GatherFirewood : GOAP_Action
+public class Action_GatherDeadwood : GOAP_Action
 {
-    public Action_GatherFirewood()
+    public Action_GatherDeadwood()
     {
         Init();
-        actionID = "GatherWood";
+        actionID = "GatherDeadwood";
         workCost = 40f;
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Wood);
     }
