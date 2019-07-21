@@ -63,6 +63,17 @@ public class GOAP_Character : MonoBehaviour
         {
             sleep -= deltaTime * tiredSpeed;
         }
+
+        if (social < 0)
+        {
+            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is lonely");
+            agent.ChangeCurrentWorldState(WorldStateKey.bHasSocialised, false);
+            social = 0;
+        }
+        else if (social > 0)
+        {
+            social -= deltaTime * lonelySpeed;
+        }
     }
 
     public void Eat()

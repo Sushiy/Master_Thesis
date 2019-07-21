@@ -54,4 +54,13 @@ public class Field_GOAT : GameObjectActionTarget
             tendedTo = true;
         }
     }
+
+    public void Harvest()
+    {
+        if (!IsAvailable()) return;
+
+        tendedTo = false;
+        currentGrowthState = 0;
+        growthTimeAlpha = 0;
+    }
 }

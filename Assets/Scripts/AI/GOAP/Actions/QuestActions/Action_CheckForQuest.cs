@@ -10,9 +10,9 @@ public class Action_CheckForQuest : GOAP_Action
     public Action_CheckForQuest()
     {
         Init();
-        workCost = 1f;
+        workCost = 5f;
         actionID = "CheckForQuest";
-        AddSatisfyWorldState(WorldStateKey.bHasWorked, 1);
+        AddSatisfyWorldState(WorldStateKey.bHasCheckedQuestboard, 1);
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)

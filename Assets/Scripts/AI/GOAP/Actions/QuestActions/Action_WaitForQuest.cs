@@ -61,7 +61,7 @@ public class Action_WaitForQuest : GOAP_Action
             {
                 if(originalQuestID != -1)
                     agent.activeQuest = GOAP_QuestBoard.instance.quests[originalQuestID];
-                Debug.Log("<color=#0000cc>" + agent.Character.characterName + "s</color> Quest " + ownQuestID + " was completed!" + ((originalQuestID > -1)? "\nThis was a solution for Quest " + originalQuestID : ""));
+                Debug.Log("<color=#0000cc>" + agent.Character.characterName + "s</color> Quest " + ownQuestID + " was completed!" + ((originalQuestID > -1)? "\nThis plan is a solution for Quest " + originalQuestID : ""));
                 agent.completedQuestIDs.Remove(ownQuestID);
                 foreach (GOAP_Worldstate state in SatisfyWorldstates)
                 {
@@ -73,7 +73,7 @@ public class Action_WaitForQuest : GOAP_Action
             {
                 Debug.Log("<color=#0000cc><b>Canceling</b>: " + agent.Character.characterName + "</color>: WaitForQuest " + ownQuestID);
                 agent.CancelPlan();
-                return false;
+                return true;
             }
         }
 

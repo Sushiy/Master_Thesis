@@ -69,7 +69,7 @@ public class GOAP_Agent
     public GOAP_Agent(GOAP_Character character, IGOAP_AgentView view)
     {
         this.character = character;
-        this.View = view;
+        View = view;
 
         checkedCharacterGoals = new List_GOAP_Worldstate();
 
@@ -85,6 +85,7 @@ public class GOAP_Agent
 
         planMemory = new List<PlanInfo>();
     }
+
     public void ChooseGoal()
     {
         activeGoal = new List_GOAP_Worldstate();
@@ -161,7 +162,21 @@ public class GOAP_Agent
                 WaitForCallUpdate(deltaTime);
                 break;
         }
+        CurrentWorldstateUpdate(deltaTime);
     }
+
+    private void CurrentWorldstateUpdate(float deltaTime)
+    {
+        foreach (GOAP_Worldstate state in currentWorldstates)
+        {
+            if (state.Forget(deltaTime))
+            {
+                RemoveCurrentWorldState(state);
+            }
+        }
+    }
+
+    #region Statemachine
 
     private void ChangeState(FSM_State newState)
     {
@@ -202,8 +217,7 @@ public class GOAP_Agent
         }
 
         currentState = newState;
-    }
-
+    }    
 
     private void IdleUpdate(float deltaTime)
     {
@@ -365,7 +379,7 @@ public class GOAP_Agent
             else
             {
                 Debug.Log("<color=#0000cc>" + character.characterName + "</color> cannot perform <color=#cc0000>" + activeAction.ActionID + "</color> anymore.");
-                CancelPlan();
+                Replan();
             }
 
         }
@@ -408,14 +422,38 @@ public class GOAP_Agent
         View.PrintMessage("Called");
         timeWaitingForCall += deltaTime;
     }
+    #endregion
 
+    /// <summary>
+    ///Cancel the action queue but keep the goal/quest and try planning again immediately
+    /// </summary>
+    public void Replan()
+    {
+        activePlanInfo = null;
+        activeAction = null;
+        currentActions.Clear();
+        actionCompleted = true;
+        ChangeState(FSM_State.PLANNING);
+    }
 
+    /// <summary>
+    /// Cancel the actionqueue and forget the plan
+    /// </summary>
     public void CancelPlan()
     {
         if(activeQuest != null)
         {
             checkedQuestIds.Remove(activeQuest.id);
         }
+        else
+        {
+            //if this was a personal goal, remove it from the checked list
+            if (activeGoal.Count == 1)
+                checkedCharacterGoals.Remove(activeGoal[0]);
+        }
+        activeQuest = null;
+        activeGoal.Clear();
+        
         activePlanInfo = null;
         activeAction = null;
         currentActions.Clear();
@@ -475,7 +513,7 @@ public class GOAP_Agent
     {
         if(currentWorldstates.ContainsKey(newState))
         {
-            if(newState.IsUniqueState())
+            if(newState.type == WorldStateType.UNIQUE)
             {
                 if (newState.value > 0)
                 {

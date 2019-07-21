@@ -28,7 +28,7 @@ public class List_GOAP_Worldstate : List<GOAP_Worldstate>
     {
         for(int i = 0; i < Count; i++)
         {
-            if(this[i].key == state.key && (state.IsUniqueState() || this[i].value == state.value))
+            if(this[i].key == state.key && (state.type == WorldStateType.UNIQUE || this[i].value == state.value))
             {
                 return true;
             }
@@ -53,7 +53,7 @@ public class List_GOAP_Worldstate : List<GOAP_Worldstate>
             }                
         }
 
-        if(!hasKey && state.IsUniqueState() && state.value == 0)
+        if(!hasKey && state.type == WorldStateType.UNIQUE && state.value == 0)
         {
             return true;
         }

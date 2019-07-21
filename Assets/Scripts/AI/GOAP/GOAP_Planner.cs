@@ -357,7 +357,6 @@ public class GOAP_Planner : MonoBehaviour
     {
         List_GOAP_Worldstate newRequired = new List_GOAP_Worldstate(activeNode.required);
         Action_BuyItem action = new Action_BuyItem();
-        action.CheckProceduralConditions(agent);
 
         bool isValidAction = false;
 
@@ -384,7 +383,6 @@ public class GOAP_Planner : MonoBehaviour
     {
         List_GOAP_Worldstate newRequired = new List_GOAP_Worldstate();
         Action_PostQuest action = new Action_PostQuest();
-        action.CheckProceduralConditions(agent);
         foreach(GOAP_Worldstate state in activeNode.required)
         {
             //Debug.Log("Adding state " + state.ToString() + " to quest");

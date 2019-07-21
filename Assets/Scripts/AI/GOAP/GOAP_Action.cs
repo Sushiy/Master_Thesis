@@ -12,7 +12,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     protected float workCost = 1f;
     protected float range = 1.0f;
 
-    private float secondsToWorkCostRatio = 0.1f; // How much Time should pass for 1 workCost: 0.1f/1f
+    private float secondsToWorkCostRatio = 0.25f; // How much Time should pass for 1 workCost: 0.1s per 1 cost
     private float workTime
     {
         get { return secondsToWorkCostRatio * workCost; }
