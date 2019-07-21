@@ -8,6 +8,8 @@ public struct QuestData
     public List_GOAP_Worldstate requiredStates;
 
     public List_GOAP_Worldstate providedStates;
+
+    public float reward;
     public void Init()
     {
         requiredStates = new List_GOAP_Worldstate();
@@ -18,6 +20,7 @@ public struct QuestData
         this.owner = owner;
         requiredStates = new List_GOAP_Worldstate();
         providedStates = new List_GOAP_Worldstate();
+        reward = 0;
     }
 
     public void ClearRequired()
@@ -41,12 +44,7 @@ public struct QuestData
 
     public string RequiredToString()
     {
-        string msg = "";
-        foreach(GOAP_Worldstate state in requiredStates)
-        {
-            msg += state.ToString() + ", ";
-        }
-        return msg;
+        return requiredStates.ToString();
     }
 }
 
@@ -54,6 +52,11 @@ public class GOAP_Quest
 {
     private static int count = 0;
     public int id;
+
+    public float Reward
+    {
+        get { return questData.reward; }
+    }
 
     private QuestData questData;
 
@@ -95,25 +98,28 @@ public class GOAP_Quest
             Owner.completedQuestIDs.Add(id);
             Owner.postedQuestIDs.Remove(id);
         }
+        else
+        {
+            Debug.LogError("Quest is no longer posted");
+        }
     }
 
-    public override string ToString()
+    public string ToLongString()
     {
         string quest = "QUEST " + id + ": " + Owner.Character.characterName + " needs someone to complete:";
-        foreach (GOAP_Worldstate state in RequiredStates)
-        {
-            quest += " " + state.ToString() + ";";
-        }
+        quest += RequiredStates.ToString();
         if(ProvidedStates != null && ProvidedStates.Count > 0)
         {
             quest += " \nIf necessary, he can provide:";
-            foreach (GOAP_Worldstate state in ProvidedStates)
-            {
-                quest += " " + state.ToString() + ";";
-            }
+            quest += ProvidedStates.ToString();
             quest += "\n and will pay you handsomly.";
         }
         quest += "\n I will pay you handsomely.";
         return quest;
+    }
+
+    public override string ToString()
+    {
+        return "ID " + id + ": " + RequiredStates.ToString();
     }
 }

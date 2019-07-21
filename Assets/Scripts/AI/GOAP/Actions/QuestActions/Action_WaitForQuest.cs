@@ -35,6 +35,7 @@ public class Action_WaitForQuest : GOAP_Action
                 Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterName + "</color>: WaitForQuest " + ownQuestID);
 
                 //Move this plan to questPlans.
+                agent.planMemory[(int)agent.activePlanInfo].SetQuestID(ownQuestID);
                 agent.SaveQuestPlan(ownQuestID);
                 if(agent.activeQuest != null)
                     originalQuestID = agent.activeQuest.id;
@@ -44,6 +45,12 @@ public class Action_WaitForQuest : GOAP_Action
             {
                     Debug.Log("<color=#0000cc><b>Restarting</b>: " + agent.Character.characterName + "</color>: WaitForQuest " + ownQuestID);
                     UpdateWorkTime(deltaTime);
+                    agent.activePlanInfo = agent.planMemory.FindIndex(x => x.questID == ownQuestID);
+                    if (agent.activePlanInfo == -1)
+                    {
+                        agent.activePlanInfo = null;
+                        Debug.LogError(agent.Character.characterName + " ActivePlanIndex: -1");
+                    }
             }
         }
 

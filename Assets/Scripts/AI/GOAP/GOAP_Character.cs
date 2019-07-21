@@ -30,12 +30,14 @@ public class GOAP_Character : MonoBehaviour
     public GameObjectActionTarget home;
 
     [Header("HealthData")]
+    
+    public float food = 100f;
+    float hungerSpeed = 2.5f; //points of hunger per second => 40s
+    public float sleep = 100f;
+    float tiredSpeed = 0.8f; //points of tiredness per second => 120s
+    public float social = 100f;
+    float lonelySpeed = 1.2f; //points of tiredness per second => 83s
 
-    //All three values are measured from 1-12
-    public float food = 40;
-    float hungerSpeed = 1f;
-    public float sleep = 120;
-    float tiredSpeed = 1f;
     float health;
 
     public void UpdateHealthData(float deltaTime)
@@ -65,11 +67,15 @@ public class GOAP_Character : MonoBehaviour
 
     public void Eat()
     {
-        food = 40;
+        food = 100;
     }
     public void Sleep()
     {
-        sleep = 120;
+        sleep = 100;
+    }
+    public void Socialise()
+    {
+        social = 100;
     }
 
     private void Awake()
@@ -77,6 +83,8 @@ public class GOAP_Character : MonoBehaviour
         agent = new GOAP_Agent(this, GetComponent<IGOAP_AgentView>());
         inventory = new Inventory();
         AddStartingInventory();
+        agent.ChangeCurrentWorldState(WorldStateKey.bHasSlept, true);
+        agent.ChangeCurrentWorldState(WorldStateKey.bHasEaten, true);
     }
 
     private void AddStartingInventory()

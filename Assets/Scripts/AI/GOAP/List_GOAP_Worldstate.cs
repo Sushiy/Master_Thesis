@@ -60,4 +60,15 @@ public class List_GOAP_Worldstate : List<GOAP_Worldstate>
 
         return false;
     }
+
+    public override string ToString()
+    {
+        string msg = "";
+        for(int i = 0; i < Count; i++)
+        {
+            msg += this[i].ToString() + ",";
+        }
+
+        return msg;
+    }
 }
