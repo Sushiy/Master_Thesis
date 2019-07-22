@@ -19,9 +19,8 @@ public class GOAP_Character : MonoBehaviour
     {
         get { return inventory; }
     }
-
-    [HideInInspector]
-    public PlannableActions availableActions;
+    
+    public List<string> availableActions;
 
     public List<ItemType> startingInventory;
 

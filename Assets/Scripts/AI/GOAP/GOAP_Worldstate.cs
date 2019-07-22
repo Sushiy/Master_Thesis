@@ -35,7 +35,7 @@ public class GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
     //Can be null
     public IActionTarget target;
 
-    public WorldStateType type;
+    public WorldStateType type { private set; get; }
 
     public int value;
 
@@ -50,15 +50,19 @@ public class GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
     {
         this.key = key;
         this.value = value;
-        this.type = DetermineType();
         this.target = target;
+        type = DetermineType();
+        forgetTime = DetermineForgetTime();
     }
 
     public bool Forget(float deltaTime)
     {
-        forgetAlpha += deltaTime / forgetTime;
-        if (forgetAlpha > 1)
-            return true;
+        if(forgetTime > 0.0f)
+        {
+            forgetAlpha += deltaTime / forgetTime;
+            if (forgetAlpha > 1)
+                return true;
+        }
         return false;
     }
 
@@ -135,6 +139,24 @@ public class GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
             //    return WorldStateType.TARGETED;
             default:
                 return WorldStateType.UNIQUE;
+        }
+    }
+
+    private float DetermineForgetTime()
+    {
+        switch (key)
+        {
+            case WorldStateKey.bWasFieldTended:
+            case WorldStateKey.bIsWheatRipe:
+                return Field_GOAT.GROWTHTIME;
+            case WorldStateKey.bIsMushroomAvailable:
+            case WorldStateKey.bIsIronAvailable:
+            case WorldStateKey.bIsDeadWoodAvailable:
+                return 40f;
+            case WorldStateKey.bHasCheckedQuestboard:
+                return 5f;
+            default:
+                return 0f;
         }
     }
 }

@@ -6,6 +6,18 @@ using UnityEngine;
 //This class contains all info on individual actions. Most of all it holds the required and satisfyWorldstate fields, which are needed for planning.
 public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
 {
+    public static string[] baseActions =
+    {
+        "Action_EatFood",
+        "Action_Sleep",
+        "Action_CheckForQuest",
+        "Action_PostQuest",
+        "Action_WaitForQuest",
+        "Action_CompleteQuest",
+        "Action_GetWater",
+        "Action_GatherDeadwood"
+    };
+
     private List_GOAP_Worldstate requiredWorldstates;
     private List_GOAP_Worldstate satisfyWorldstates;
 
@@ -64,7 +76,6 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         requiredWorldstates = new List_GOAP_Worldstate();
         satisfyWorldstates = new List_GOAP_Worldstate();
     }
-  
 
     //Perform this Action
     public abstract bool Perform(GOAP_Agent agent, float deltaTime);

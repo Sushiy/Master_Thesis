@@ -1424,7 +1424,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 13.47, y: -0.00004137496}
+  m_AnchoredPosition: {x: 13.47, y: -0.000047449477}
   m_SizeDelta: {x: -24.1, y: 40.81}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &71713798
@@ -1631,13 +1631,23 @@ MonoBehaviour:
     level: 4
   goals:
   - key: 3
-    type: 0
     value: 1
   - key: 5
-    type: 0
+    value: 1
+  - key: 2
     value: 1
   itemStockPilePriorities: 02000000000000000001000001010000
-  availableActions: 1098
+  availableActions:
+  - Action_EatFood
+  - Action_Sleep
+  - Action_CheckForQuest
+  - Action_GetWater
+  - Action_GatherDeadwood
+  - Action_MakeHoe
+  - Action_MakePickaxe
+  - Action_MineIron
+  - Action_MakeAxe
+  - Action_ChopWood
   startingInventory: 01010000
   home: {fileID: 455813414}
   food: 40
@@ -5744,7 +5754,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1ecf757f5ef28049936259402e205f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  globalKnowledgePlannableActions: -1
   heuristicFactor: 2
   writePlannerLog: 1
 --- !u!4 &294155738 stripped
@@ -10257,7 +10266,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000027337734}
+  m_AnchoredPosition: {x: 0, y: -0.00006766524}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &493754571
@@ -10986,7 +10995,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 16.5, y: -0.000020377205}
+  m_AnchoredPosition: {x: 16.5, y: -0.0000094841225}
   m_SizeDelta: {x: -24.2, y: 40.81}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &568073978
@@ -16327,7 +16336,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 16.5, y: -0.000037591246}
+  m_AnchoredPosition: {x: 16.5, y: -0.000043015498}
   m_SizeDelta: {x: -57.1, y: 20.11}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &598892471
@@ -18058,7 +18067,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1866415366}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.99999994
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -21771,7 +21780,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000026457192}
+  m_AnchoredPosition: {x: 0, y: -0.000092756934}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &894161269
@@ -24162,7 +24171,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2030263986}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.99999994
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -24580,8 +24589,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1644244706}
   m_HandleRect: {fileID: 1644244705}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 0.9999996
+  m_Value: 1
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -32209,7 +32218,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000029438936}
+  m_AnchoredPosition: {x: 0, y: -0.00006888467}
   m_SizeDelta: {x: -206.73, y: 20.11}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1384956676
@@ -40230,7 +40239,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 450854742}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.99999994
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -40931,13 +40940,20 @@ MonoBehaviour:
     level: 4
   goals:
   - key: 3
-    type: 0
     value: 1
   - key: 5
-    type: 0
+    value: 1
+  - key: 2
     value: 1
   itemStockPilePriorities: 0000000001000000
-  availableActions: 519
+  availableActions:
+  - Action_ChopTree
+  - Action_EatFood
+  - Action_Sleep
+  - Action_CheckForQuest
+  - Action_GetWater
+  - Action_GatherDeadwood
+  - Action_ChopWood
   startingInventory: 00010000
   home: {fileID: 1898666206}
   food: 30
@@ -42181,13 +42197,21 @@ MonoBehaviour:
     level: 4
   goals:
   - key: 3
-    type: 0
     value: 1
   - key: 5
-    type: 0
+    value: 1
+  - key: 2
     value: 1
   itemStockPilePriorities: 
-  availableActions: 784
+  availableActions:
+  - Action_Farm
+  - Action_EatFood
+  - Action_Sleep
+  - Action_CheckForQuest
+  - Action_GetWater
+  - Action_GatherDeadwood
+  - Action_MakeFlour
+  - Action_MakeBread
   startingInventory: 00020000
   home: {fileID: 820082526}
   food: 60
@@ -46959,7 +46983,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0000073936985}
+  m_AnchoredPosition: {x: 0, y: -0.000038264145}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1782978589
@@ -50451,7 +50475,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 69920038}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9999997
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

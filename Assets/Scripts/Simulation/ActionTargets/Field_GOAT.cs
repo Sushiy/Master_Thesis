@@ -5,7 +5,7 @@ using UnityEngine;
 public class Field_GOAT : GameObjectActionTarget
 {
     const int MAXGROWTHSTATE = 5;
-    const float GROWTHTIME = 60f; // time it takes to increase growthstate
+    public const float GROWTHTIME = 30f; // time it takes to increase growthstate
     //State of growth from 1-5
     int currentGrowthState = MAXGROWTHSTATE;
 
