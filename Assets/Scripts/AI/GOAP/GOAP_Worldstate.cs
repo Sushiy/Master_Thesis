@@ -6,11 +6,24 @@ public enum WorldStateKey
 {
     eHasItem = 0,
     bAttackingTarget = 1,
-    bHasWorked,
+    bHasCheckedQuestboard,
     bHasEaten,
     bIsHealthy,
     bHasSlept,
-    bHasStockpiledRessources
+    bHasSocialised,
+    bHasStockpiledRessources,
+    bWasFieldTended,
+    bIsWheatRipe,
+    bIsMushroomAvailable,
+    bIsDeadWoodAvailable,
+    bIsIronAvailable
+}
+
+public enum WorldStateType
+{
+    UNIQUE = 0,
+    INDEXED,
+    TARGETED
 }
 
 [System.Serializable]
@@ -22,7 +35,12 @@ public class GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
     //Can be null
     public IActionTarget target;
 
+    public WorldStateType type { private set; get; }
+
     public int value;
+
+    float forgetTime = 0.0f; //How long it takes for the NPC to forget this state (0 means he wont forget at all)
+    float forgetAlpha = 0f;
 
     public GOAP_Worldstate(WorldStateKey key, bool value, IActionTarget target = null) : this(key, value == true ? 1 : 0, target)
     {
@@ -33,14 +51,29 @@ public class GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
         this.key = key;
         this.value = value;
         this.target = target;
+        type = DetermineType();
+        forgetTime = DetermineForgetTime();
+    }
+
+    public bool Forget(float deltaTime)
+    {
+        if(forgetTime > 0.0f)
+        {
+            forgetAlpha += deltaTime / forgetTime;
+            if (forgetAlpha > 1)
+                return true;
+        }
+        return false;
     }
 
     public bool Equals(GOAP_Worldstate other)
     {
-        if(IsUniqueState())
+        if(this.type == WorldStateType.UNIQUE)
             return other.key == this.key;
-        else
+        else if(this.type == WorldStateType.INDEXED)
             return other.key == this.key && other.value == this.value;
+        else 
+            return other.key == this.key && other.target == this.target;
 
     }
 
@@ -62,7 +95,7 @@ public class GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
     /// <returns></returns>
     public override int GetHashCode()
     {
-        int calculation = (int)key.GetHashCode() * (IsUniqueState() ? 1 : value.GetHashCode());
+        int calculation = (int)key.GetHashCode() * (this.type == WorldStateType.UNIQUE ? 1 : value.GetHashCode());
         return calculation;
     }
 
@@ -92,14 +125,39 @@ public class GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
             return key.ToString();
     }
 
-    public bool IsUniqueState()
+    private WorldStateType DetermineType()
     {
-        //Add all nonunique keys here
-        if(key == WorldStateKey.eHasItem)
+        switch(key)
         {
-            return false;
+            case WorldStateKey.eHasItem:
+                return WorldStateType.INDEXED;
+            //case WorldStateKey.bWasFieldTended:
+            //case WorldStateKey.bIsWheatRipe:
+            //case WorldStateKey.bIsMushroomAvailable:
+            //case WorldStateKey.bIsIronAvailable:
+            //case WorldStateKey.bIsDeadWoodAvailable:
+            //    return WorldStateType.TARGETED;
+            default:
+                return WorldStateType.UNIQUE;
         }
-        return true;
+    }
+
+    private float DetermineForgetTime()
+    {
+        switch (key)
+        {
+            case WorldStateKey.bWasFieldTended:
+            case WorldStateKey.bIsWheatRipe:
+                return Field_GOAT.GROWTHTIME;
+            case WorldStateKey.bIsMushroomAvailable:
+            case WorldStateKey.bIsIronAvailable:
+            case WorldStateKey.bIsDeadWoodAvailable:
+                return 40f;
+            case WorldStateKey.bHasCheckedQuestboard:
+                return 5f;
+            default:
+                return 0f;
+        }
     }
 }
 

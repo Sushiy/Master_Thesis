@@ -1,33 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
-
-public enum PlannableActions
-{
-    None = 0,
-    ChopTree = 1 << 0,
-    ChopWood = 1 << 1,
-    GetAxe = 1 << 2,
-    MakeAxe = 1 << 3,
-    MakeBread = 1 << 4,
-    BuyItem = 1 << 5,
-    MineIron = 1 << 6,
-    MakePickaxe = 1 << 7,
-    Farm = 1 << 8,
-    MakeFlour = 1 << 9,
-    MakeHoe = 1 << 10
-}
 
 public class GOAP_Planner : MonoBehaviour
 {
     public static GOAP_Planner instance;
-    [HideInInspector]
-    public PlannableActions globalKnowledgePlannableActions;
-    private List<GOAP_Action> globalKnowledgeAvailableActions;
     public float heuristicFactor = 2f;
 
     public bool writePlannerLog = true;
     string plannerLog = "";
+
+    private Dictionary<string, Type> typeMap;
+
+    private void AddToTypeMap(string className, Type type)
+    {
+        typeMap.Add(className, type);
+    }
 
     public void Awake()
     {
@@ -36,67 +26,38 @@ public class GOAP_Planner : MonoBehaviour
         else
             Destroy(this);
 
-        globalKnowledgeAvailableActions = new List<GOAP_Action>();
-
-        GetActionSet(this.globalKnowledgePlannableActions, ref globalKnowledgeAvailableActions);
-    }
-
-    public void InstantiateAction<T>(PlannableActions plannableActions, ref List<GOAP_Action> set) where T : GOAP_Action, new()
-    {
-        T action = new T();
-        if (IsActionAvailable(plannableActions, (PlannableActions)Enum.Parse(typeof(PlannableActions), action.ActionID)))
+        typeMap = new Dictionary<string, Type>();
+        System.Type[] types = typeof(GOAP_Action).Assembly.GetTypes().Where(type => type.IsSubclassOf(typeof(GOAP_Action))).ToArray();
+        for (int i = 0; i < types.Length; i++)
         {
-            set.Add(action);
+            AddToTypeMap(types[i].ToString(), types[i]);
         }
     }
 
-    public void InstantiateBaseAction<T>(ref List<GOAP_Action> set) where T : GOAP_Action, new()
+    public GOAP_Action InstantiateAction(string actionType)
     {
-        set.Add(new T());
-    }
-
-    public void GetActionSet(PlannableActions plannableActions, ref List<GOAP_Action> set)
-    {
-        //BASE ACTION
-        InstantiateBaseAction<Action_EatFood>(ref set);
-        InstantiateBaseAction<Action_GatherDeadwood>(ref set);
-        InstantiateBaseAction<Action_Sleep>(ref set);
-        InstantiateBaseAction<Action_GetWater>(ref set);
-        InstantiateBaseAction<Action_CheckForQuest>(ref set);
-
-        //Extra Actions
-        InstantiateAction<Action_ChopTree>(plannableActions, ref set);
-        InstantiateAction<Action_ChopWood>(plannableActions, ref set);
-        InstantiateAction<Action_GetAxe>(plannableActions, ref set);
-        InstantiateAction<Action_MakeAxe>(plannableActions, ref set);
-        InstantiateAction<Action_MakeBread>(plannableActions, ref set);
-        InstantiateAction<Action_BuyItem>(plannableActions, ref set);
-        InstantiateAction<Action_MineIron>(plannableActions, ref set);
-        InstantiateAction<Action_MakePickaxe>(plannableActions, ref set);
-        InstantiateAction<Action_Farm>(plannableActions, ref set);
-        InstantiateAction<Action_MakeFlour>(plannableActions, ref set);
-        InstantiateAction<Action_MakeHoe>(plannableActions, ref set);
-
-
-        string msg = "<b>Initializing ActionSet \nAvailable Actions:</b>\n";
-        foreach(GOAP_Action action in set)
+        try
         {
-            msg += action.ActionID + "\n";
+            Type t = typeMap[actionType];
+            return (GOAP_Action)Activator.CreateInstance(t);
         }
-        //Debug.Log(msg);
+        catch(KeyNotFoundException key)
+        {
+            Debug.LogError(actionType);
+            return null;
+        }
+        catch(MissingMethodException)
+        {
+            return null;
+        }
     }
 
-    public bool IsActionAvailable(PlannableActions plannableActions, PlannableActions action)
-    {
-        return (plannableActions & action) != PlannableActions.None;
-    }
-
-    public Queue<GOAP_Action> Plan(GOAP_Agent agent, List_GOAP_Worldstate goal, List_GOAP_Worldstate currentWorldState, List<GOAP_Action> availableActions)
+    public Queue<GOAP_Action> Plan(GOAP_Agent agent, List_GOAP_Worldstate goal, List_GOAP_Worldstate currentWorldState, List<string> availableActions)
     {
         plannerLog = "<color=#0000cc> <b>PLANNING</b>: " + agent.Character.characterName + "</color>\n";
 
         //Search for a valid plan
-        Node startNode = WhileBuild(goal, new List<GOAP_Action>(availableActions), currentWorldState, agent);
+        Node startNode = WhileBuild(goal, availableActions, currentWorldState, agent);
         plannerLog += "\n";
 
         //Return null if you couldn't find a plan!
@@ -121,21 +82,15 @@ public class GOAP_Planner : MonoBehaviour
         return MakeQueue(startNode, agent);
     }
 
-    //Get the agents goal and try to find a plan for it
-    public Queue<GOAP_Action> Plan(GOAP_Agent agent, List_GOAP_Worldstate goal, List_GOAP_Worldstate currentWorldState)
-    {
-        return Plan(agent, goal, currentWorldState, globalKnowledgeAvailableActions);
-    }
-
-    public Queue<GOAP_Action> Plan(GOAP_Agent agent, List_GOAP_Worldstate goal, List_GOAP_Worldstate currentWorldState, PlannableActions plannableActions)
-    {
-        List<GOAP_Action> availableActions = new List<GOAP_Action>();
-        GetActionSet(plannableActions, ref availableActions);
-        return Plan(agent, goal, currentWorldState, availableActions);
-    }
-
-    //Perform A* reverse pathfinding search to get a plan
-    private Node WhileBuild(List_GOAP_Worldstate goal, List<GOAP_Action> availableActions, List_GOAP_Worldstate currentWorldState, GOAP_Agent agent)
+    /// <summary>
+    /// Perform an A*-search to find a valid plan
+    /// </summary>
+    /// <param name="goal">Agent's goal</param>
+    /// <param name="availableActions">Agent's available actions</param>
+    /// <param name="currentWorldState">Agent's current worldstate</param>
+    /// <param name="agent">Agent that wants a plan</param>
+    /// <returns>the starting node, if one was found, else null</returns>
+    private Node WhileBuild(List_GOAP_Worldstate goal, List<string> availableActions, List_GOAP_Worldstate currentWorldState, GOAP_Agent agent)
     {
         PlanInfo planInfo = agent.planMemory[agent.planMemory.Count - 1];
         int currentNodeID = 0;
@@ -203,9 +158,9 @@ public class GOAP_Planner : MonoBehaviour
             bool foundValidNeighbor = false;
             for (int i = 0; i < availableActions.Count; i++)
             {
-                if (availableActions[i].Equals(current.action)) continue; //Dont do the same action twice
+                if (availableActions[i].Equals("Action_" + current.action)) continue; //Dont do the same action twice
 
-                Node neighbor = (availableActions[i].ActionID == "BuyItem") ? GenerateBuyNode(current, currentWorldState,agent) : GetValidNeighborNode(current, availableActions[i], currentWorldState, agent);
+                Node neighbor = (availableActions[i] == "Action_BuyItem") ? GenerateBuyNode(current, currentWorldState,agent) : GetValidNeighborNode(current, InstantiateAction(availableActions[i]), currentWorldState, agent);
                 if(neighbor != null)
                 {
                     neighbor.id = currentNodeID++;
@@ -271,6 +226,12 @@ public class GOAP_Planner : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// Checks if the goal worldstate is already satisfied within the current worldstate
+    /// </summary>
+    /// <param name="currentWorldState"></param>
+    /// <param name="goalWorldState"></param>
+    /// <returns></returns>
     public bool IsGoalSatisfied(List_GOAP_Worldstate currentWorldState, GOAP_Worldstate goalWorldState)
     {
         //First, check if we have not already reached the goal, by checking it against our currentWorldstate
@@ -279,8 +240,13 @@ public class GOAP_Planner : MonoBehaviour
             return false;
         return true;
     }
-
-    //Combine Current and Goal Worldstate to see if a plan needs to be made in order to fulfill this goal
+    
+    /// <summary>
+    /// Combines current and goal worldstate
+    /// </summary>
+    /// <param name="currentWorldState"></param>
+    /// <param name="goalWorldState"></param>
+    /// <returns></returns>
     private Node GetGoalNode(List_GOAP_Worldstate currentWorldState, List_GOAP_Worldstate goalWorldState)
     {
         List_GOAP_Worldstate newRequired = new List_GOAP_Worldstate(goalWorldState);
@@ -296,10 +262,18 @@ public class GOAP_Planner : MonoBehaviour
         plannerLog += "\n";
         return new Node(null, newRequired, null, 0);
     }
-
-    //Try to apply the action onto the activeNode to see if it results in a valid neighbor
+    
+    /// <summary>
+    /// Tries to apply the action onto the activeNode to see if it results in a valid neighbor
+    /// </summary>
+    /// <param name="activeNode"></param>
+    /// <param name="action"></param>
+    /// <param name="planningWorldState">worldstate at the current stage of planning</param>
+    /// <param name="agent">currently planning agent</param>
+    /// <returns></returns>
     private Node GetValidNeighborNode(Node activeNode, GOAP_Action action, List_GOAP_Worldstate planningWorldState, GOAP_Agent agent)
     {
+        if (action == null) return null;
         bool isUsefulAction = false;
 
         List_GOAP_Worldstate newRequired = new List_GOAP_Worldstate(activeNode.required);
@@ -357,7 +331,6 @@ public class GOAP_Planner : MonoBehaviour
     {
         List_GOAP_Worldstate newRequired = new List_GOAP_Worldstate(activeNode.required);
         Action_BuyItem action = new Action_BuyItem();
-        action.CheckProceduralConditions(agent);
 
         bool isValidAction = false;
 
@@ -378,13 +351,18 @@ public class GOAP_Planner : MonoBehaviour
         float estimatedBuyCost = action.ActionCost * activeNode.required.Count;
         return new Node(activeNode, newRequired, action, estimatedBuyCost + activeNode.estimatedPathCost);
     }
-
-    //Generate a quest for the current Node, because it is somehow unsolvable
+    
+    /// <summary>
+    /// Generates a Node containing a PostQuest action from the activeNodes required worldstates
+    /// </summary>
+    /// <param name="activeNode"></param>
+    /// <param name="planningWorldState"></param>
+    /// <param name="agent"></param>
+    /// <returns></returns>
     private Node GenerateQuestNode(Node activeNode, List_GOAP_Worldstate planningWorldState, GOAP_Agent agent)
     {
         List_GOAP_Worldstate newRequired = new List_GOAP_Worldstate();
         Action_PostQuest action = new Action_PostQuest();
-        action.CheckProceduralConditions(agent);
         foreach(GOAP_Worldstate state in activeNode.required)
         {
             //Debug.Log("Adding state " + state.ToString() + " to quest");
@@ -393,8 +371,13 @@ public class GOAP_Planner : MonoBehaviour
         float estimatedQuestCost = action.ActionCost * activeNode.required.Count;
         return new Node(activeNode, newRequired, action, estimatedQuestCost + activeNode.estimatedPathCost);
     }
-
-    //Form a queue of actions from the plan of nodes
+    
+    /// <summary>
+    /// Forms a queue of actions from the nodes generated by the A*-search
+    /// </summary>
+    /// <param name="start">The first node</param>
+    /// <param name="agent"></param>
+    /// <returns></returns>
     private Queue<GOAP_Action> MakeQueue(Node start, GOAP_Agent agent)
     {
         Queue<GOAP_Action> queue = new Queue<GOAP_Action>();

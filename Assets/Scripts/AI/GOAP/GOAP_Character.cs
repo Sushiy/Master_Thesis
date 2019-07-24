@@ -19,9 +19,8 @@ public class GOAP_Character : MonoBehaviour
     {
         get { return inventory; }
     }
-
-    [HideInInspector]
-    public PlannableActions availableActions;
+    
+    public List<string> availableActions;
 
     public List<ItemType> startingInventory;
 
@@ -62,6 +61,17 @@ public class GOAP_Character : MonoBehaviour
         else if (sleep > 0)
         {
             sleep -= deltaTime * tiredSpeed;
+        }
+
+        if (social < 0)
+        {
+            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is lonely");
+            agent.ChangeCurrentWorldState(WorldStateKey.bHasSocialised, false);
+            social = 0;
+        }
+        else if (social > 0)
+        {
+            social -= deltaTime * lonelySpeed;
         }
     }
 
