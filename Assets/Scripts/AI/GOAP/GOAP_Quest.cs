@@ -106,7 +106,7 @@ public class GOAP_Quest
 
     public string ToLongString()
     {
-        string quest = "QUEST " + id + ": " + Owner.Character.characterName + " needs someone to complete:";
+        string quest = "QUEST " + id + ": " + Owner.Character.characterData.characterName + " needs someone to complete:";
         quest += RequiredStates.ToString();
         if(ProvidedStates != null && ProvidedStates.Count > 0)
         {

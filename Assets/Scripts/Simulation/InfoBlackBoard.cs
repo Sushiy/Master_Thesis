@@ -7,6 +7,8 @@ public class InfoBlackBoard : MonoBehaviour
 
     public static InfoBlackBoard instance;
 
+    public GameObjectActionTarget campFireLocation;
+
     [Header("ActionLocations")]
     public GameObjectActionTarget questBoardLocation;
     [Space]

@@ -97,7 +97,7 @@ public class UICharacterWindow : BasicWindow
 
     private void UpdateWindow()
     {
-        title.text = character.characterName;
+        title.text = character.characterData.characterName;
 
         //GOAP basic
         currentGoal.text = "Goal: " + character.agent.PrintGoal();
@@ -114,9 +114,9 @@ public class UICharacterWindow : BasicWindow
 
         if (skills != null && skills.Length > 0)
         {
-            for (int i = 0; i < character.skills.Count; i++)
+            for (int i = 0; i < character.characterData.skills.Count; i++)
             {
-                skills[i].text = character.skills[i].id.ToString() + ": " + character.skills[i].level;
+                skills[i].text = character.characterData.skills[i].id.ToString() + ": " + character.characterData.skills[i].level;
             }
         }
         if (inventoryContentPanel != null)

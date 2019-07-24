@@ -7,10 +7,13 @@ public class Field_GOAT : GameObjectActionTarget
     const int MAXGROWTHSTATE = 5;
     public const float GROWTHTIME = 30f; // time it takes to increase growthstate
     //State of growth from 1-5
-    int currentGrowthState = MAXGROWTHSTATE;
+    public int currentGrowthState = MAXGROWTHSTATE;
 
-    float growthTimeAlpha = 0.0f;
+    public float growthTimeAlpha = 0.0f;
     bool tendedTo = false;
+
+    public MeshRenderer[] plantRenderers;
+    public Gradient plantColor;
 
     public bool IsAlreadyTendedTo
     {
@@ -21,7 +24,7 @@ public class Field_GOAT : GameObjectActionTarget
     }
     private void Start()
     {
-        currentGrowthState = Random.Range(1, MAXGROWTHSTATE);
+        SetGrowthState(Random.Range(1, MAXGROWTHSTATE));
     }
 
     private void Update()
@@ -32,9 +35,20 @@ public class Field_GOAT : GameObjectActionTarget
             if (growthTimeAlpha >= GROWTHTIME)
             {
                 growthTimeAlpha = 0f;
-                currentGrowthState++;
+                SetGrowthState(currentGrowthState+1);
                 tendedTo = false;
             }
+        }
+    }
+
+    void SetGrowthState(int state)
+    {
+        float alpha = (float)state / (float)MAXGROWTHSTATE;
+        currentGrowthState = state;
+        for(int i = 0; i < plantRenderers.Length; i++)
+        {
+            plantRenderers[i].material.color = plantColor.Evaluate(alpha);
+            plantRenderers[i].transform.localScale = new Vector3(0.7f, alpha * 0.7f, 0.7f);
         }
     }
 
@@ -49,7 +63,7 @@ public class Field_GOAT : GameObjectActionTarget
 
     public void TendToField()
     {
-        if(tendedTo)
+        if(!tendedTo)
         {
             tendedTo = true;
         }
@@ -60,7 +74,7 @@ public class Field_GOAT : GameObjectActionTarget
         if (!IsAvailable()) return;
 
         tendedTo = false;
-        currentGrowthState = 0;
+        SetGrowthState(0);
         growthTimeAlpha = 0;
     }
 }

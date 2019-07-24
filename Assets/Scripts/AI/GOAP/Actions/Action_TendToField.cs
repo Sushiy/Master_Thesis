@@ -2,17 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Action_HarvestWheat : GOAP_Action
+public class Action_TendToField : GOAP_Action
 {
     Field_GOAT field;
-    public Action_HarvestWheat()
+    public Action_TendToField()
     {
         Init();
-        actionID = "HarvestWheat";
-        workCost = 30f;
+        actionID = "TendToField";
+        workCost = 20f;
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Hoe);
-        AddRequiredWorldState(WorldStateKey.bIsWheatRipe, true);
-        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Wheat);
+        AddRequiredWorldState(WorldStateKey.bWasFieldTended, false);
+        AddRequiredWorldState(WorldStateKey.bIsWheatRipe, false);
+        AddSatisfyWorldState(WorldStateKey.bWasFieldTended, true);
+        AddSatisfyWorldState(WorldStateKey.bIsWheatRipe, true);
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
@@ -32,14 +34,13 @@ public class Action_HarvestWheat : GOAP_Action
     public override bool Perform(GOAP_Agent agent, float deltaTime)
     {
         StartPerform(agent);
-        if(isStartingWork)
+        if (isStartingWork)
         {
             field = (Field_GOAT)target;
-            if(!field.IsAvailable())
+            if (field.IsAlreadyTendedTo)
             {
-                agent.ChangeCurrentWorldState(new GOAP_Worldstate(WorldStateKey.bIsWheatRipe, false, field));
-                agent.ChangeCurrentWorldState(new GOAP_Worldstate(WorldStateKey.bWasFieldTended, field.IsAlreadyTendedTo, field));
-                Debug.Log("<color=#cc0000>" + agent.Character.characterData.characterName + " could not harvest wheat, as it is not ripe.</color>");
+                agent.ChangeCurrentWorldState(new GOAP_Worldstate(WorldStateKey.bWasFieldTended, true, field));
+                Debug.Log("<color=#cc0000>" + agent.Character.characterData.characterName + " could not tend to the field.</color>");
                 agent.Replan();
                 return true;
             }
@@ -53,9 +54,8 @@ public class Action_HarvestWheat : GOAP_Action
                 Debug.Log("<color=#cc0000>" + agent.Character.characterData.characterName + "s Hoe broke.</color>");
                 agent.Character.UpdateInventory(ItemType.Hoe, false);
             }
-            agent.Character.UpdateInventory(ItemType.Wheat, true, 4);
             CompletePerform(agent);
-            field.Harvest();
+            field.TendToField();
         }
         return completed;
     }

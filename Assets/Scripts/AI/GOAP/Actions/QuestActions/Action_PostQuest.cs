@@ -37,7 +37,7 @@ public class Action_PostQuest : GOAP_Action
     {
         if (isStartingWork)
         {
-            Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterName + "</color>: PostQuest(" + questData.RequiredToString() + ")");
+            Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterData.characterName + "</color>: PostQuest(" + questData.RequiredToString() + ")");
             agent.View.PrintMessage(ActionID);
         }
 

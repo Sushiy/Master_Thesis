@@ -142,6 +142,8 @@ public class GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
         }
     }
 
+    public bool IsObservableState { get { return key != WorldStateKey.bHasCheckedQuestboard && DetermineForgetTime() > 0; } }
+
     private float DetermineForgetTime()
     {
         switch (key)

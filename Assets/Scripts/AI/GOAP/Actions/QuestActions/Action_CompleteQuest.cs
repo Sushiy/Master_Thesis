@@ -28,11 +28,11 @@ public class Action_CompleteQuest : GOAP_Action
     {
         if(isStartingWork)
         {
-            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is completing Quest " + questID);
+            Debug.Log("<color=#0000cc>" + agent.Character.characterData.characterName + "</color> is completing Quest " + questID);
         }
         if(!GOAP_QuestBoard.instance.quests.ContainsKey(questID))
         {
-            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> can't complete quest, already finished");
+            Debug.Log("<color=#0000cc>" + agent.Character.characterData.characterName + "</color> can't complete quest, already finished");
             agent.CancelPlan();
             return true;
         }

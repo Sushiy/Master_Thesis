@@ -41,7 +41,7 @@ public class Action_ChopWood : GOAP_Action
 
             if (Random.value < 0.1f)
             {
-                Debug.Log("<color=#cc0000>" + agent.Character.characterName + "s Axe broke.</color>");
+                Debug.Log("<color=#cc0000>" + agent.Character.characterData.characterName + "s Axe broke.</color>");
                 agent.Character.UpdateInventory(ItemType.Axe, false);
             }
             CompletePerform(agent);

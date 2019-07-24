@@ -2,48 +2,114 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-
+using System.Linq;
 
 public class GOAP_Character : MonoBehaviour
 {
-    public string characterName;
+    [System.Serializable]
+    public class CharacterData
+    {
+        public string characterName;
+        public int characterSkinIndex;
 
-    public List<GOAP_Skill> skills;
+        public List<GOAP_Skill> skills;
 
-    public List<GOAP_Worldstate> goals;
+        public List<GOAP_Worldstate> goals;
 
-    public List<ItemType> itemStockPilePriorities;
+        [HideInInspector]
+        public List<string> availableActions;
+
+        public List<ItemType> startingInventory;
+
+        public float laziness;
+
+
+        public CharacterData(string characterName, List<GOAP_Skill> skills, List<GOAP_Worldstate> goals, List<string> availableActions, List<ItemType> startingInventory, float laziness)
+        {
+            this.characterName = characterName;
+            this.skills = skills;
+            this.goals = goals;
+            this.availableActions = availableActions;
+            this.startingInventory = startingInventory;
+            this.laziness = laziness;
+        }
+
+        public CharacterData(CharacterData characterData) : this(characterData.characterName
+            , new List<GOAP_Skill>(characterData.skills)
+            , new List<GOAP_Worldstate>(characterData.goals)
+            , new List<string>(characterData.availableActions)
+            , new List<ItemType>(characterData.startingInventory)
+            , characterData.laziness
+            )
+        {
+
+        }
+
+        public void InitBaseActions(string[] allActions)
+        {
+            for (int i = 0; i < allActions.Length; i++)
+            {
+                string action = allActions[i];
+                if (!availableActions.Contains(action) && GOAP_Action.baseActions.Contains(action))
+                {
+                    availableActions.Add(action);
+                }
+            }
+        }
+
+        public void RemoveWrongActions(string[] allActions)
+        {
+            for (int i = availableActions.Count - 1; i >= 0; i--)
+            {
+                string action = availableActions[i];
+                if (!allActions.Contains(action) || action == "Action_CompleteQuest" || action == "Action_WaitForQuest" || action == "Action_PostQuest")
+                {
+                    availableActions.RemoveAt(i);
+                }
+            }
+        }
+    }
+
+    public CharacterData characterData;
+
+    [Header("HealthData")]
+    public float food = 100f;
+    public float sleep = 100f;
+    public float social = 100f;
+    float hungerSpeed = 2.5f; //points of hunger per second => 40s
+    float tiredSpeed = 0.8f; //points of tiredness per second => 120s
+    float lonelySpeed = 1.2f; //points of tiredness per second => 83s
+    float health;
+
+    public GOAP_Agent agent;
+
+    public GameObjectActionTarget home;
 
     Inventory inventory;
     public Inventory Inventory
     {
         get { return inventory; }
     }
-    
-    public List<string> availableActions;
 
-    public List<ItemType> startingInventory;
+    private void Awake()
+    {
+        agent = new GOAP_Agent(this, GetComponent<IGOAP_AgentView>());
+        inventory = new Inventory();
+        AddStartingInventory();
+        agent.ChangeCurrentWorldState(WorldStateKey.bHasSlept, true);
+        agent.ChangeCurrentWorldState(WorldStateKey.bHasEaten, true);
+    }
 
-    public GOAP_Agent agent;
-
-    public GameObjectActionTarget home;
-
-    [Header("HealthData")]
-    
-    public float food = 100f;
-    float hungerSpeed = 2.5f; //points of hunger per second => 40s
-    public float sleep = 100f;
-    float tiredSpeed = 0.8f; //points of tiredness per second => 120s
-    public float social = 100f;
-    float lonelySpeed = 1.2f; //points of tiredness per second => 83s
-
-    float health;
+    public void SetCharacterData(CharacterData data)
+    {
+        characterData = data;
+    }
 
     public void UpdateHealthData(float deltaTime)
     {
         if (food < 0)
         {
-            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is hungry");
+            Debug.Log("<color=#0000cc>" + characterData.characterName + "</color> is hungry");
             agent.ChangeCurrentWorldState(WorldStateKey.bHasEaten, false);
             food = 0;
         }
@@ -54,7 +120,7 @@ public class GOAP_Character : MonoBehaviour
 
         if (sleep < 0)
         {
-            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is tired");
+            Debug.Log("<color=#0000cc>" + characterData.characterName + "</color> is tired");
             agent.ChangeCurrentWorldState(WorldStateKey.bHasSlept, false);
             sleep = 0;
         }
@@ -65,7 +131,7 @@ public class GOAP_Character : MonoBehaviour
 
         if (social < 0)
         {
-            Debug.Log("<color=#0000cc>" + agent.Character.characterName + "</color> is lonely");
+            Debug.Log("<color=#0000cc>" + characterData.characterName + "</color> is lonely");
             agent.ChangeCurrentWorldState(WorldStateKey.bHasSocialised, false);
             social = 0;
         }
@@ -88,20 +154,12 @@ public class GOAP_Character : MonoBehaviour
         social = 100;
     }
 
-    private void Awake()
-    {
-        agent = new GOAP_Agent(this, GetComponent<IGOAP_AgentView>());
-        inventory = new Inventory();
-        AddStartingInventory();
-        agent.ChangeCurrentWorldState(WorldStateKey.bHasSlept, true);
-        agent.ChangeCurrentWorldState(WorldStateKey.bHasEaten, true);
-    }
 
     private void AddStartingInventory()
     {
-        for(int i = 0; i < startingInventory.Count; i++)
+        for(int i = 0; i < characterData.startingInventory.Count; i++)
         {
-            UpdateInventory(startingInventory[i], true);
+            UpdateInventory(characterData.startingInventory[i], true);
         }
     }
 
@@ -115,8 +173,8 @@ public class GOAP_Character : MonoBehaviour
     public void AddSkill(Skills id, int level)
     {
         GOAP_Skill skill = new GOAP_Skill(id, level);
-        if (skills.Contains(skill)) return;
-        skills.Add(skill);
+        if (characterData.skills.Contains(skill)) return;
+        characterData.skills.Add(skill);
     }
 
     public void UpdateInventory(ItemType id, bool adding, int count = 1)

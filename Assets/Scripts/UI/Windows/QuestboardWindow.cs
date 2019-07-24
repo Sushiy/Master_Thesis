@@ -73,7 +73,7 @@ public class QuestboardWindow : BasicWindow
     public void AddQuest(GOAP_Quest quest)
     {
         GameObject g = Instantiate(questPanelPrefab, questsParent);
-        g.GetComponent<QuestContentPanel>().SetContent("Quest " + quest.id, quest.ToLongString(), "Owner: " + quest.Owner.Character.characterName + "\nRequired: " + quest.RequiredStates.ToString() + "\n\nReward: " + quest.Reward);
+        g.GetComponent<QuestContentPanel>().SetContent("Quest " + quest.id, quest.ToLongString(), "Owner: " + quest.Owner.Character.characterData.characterName + "\nRequired: " + quest.RequiredStates.ToString() + "\n\nReward: " + quest.Reward);
         panels.Add(quest.id, g);
     }
 

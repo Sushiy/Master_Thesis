@@ -32,7 +32,7 @@ public class Action_WaitForQuest : GOAP_Action
             {
                 ownQuestID = agent.postedQuestIDs.Last();
                 agent.View.PrintMessage(ActionID);
-                Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterName + "</color>: WaitForQuest " + ownQuestID);
+                Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterData.characterName + "</color>: WaitForQuest " + ownQuestID);
 
                 //Move this plan to questPlans.
                 agent.planMemory[(int)agent.activePlanInfo].SetQuestID(ownQuestID);
@@ -43,14 +43,20 @@ public class Action_WaitForQuest : GOAP_Action
             }
             else
             {
-                    Debug.Log("<color=#0000cc><b>Restarting</b>: " + agent.Character.characterName + "</color>: WaitForQuest " + ownQuestID);
-                    UpdateWorkTime(deltaTime);
-                    agent.activePlanInfo = agent.planMemory.FindIndex(x => x.questID == ownQuestID);
-                    if (agent.activePlanInfo == -1)
-                    {
-                        agent.activePlanInfo = null;
-                        Debug.LogError(agent.Character.characterName + " ActivePlanIndex: -1");
-                    }
+                Debug.Log("<color=#0000cc><b>Restarting</b>: " + agent.Character.characterData.characterName + "</color>: WaitForQuest " + ownQuestID);
+                UpdateWorkTime(deltaTime);
+                if (originalQuestID != -1)
+                {
+                    agent.activeQuest = GOAP_QuestBoard.instance.quests[originalQuestID];
+                    agent.activeGoal.Clear();
+                    agent.activeGoal.AddRange(agent.activeQuest.RequiredStates);
+                }
+                agent.activePlanInfo = agent.planMemory.FindIndex(x => x.questID == ownQuestID);
+                if (agent.activePlanInfo == -1)
+                {
+                    agent.activePlanInfo = null;
+                    Debug.LogError(agent.Character.characterData.characterName + " ActivePlanIndex: -1");
+                }
             }
         }
 
@@ -59,9 +65,7 @@ public class Action_WaitForQuest : GOAP_Action
             //Finish Quest
             if(originalQuestID == -1 || GOAP_QuestBoard.instance.quests.Keys.Contains(originalQuestID))
             {
-                if(originalQuestID != -1)
-                    agent.activeQuest = GOAP_QuestBoard.instance.quests[originalQuestID];
-                Debug.Log("<color=#0000cc>" + agent.Character.characterName + "s</color> Quest " + ownQuestID + " was completed!" + ((originalQuestID > -1)? "\nThis plan is a solution for Quest " + originalQuestID : ""));
+                Debug.Log("<color=#0000cc>" + agent.Character.characterData.characterName + "s</color> Quest " + ownQuestID + " was completed!" + ((originalQuestID > -1)? "\nThis plan is a solution for Quest " + originalQuestID : ""));
                 agent.completedQuestIDs.Remove(ownQuestID);
                 foreach (GOAP_Worldstate state in SatisfyWorldstates)
                 {
@@ -71,7 +75,7 @@ public class Action_WaitForQuest : GOAP_Action
             }
             else
             {
-                Debug.Log("<color=#0000cc><b>Canceling</b>: " + agent.Character.characterName + "</color>: WaitForQuest " + ownQuestID);
+                Debug.Log("<color=#0000cc><b>Canceling</b>: " + agent.Character.characterData.characterName + "</color>: WaitForQuest " + ownQuestID);
                 agent.CancelPlan();
                 return true;
             }

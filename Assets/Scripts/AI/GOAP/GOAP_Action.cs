@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 //This class contains all info on individual actions. Most of all it holds the required and satisfyWorldstate fields, which are needed for planning.
@@ -17,6 +18,23 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         "Action_GetWater",
         "Action_GatherDeadwood"
     };
+
+    private static string[] allActions;
+    public static string[] GetAllActionNames()
+    {
+        System.Type[] types = typeof(GOAP_Action).Assembly.GetTypes().Where(type => type.IsSubclassOf(typeof(GOAP_Action))).ToArray();
+
+        if (allActions == null || allActions.Length != types.Length)
+        {
+            allActions = new string[types.Length];
+            for (int i = 0; i < types.Length; i++)
+            {
+                string actionName = types[i].ToString();
+                allActions[i] = actionName;
+            }
+        }
+        return allActions;
+    }
 
     private List_GOAP_Worldstate requiredWorldstates;
     private List_GOAP_Worldstate satisfyWorldstates;
@@ -85,7 +103,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         //Only do this, when once at the beginning of the action
         if (alphaWorkTime != 0f) return;
 
-        Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterName + "</color>:" + actionID + "(" + ActionCost + ((requiredSkill == null ) ? ")" : (" reduced by:" + requiredSkill.id.ToString()) + ")") );
+        Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterData.characterName + "</color>:" + actionID + "(" + ActionCost + ((requiredSkill == null ) ? ")" : (" reduced by:" + requiredSkill.id.ToString()) + ")") );
         agent.View.PrintMessage(ActionID);
     }
 
@@ -118,7 +136,15 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
             {
                 if (!agent.currentWorldstates.ContainsExactly(state))
                 {
-                    return false;
+                    if (state.IsObservableState && !agent.currentWorldstates.ContainsKey(state))
+                    {
+                        agent.ChangeCurrentWorldState(state);
+                        Debug.Log("<color=#cc00cc>" + agent.Character.characterData.characterName + "</color> assumes state:" + state.ToString());
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
             return true;

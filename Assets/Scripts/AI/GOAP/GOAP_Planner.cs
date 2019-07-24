@@ -54,7 +54,7 @@ public class GOAP_Planner : MonoBehaviour
 
     public Queue<GOAP_Action> Plan(GOAP_Agent agent, List_GOAP_Worldstate goal, List_GOAP_Worldstate currentWorldState, List<string> availableActions)
     {
-        plannerLog = "<color=#0000cc> <b>PLANNING</b>: " + agent.Character.characterName + "</color>\n";
+        plannerLog = "<color=#0000cc> <b>PLANNING</b>: " + agent.Character.characterData.characterName + "</color>\n";
 
         //Search for a valid plan
         Node startNode = WhileBuild(goal, availableActions, currentWorldState, agent);
@@ -63,7 +63,7 @@ public class GOAP_Planner : MonoBehaviour
         //Return null if you couldn't find a plan!
         if (startNode == null)
         {
-            plannerLog += "<color=#cc0000>Couldn't find actions fulfilling " + agent.Character.characterName + "s goal.</color>\n";
+            plannerLog += "<color=#cc0000>Couldn't find actions fulfilling " + agent.Character.characterData.characterName + "s goal.</color>\n";
 
             Debug.Log(plannerLog);
             return null;
@@ -76,7 +76,7 @@ public class GOAP_Planner : MonoBehaviour
             Debug.Log(plannerLog);
             return null;
         }
-        plannerLog += "<color=#00cc00>" + agent.Character.characterName + "found plan:</color>\n";
+        plannerLog += "<color=#00cc00>" + agent.Character.characterData.characterName + "found plan:</color>\n";
 
         //Otherwise return the queue
         return MakeQueue(startNode, agent);
@@ -298,7 +298,16 @@ public class GOAP_Planner : MonoBehaviour
         {
             if (!planningWorldState.ContainsExactly(state))
             {
-                newRequired.Add(state);
+                //If the state is an observable one and the agent does not have any memory of it, they just assume that it is in their favor
+                if (state.IsObservableState && !agent.currentWorldstates.ContainsKey(state))
+                {
+                    agent.ChangeCurrentWorldState(state);
+                    Debug.Log("<color=#cc00cc>" + agent.Character.characterData.characterName + "</color> assumes state:" + state.ToString());
+                }
+                else
+                {
+                    newRequired.Add(state);
+                }
             }
         }
 
@@ -306,11 +315,11 @@ public class GOAP_Planner : MonoBehaviour
         float skillModifier = 1f;
         if (action.RequiredSkill != null)
         {
-            int index = agent.Character.skills.IndexOf(action.RequiredSkill);
+            int index = agent.Character.characterData.skills.IndexOf(action.RequiredSkill);
             if (index != -1)
             {
                 //If the character is actually skilled in this action, adjust the skillmodifier
-                int difference = action.RequiredSkill.level - agent.Character.skills[index].level;
+                int difference = action.RequiredSkill.level - agent.Character.characterData.skills[index].level;
                 if (difference > 0) skillModifier *= difference + 1;
                 else skillModifier /= (-difference) + 1;
             }
