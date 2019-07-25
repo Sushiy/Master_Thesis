@@ -595,7 +595,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00007055014}
+  m_AnchoredPosition: {x: 0, y: -0.000045018573}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &342952736
@@ -876,7 +876,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   characterCount: {fileID: 1039230050}
-  characterSpawner: {fileID: 1510193106}
 --- !u!1 &697711226
 GameObject:
   m_ObjectHideFlags: 0
@@ -1364,7 +1363,6 @@ MonoBehaviour:
   characterCreationParent: {fileID: 1422337626}
   characterCreationPrefab: {fileID: 1886761210542438, guid: 5fc6832bcc04fa14ba769d6bd90fea7f,
     type: 2}
-  characterSpawner: {fileID: 1510193106}
 --- !u!1 &1039230048
 GameObject:
   m_ObjectHideFlags: 0
@@ -2164,7 +2162,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 697711228}
   m_HandleRect: {fileID: 697711227}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
