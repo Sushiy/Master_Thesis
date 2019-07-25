@@ -10,7 +10,9 @@ public class SimpleContentPanel : MonoBehaviour
 
     public virtual void SetContent(string title, string content)
     {
-        this.title.text = title;
-        this.content.text = content;
+        if(!string.IsNullOrEmpty(title))
+            this.title.text = title;
+        if (!string.IsNullOrEmpty(content))
+            this.content.text = content;
     }
 }

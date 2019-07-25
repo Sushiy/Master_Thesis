@@ -12,7 +12,7 @@ public class AvailableActionsWindow : BasicWindow
     public GameObject actionPanelPrefab;
 
     [HideInInspector]
-    public GOAP_Character character;
+    public GOAP_Character.CharacterData characterData;
 
     string[] allActions;
 
@@ -40,11 +40,11 @@ public class AvailableActionsWindow : BasicWindow
         //UpdateWindow();
     }
 
-    public void ShowWindow(GOAP_Character character)
+    public void ShowWindow(GOAP_Character.CharacterData characterData)
     {
-        this.character = character;
-        character.characterData.InitBaseActions(allActions);
-        character.characterData.RemoveWrongActions(allActions);
+        this.characterData = characterData;
+        characterData.InitBaseActions(allActions);
+        characterData.RemoveWrongActions(allActions);
         UpdateWindow();
         base.ShowWindow();
     }
@@ -55,27 +55,28 @@ public class AvailableActionsWindow : BasicWindow
         {
             string actionName = allActions[i].ToString();
             AvailableActionPanel actionPanel = Instantiate(actionPanelPrefab, actionsParent).GetComponent<AvailableActionPanel>();
-            actionPanel.SetContent(actionName, character.characterData.availableActions.Contains(actionName));
+            actionPanel.SetContent(actionName, characterData.availableActions.Contains(actionName));
 
             if (GOAP_Action.baseActions.Contains(actionName))
             {
                 actionPanel.buttonImage.GetComponent<Button>().interactable = false;
+                actionPanel.buttonImage.color = Color.grey;
                 actionPanel.buttonLabel.text = "BASE";
                 actionPanel.transform.SetAsFirstSibling();
-                if(!character.characterData.availableActions.Contains(actionName))
+                if(!characterData.availableActions.Contains(actionName))
                 {
-                    character.characterData.availableActions.Add(actionName);
+                    characterData.availableActions.Add(actionName);
                 }
             }
         }
 
         //remove all actions not on the list from available
-        for (int i = character.characterData.availableActions.Count - 1; i >= 0; i--)
+        for (int i = characterData.availableActions.Count - 1; i >= 0; i--)
         {
-            string action = character.characterData.availableActions[i];
+            string action = characterData.availableActions[i];
             if (!allActions.Contains(action) || action == "Action_CompleteQuest" || action == "Action_WaitForQuest" || action == "Action_PostQuest")
             {
-                character.characterData.availableActions.RemoveAt(i);
+                characterData.availableActions.RemoveAt(i);
             }
         }
     }
@@ -92,15 +93,15 @@ public class AvailableActionsWindow : BasicWindow
 
     public bool TogglePanel(string actionName)
     {
-        bool contained = character.characterData.availableActions.Contains(actionName);
+        bool contained = characterData.availableActions.Contains(actionName);
         if (!contained)
         {
-            character.characterData.availableActions.Add(actionName);
+            characterData.availableActions.Add(actionName);
             return true;
         }
         else
         {
-            character.characterData.availableActions.Remove(actionName);
+            characterData.availableActions.Remove(actionName);
             return false;
         }
     }

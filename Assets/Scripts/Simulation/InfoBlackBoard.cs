@@ -25,6 +25,7 @@ public class InfoBlackBoard : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
+        GOAP_Planner.Init();
         if (instance == null)
             instance = this;
         else

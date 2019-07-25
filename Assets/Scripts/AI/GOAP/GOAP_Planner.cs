@@ -4,28 +4,17 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-public class GOAP_Planner : MonoBehaviour
+public static class GOAP_Planner
 {
-    public static GOAP_Planner instance;
-    public float heuristicFactor = 2f;
+    public static float heuristicFactor = 2f;
 
-    public bool writePlannerLog = true;
-    string plannerLog = "";
+    public static bool writePlannerLog = true;
+    static string plannerLog = "";
 
-    private Dictionary<string, Type> typeMap;
+    private static Dictionary<string, Type> typeMap;
 
-    private void AddToTypeMap(string className, Type type)
+    public static void Init()
     {
-        typeMap.Add(className, type);
-    }
-
-    public void Awake()
-    {
-        if (instance == null)
-            instance = this;
-        else
-            Destroy(this);
-
         typeMap = new Dictionary<string, Type>();
         System.Type[] types = typeof(GOAP_Action).Assembly.GetTypes().Where(type => type.IsSubclassOf(typeof(GOAP_Action))).ToArray();
         for (int i = 0; i < types.Length; i++)
@@ -34,7 +23,7 @@ public class GOAP_Planner : MonoBehaviour
         }
     }
 
-    public GOAP_Action InstantiateAction(string actionType)
+    public static GOAP_Action InstantiateAction(string actionType)
     {
         try
         {
@@ -51,8 +40,15 @@ public class GOAP_Planner : MonoBehaviour
             return null;
         }
     }
-
-    public Queue<GOAP_Action> Plan(GOAP_Agent agent, List_GOAP_Worldstate goal, List_GOAP_Worldstate currentWorldState, List<string> availableActions)
+    /// <summary>
+    /// Initiate a new plan
+    /// </summary>
+    /// <param name="agent">Agent that is planning</param>
+    /// <param name="goal">Agent's goal</param>
+    /// <param name="currentWorldState">Agent's current worldstate</param>
+    /// <param name="availableActions">Agent's available actions</param>
+    /// <returns></returns>
+    public static Queue<GOAP_Action> Plan(GOAP_Agent agent, List_GOAP_Worldstate goal, List_GOAP_Worldstate currentWorldState, List<string> availableActions)
     {
         plannerLog = "<color=#0000cc> <b>PLANNING</b>: " + agent.Character.characterData.characterName + "</color>\n";
 
@@ -90,7 +86,7 @@ public class GOAP_Planner : MonoBehaviour
     /// <param name="currentWorldState">Agent's current worldstate</param>
     /// <param name="agent">Agent that wants a plan</param>
     /// <returns>the starting node, if one was found, else null</returns>
-    private Node WhileBuild(List_GOAP_Worldstate goal, List<string> availableActions, List_GOAP_Worldstate currentWorldState, GOAP_Agent agent)
+    private static Node WhileBuild(List_GOAP_Worldstate goal, List<string> availableActions, List_GOAP_Worldstate currentWorldState, GOAP_Agent agent)
     {
         PlanInfo planInfo = agent.planMemory[agent.planMemory.Count - 1];
         int currentNodeID = 0;
@@ -232,7 +228,7 @@ public class GOAP_Planner : MonoBehaviour
     /// <param name="currentWorldState"></param>
     /// <param name="goalWorldState"></param>
     /// <returns></returns>
-    public bool IsGoalSatisfied(List_GOAP_Worldstate currentWorldState, GOAP_Worldstate goalWorldState)
+    public static bool IsGoalSatisfied(List_GOAP_Worldstate currentWorldState, GOAP_Worldstate goalWorldState)
     {
         //First, check if we have not already reached the goal, by checking it against our currentWorldstate
         
@@ -247,7 +243,7 @@ public class GOAP_Planner : MonoBehaviour
     /// <param name="currentWorldState"></param>
     /// <param name="goalWorldState"></param>
     /// <returns></returns>
-    private Node GetGoalNode(List_GOAP_Worldstate currentWorldState, List_GOAP_Worldstate goalWorldState)
+    private static Node GetGoalNode(List_GOAP_Worldstate currentWorldState, List_GOAP_Worldstate goalWorldState)
     {
         List_GOAP_Worldstate newRequired = new List_GOAP_Worldstate(goalWorldState);
         plannerLog += "Found Goal:\n";
@@ -271,7 +267,7 @@ public class GOAP_Planner : MonoBehaviour
     /// <param name="planningWorldState">worldstate at the current stage of planning</param>
     /// <param name="agent">currently planning agent</param>
     /// <returns></returns>
-    private Node GetValidNeighborNode(Node activeNode, GOAP_Action action, List_GOAP_Worldstate planningWorldState, GOAP_Agent agent)
+    private static Node GetValidNeighborNode(Node activeNode, GOAP_Action action, List_GOAP_Worldstate planningWorldState, GOAP_Agent agent)
     {
         if (action == null) return null;
         bool isUsefulAction = false;
@@ -336,7 +332,7 @@ public class GOAP_Planner : MonoBehaviour
         return new Node(activeNode, newRequired, action, newRequired.Count * heuristicFactor + action.ActionCost + activeNode.estimatedPathCost);
     }
 
-    private Node GenerateBuyNode(Node activeNode, List_GOAP_Worldstate planningWorldState, GOAP_Agent agent)
+    private static Node GenerateBuyNode(Node activeNode, List_GOAP_Worldstate planningWorldState, GOAP_Agent agent)
     {
         List_GOAP_Worldstate newRequired = new List_GOAP_Worldstate(activeNode.required);
         Action_BuyItem action = new Action_BuyItem();
@@ -368,7 +364,7 @@ public class GOAP_Planner : MonoBehaviour
     /// <param name="planningWorldState"></param>
     /// <param name="agent"></param>
     /// <returns></returns>
-    private Node GenerateQuestNode(Node activeNode, List_GOAP_Worldstate planningWorldState, GOAP_Agent agent)
+    private static Node GenerateQuestNode(Node activeNode, List_GOAP_Worldstate planningWorldState, GOAP_Agent agent)
     {
         List_GOAP_Worldstate newRequired = new List_GOAP_Worldstate();
         Action_PostQuest action = new Action_PostQuest();
@@ -387,7 +383,7 @@ public class GOAP_Planner : MonoBehaviour
     /// <param name="start">The first node</param>
     /// <param name="agent"></param>
     /// <returns></returns>
-    private Queue<GOAP_Action> MakeQueue(Node start, GOAP_Agent agent)
+    private static Queue<GOAP_Action> MakeQueue(Node start, GOAP_Agent agent)
     {
         Queue<GOAP_Action> queue = new Queue<GOAP_Action>();
         string message = "<color=#00AA00>ActionQueue:</color> ";
@@ -420,7 +416,7 @@ public class GOAP_Planner : MonoBehaviour
         return queue;
     }
 
-    string makeIndent(int depth)
+    private static string makeIndent(int depth)
     {
         string s = "";
         for(int i = 0; i<depth; i++)
@@ -429,7 +425,12 @@ public class GOAP_Planner : MonoBehaviour
         }
         return s;
     }
-    
+
+    private static void AddToTypeMap(string className, Type type)
+    {
+        typeMap.Add(className, type);
+    }
+
     private class Node : System.IComparable<Node>, System.IEquatable<Node>
     {
         public int id;

@@ -82,6 +82,8 @@ public class GOAP_Agent
         activeGoal = new List_GOAP_Worldstate();
 
         planMemory = new List<PlanInfo>();
+
+        timeSincePlanned = Random.Range(0, planningWaitTimer);
     }
 
     public void ChooseGoal()
@@ -95,7 +97,7 @@ public class GOAP_Agent
             GOAP_Worldstate goal = character.characterData.goals[i];
 
             //Check if the goal is already satisfied
-            if(!GOAP_Planner.instance.IsGoalSatisfied(currentWorldstates, goal))
+            if(!GOAP_Planner.IsGoalSatisfied(currentWorldstates, goal))
             {
                 //And if it has been checked before
                 if(!checkedCharacterGoals.ContainsExactly(goal))
@@ -250,7 +252,7 @@ public class GOAP_Agent
             Queue<GOAP_Action> newPlan;
             //Fetch a new Plan from the planner
             planMemory.Add(new PlanInfo(PrintGoal(), Character.characterData.characterName));
-            newPlan = GOAP_Planner.instance.Plan(this, activeGoal, currentWorldstates, character.characterData.availableActions);
+            newPlan = GOAP_Planner.Plan(this, activeGoal, currentWorldstates, character.characterData.availableActions);
 
             timeSincePlanned = 0.0f;
 
