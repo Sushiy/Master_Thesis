@@ -11,7 +11,7 @@ public class Action_MakePickaxe : GOAP_Action
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Pickaxe);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Iron);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Wood);
-        requiredSkill = new GOAP_Skill(Skills.Smithing, 3);
+        BenefitingSkill = Skills.Smithing;
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)

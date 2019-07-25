@@ -11,7 +11,7 @@ public class Action_ChopTree : GOAP_Action
         workCost = 4f;
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Axe);
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Log);
-        requiredSkill = new GOAP_Skill(Skills.WoodCutting, 2);
+        BenefitingSkill = Skills.WoodCutting;
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)

@@ -44,7 +44,7 @@ public class CharacterDataPropertyDrawer : PropertyDrawer
             }
             if (GUI.Button(new Rect(position.xMin + 30f, position.yMax - 20, position.width - 30f, 20f), "Edit Available Actions"))
             {
-                AvailableActionsEditorWindow.ShowWindow(ref characterData, index);
+                AvailableActionsEditorWindow.ShowWindow(ref characterData);
             }
         }
     }

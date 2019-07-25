@@ -30,9 +30,10 @@ public static class GOAP_Planner
             Type t = typeMap[actionType];
             return (GOAP_Action)Activator.CreateInstance(t);
         }
-        catch(KeyNotFoundException key)
+        catch(KeyNotFoundException)
         {
             Debug.LogError(actionType);
+
             return null;
         }
         catch(MissingMethodException)
@@ -320,25 +321,23 @@ public static class GOAP_Planner
 
         //Apply skillmodification onto the neighbor if it is valid
         float skillModifier = 1f;
-        if (action.RequiredSkill != null)
+        if (action.BenefitingSkill != Skills.None)
         {
-            int index = agent.Character.characterData.skills.IndexOf(action.RequiredSkill);
-            if (index != -1)
+            GOAP_Skill skill = agent.Character.characterData.skills.Find(x => x.id == action.BenefitingSkill);
+            if (skill != null)
             {
                 //If the character is actually skilled in this action, adjust the skillmodifier
-                int difference = action.RequiredSkill.level - agent.Character.characterData.skills[index].level;
-                if (difference > 0) skillModifier *= difference + 1;
-                else skillModifier /= (-difference) + 1;
+                skillModifier /= skill.level;
             }
             else
             {
                 //If the character is not skilled in this action, the skillmodifier is set to 5. This only comes into play, when global knowledge planning is used.
-                skillModifier = 5f;
+                skillModifier = 1f;
             }
         }
 
         //Change the skillmodifier on the action 
-        //action.ApplySkillModifier(skillModifier);
+        action.ApplySkillModifier(skillModifier);
 
         return new Node(activeNode, newRequired, action, newRequired.Count * heuristicFactor + action.ActionCost + activeNode.estimatedPathCost);
     }

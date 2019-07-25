@@ -105,11 +105,6 @@ public class AvailableActionsWindow : BasicWindow
         base.HideWindow();
     }
 
-    public void AddAction(GOAP_Action action)
-    {
-        GameObject g = Instantiate(actionPanelPrefab, actionsParent);
-    }
-
     public bool TogglePanel(string actionName)
     {
         bool contained = characterData.availableActions.Contains(actionName);

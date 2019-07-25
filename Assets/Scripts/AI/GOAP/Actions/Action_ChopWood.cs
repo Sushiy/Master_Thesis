@@ -12,7 +12,7 @@ public class Action_ChopWood : GOAP_Action
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Axe);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Log);
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Wood);
-        requiredSkill = new GOAP_Skill(Skills.WoodCutting, 1);
+        BenefitingSkill = Skills.WoodCutting;
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)

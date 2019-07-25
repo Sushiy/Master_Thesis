@@ -17,30 +17,8 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         "Action_CompleteQuest",
     };
 
-    public static bool IsQuestActionID(string id)
-    {
-        return id == "Action_PostQuest" || id == "Action_WaitForQuest" || id == "Action_CompleteQuest";
-    }
-
-    private static string[] allActions;
-    public static string[] GetAllActionNames()
-    {
-        System.Type[] types = typeof(GOAP_Action).Assembly.GetTypes().Where(type => type.IsSubclassOf(typeof(GOAP_Action))).ToArray();
-
-        if (allActions == null || allActions.Length != types.Length)
-        {
-            allActions = new string[types.Length];
-            for (int i = 0; i < types.Length; i++)
-            {
-                string actionName = types[i].ToString();
-                allActions[i] = actionName;
-            }
-        }
-        return allActions;
-    }
-
-    private List_GOAP_Worldstate requiredWorldstates;
-    private List_GOAP_Worldstate satisfyWorldstates;
+    public List_GOAP_Worldstate RequiredWorldstates { private set; get; }
+    public List_GOAP_Worldstate SatisfyWorldstates { private set; get; }
 
     protected float workCost = 1f;
     protected float range = 1.0f;
@@ -82,20 +60,17 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         }
     }
 
-    protected GOAP_Skill requiredSkill = null;
-    public GOAP_Skill RequiredSkill
+    public Skills BenefitingSkill
     {
-        get
-        {
-            return requiredSkill;
-        }
+        protected set;
+        get;
     }
 
 
     protected void Init()
     {
-        requiredWorldstates = new List_GOAP_Worldstate();
-        satisfyWorldstates = new List_GOAP_Worldstate();
+        RequiredWorldstates = new List_GOAP_Worldstate();
+        SatisfyWorldstates = new List_GOAP_Worldstate();
     }
 
     //Perform this Action
@@ -106,13 +81,13 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         //Only do this, when once at the beginning of the action
         if (alphaWorkTime != 0f) return;
 
-        Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterData.characterName + "</color>:" + actionID + "(" + ActionCost + ((requiredSkill == null ) ? ")" : (" reduced by:" + requiredSkill.id.ToString()) + ")") );
+        Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterData.characterName + "</color>:" + actionID + "(" + ActionCost + ((BenefitingSkill == Skills.None ) ? ")" : (" reduced by:" + BenefitingSkill.ToString()) + ")") );
         agent.View.PrintMessage(ActionID);
     }
 
     protected void CompletePerform(GOAP_Agent agent)
     {
-        foreach (GOAP_Worldstate state in satisfyWorldstates)
+        foreach (GOAP_Worldstate state in SatisfyWorldstates)
         {
             agent.ChangeCurrentWorldState(state);
         }
@@ -135,7 +110,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     {
         if(CheckProceduralConditions(agent))
         {
-            foreach (GOAP_Worldstate state in requiredWorldstates)
+            foreach (GOAP_Worldstate state in RequiredWorldstates)
             {
                 if (!agent.currentWorldstates.ContainsExactly(state))
                 {
@@ -182,7 +157,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     protected void AddRequiredWorldState(WorldStateKey key, int value, IActionTarget target = null)
     {
         GOAP_Worldstate state = new GOAP_Worldstate(key, value, target);
-        requiredWorldstates.Add(state);
+        RequiredWorldstates.Add(state);
     }
     protected void AddSatisfyWorldState(WorldStateKey key, bool value, IActionTarget target = null)
     {
@@ -191,7 +166,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     protected void AddSatisfyWorldState(WorldStateKey key, int value, IActionTarget target = null)
     {
         GOAP_Worldstate state = new GOAP_Worldstate(key, value, target);
-        satisfyWorldstates.Add(state);
+        SatisfyWorldstates.Add(state);
     }
 
     bool IEquatable<GOAP_Action>.Equals(GOAP_Action other)
@@ -200,19 +175,25 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         return other.actionID.Equals(actionID);
     }
 
-    public List_GOAP_Worldstate RequiredWorldstates
+    public static bool IsQuestActionID(string id)
     {
-        get
-        {
-            return requiredWorldstates;
-        }
+        return id == "Action_PostQuest" || id == "Action_WaitForQuest" || id == "Action_CompleteQuest";
     }
 
-    public List_GOAP_Worldstate SatisfyWorldstates
+    private static string[] allActions;
+    public static string[] GetAllActionNames()
     {
-        get
+        System.Type[] types = typeof(GOAP_Action).Assembly.GetTypes().Where(type => type.IsSubclassOf(typeof(GOAP_Action))).ToArray();
+
+        if (allActions == null || allActions.Length != types.Length)
         {
-            return satisfyWorldstates;
+            allActions = new string[types.Length];
+            for (int i = 0; i < types.Length; i++)
+            {
+                string actionName = types[i].ToString();
+                allActions[i] = actionName;
+            }
         }
+        return allActions;
     }
 }

@@ -8,14 +8,9 @@ public class AvailableActionsEditorWindow : EditorWindow
 {
     GOAP_Character.CharacterData characterData;
 
-    Skills newSkill = Skills.WoodCutting;
-    int newSkillLevel = 0;
-
     string[] allActions;
 
-    int index;
-
-    public static void ShowWindow(ref GOAP_Character.CharacterData characterData, int index)
+    public static void ShowWindow(ref GOAP_Character.CharacterData characterData)
     {
         AvailableActionsEditorWindow window  = (AvailableActionsEditorWindow)EditorWindow.GetWindow(typeof(AvailableActionsEditorWindow));
         window.characterData = characterData;
@@ -29,7 +24,7 @@ public class AvailableActionsEditorWindow : EditorWindow
     private void OnGUI()
     {
         EditorGUILayout.BeginVertical();
-        GUILayout.Label(characterData.characterName + " " + index);
+        GUILayout.Label(characterData.characterName);
         for(int i = 0; i < allActions.Length; i++)
         {
             string action = allActions[i];
