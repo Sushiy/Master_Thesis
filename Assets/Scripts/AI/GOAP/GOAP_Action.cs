@@ -15,9 +15,12 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         "Action_PostQuest",
         "Action_WaitForQuest",
         "Action_CompleteQuest",
-        "Action_GetWater",
-        "Action_GatherDeadwood"
     };
+
+    public static bool IsQuestActionID(string id)
+    {
+        return id == "Action_PostQuest" || id == "Action_WaitForQuest" || id == "Action_CompleteQuest";
+    }
 
     private static string[] allActions;
     public static string[] GetAllActionNames()

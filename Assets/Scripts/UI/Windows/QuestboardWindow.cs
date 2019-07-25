@@ -64,9 +64,10 @@ public class QuestboardWindow : BasicWindow
 
     public void ClearQuests()
     {
-        foreach(KeyValuePair<int, GameObject> p in panels)
+        List<int> list = new List<int>(panels.Keys);
+        for (int i = list.Count-1; i >= 0; i--)
         {
-            RemoveQuest(p.Key);
+            RemoveQuest(list[i]);
         }
     }
 

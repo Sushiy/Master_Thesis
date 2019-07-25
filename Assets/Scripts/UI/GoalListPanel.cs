@@ -32,6 +32,14 @@ public class GoalListPanel : MonoBehaviour
         this.itemOptions = itemOptions;
         this.itemTypes = itemTypes;
         stateKey.value = stateKeyValue;
+        if (stateKey.options[stateKey.value].text == "eHasItem")
+        {
+            SetItemDropdown();
+        }
+        else
+        {
+            SetBoolDropdown();
+        }
         value.value = valueValue;
     }
 

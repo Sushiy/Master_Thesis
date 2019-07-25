@@ -40,8 +40,8 @@ public class CharacterCreationPanel : MonoBehaviour
         itemTypes = Enum.GetValues(typeof(ItemType)).Cast<ItemType>().ToList();
         ItemTypeOptions = itemTypes.Select(v => new TMP_Dropdown.OptionData(v.ToString())).ToList();
         boolOptions = new List<TMP_Dropdown.OptionData>();
-        boolOptions.Add(new TMP_Dropdown.OptionData("true"));
         boolOptions.Add(new TMP_Dropdown.OptionData("false"));
+        boolOptions.Add(new TMP_Dropdown.OptionData("true"));
 
     }
 
@@ -91,6 +91,7 @@ public class CharacterCreationPanel : MonoBehaviour
     {
         GoalListPanel p = Instantiate(goalsPrefab, goalsParent).GetComponent<GoalListPanel>();
         p.SetContent(characterData, worldStateOptions, boolOptions, ItemTypeOptions, itemTypes, (int)goal.key, goal.value);
+        Debug.Log("Add Goal " + goal.ToString());
     }
 
     private void AddInventory(ItemType item)

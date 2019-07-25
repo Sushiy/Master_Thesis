@@ -114,7 +114,7 @@ public class GOAP_Quest
             quest += ProvidedStates.ToString();
             quest += "\n and will pay you handsomly.";
         }
-        quest += "\n I will pay you handsomely.";
+        quest += "\nand will pay you handsomely.";
         return quest;
     }
 

@@ -122,7 +122,7 @@ public class GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
         if(key == WorldStateKey.eHasItem)
             return key.ToString() + ":" + ((ItemType)value).ToString();
         else
-            return key.ToString();
+            return key.ToString() + ":" + value.ToString();
     }
 
     private WorldStateType DetermineType()

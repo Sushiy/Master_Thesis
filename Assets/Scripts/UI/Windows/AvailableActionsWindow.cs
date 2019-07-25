@@ -28,6 +28,7 @@ public class AvailableActionsWindow : BasicWindow
             //Add all actions to the list
             allActions = GOAP_Action.GetAllActionNames();
         }
+        InitWindow();
     }
 
     private void Start()
@@ -45,16 +46,29 @@ public class AvailableActionsWindow : BasicWindow
         this.characterData = characterData;
         characterData.InitBaseActions(allActions);
         characterData.RemoveWrongActions(allActions);
-        UpdateWindow();
+        UpdateWindowAndActions();
         base.ShowWindow();
     }
 
-    private void UpdateWindow()
+    private void InitWindow()
     {
         for (int i = 0; i < allActions.Length; i++)
         {
             string actionName = allActions[i].ToString();
-            AvailableActionPanel actionPanel = Instantiate(actionPanelPrefab, actionsParent).GetComponent<AvailableActionPanel>();
+            if (GOAP_Action.IsQuestActionID(actionName)) continue;
+            AvailableActionWindowPanel actionPanel = Instantiate(actionPanelPrefab, actionsParent).GetComponent<AvailableActionWindowPanel>();
+            actionPanel.SetContent(actionName, characterData.availableActions.Contains(actionName));
+        }
+
+    }
+
+    private void UpdateWindowAndActions()
+    {
+        for (int i = 0; i < allActions.Length; i++)
+        {
+            string actionName = allActions[i].ToString();
+            if (GOAP_Action.IsQuestActionID(actionName)) continue;
+            AvailableActionWindowPanel actionPanel = actionsParent.GetChild(i).GetComponent<AvailableActionWindowPanel>();
             actionPanel.SetContent(actionName, characterData.availableActions.Contains(actionName));
 
             if (GOAP_Action.baseActions.Contains(actionName))
@@ -63,12 +77,17 @@ public class AvailableActionsWindow : BasicWindow
                 actionPanel.buttonImage.color = Color.grey;
                 actionPanel.buttonLabel.text = "BASE";
                 actionPanel.transform.SetAsFirstSibling();
-                if(!characterData.availableActions.Contains(actionName))
+                if (!characterData.availableActions.Contains(actionName))
                 {
                     characterData.availableActions.Add(actionName);
                 }
             }
+            else
+            {
+                actionPanel.buttonImage.GetComponent<Button>().interactable = true;
+            }
         }
+
 
         //remove all actions not on the list from available
         for (int i = characterData.availableActions.Count - 1; i >= 0; i--)

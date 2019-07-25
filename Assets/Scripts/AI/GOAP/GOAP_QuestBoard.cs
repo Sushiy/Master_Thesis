@@ -26,7 +26,8 @@ public class GOAP_QuestBoard : MonoBehaviour
 	public void AddQuest(GOAP_Quest quest)
     {
         quests.Add(quest.id, quest);
-        addQuestEvent.Invoke(quest);
+        if(addQuestEvent != null)
+            addQuestEvent.Invoke(quest);
     }
 
     public void CompleteQuest(int index)
@@ -34,6 +35,7 @@ public class GOAP_QuestBoard : MonoBehaviour
         quests[index].Complete();
         questArchive.Add(index, quests[index]);
         quests.Remove(index);
-        completeQuestEvent.Invoke(index);
+        if (completeQuestEvent != null)
+            completeQuestEvent.Invoke(index);
     }
 }

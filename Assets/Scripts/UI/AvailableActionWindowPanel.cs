@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class AvailableActionPanel : MonoBehaviour
+public class AvailableActionWindowPanel : MonoBehaviour
 {
     public TextMeshProUGUI nameLabel;
     public TextMeshProUGUI buttonLabel;
