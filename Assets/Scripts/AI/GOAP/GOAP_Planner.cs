@@ -114,6 +114,11 @@ public static class GOAP_Planner
         //Reverse A*
         while(openSet.Count > 0)
         {
+            if(graphDepth >= 20)
+            {
+                Debug.LogError("Plan must be recursive and has exceeded 20 iterations");
+                break;
+            }
             //Sort the open set by pathcosts and pick the best node
             openSet.Sort();
             string last = "";
@@ -127,18 +132,19 @@ public static class GOAP_Planner
             string openSetString = "";
             for (int i = 0; i < openSet.Count; i++)
             {
-                openSetString += "\n- " + openSet[i].ToString();
+                openSetString += "\n" + makeIndent(graphDepth) + "- " + openSet[i].ToString();
             }
             if (writePlannerLog)
             {
-                plannerLog += "\n Planning at depth" + graphDepth;
+                plannerLog += "\n" + makeIndent(graphDepth) + "Planning at depth" + graphDepth;
+                plannerLog += "\n" + makeIndent(graphDepth) + "Current: " + last;
                 
-                plannerLog += "\n<color=#CCCC00>OpenSet(" + openSet.Count + "): </color>";
+                plannerLog += "\n" + makeIndent(graphDepth) + "<color=#CCCC00>OpenSet(" + openSet.Count + "): </color>";
                 plannerLog += openSetString;
 
-                plannerLog += "\n\n";
+                plannerLog += "\n";
 
-                plannerLog += makeIndent(graphDepth) + "-><color=#00CC00>Best Node Chosen:</color> " + current.ToString() + "\n";
+                plannerLog += makeIndent(graphDepth) + "-><color=#00CC00>Best Node Chosen:</color> " + current.ToString() + "\n\n";
             }
 
             planInfo.AddIteration(graphDepth, "Current:\n- " + last.ToString(), "OpenSet(" + openSet.Count + "):" + openSetString, current.ToString());
@@ -279,6 +285,10 @@ public static class GOAP_Planner
         {
             if (action.SatisfyWorldstates.ContainsExactly(state))
             {
+                if(state.key == WorldStateKey.bWasFieldTended && state.value == 0)
+                {
+                    Debug.LogError(action.SatisfyWorldstates.ToString());
+                }
                 newRequired.Remove(state);
                 isUsefulAction = true;
             }
@@ -286,6 +296,7 @@ public static class GOAP_Planner
 
         //if this action does not help the plan, return null
         if (!isUsefulAction) return null;
+
         //If the actions proceduralConditions are not met, we can't perform it anyways
         //if (!action.CheckProceduralConditions(agent)) return null;
 
@@ -297,8 +308,8 @@ public static class GOAP_Planner
                 //If the state is an observable one and the agent does not have any memory of it, they just assume that it is in their favor
                 if (state.IsObservableState && !agent.currentWorldstates.ContainsKey(state))
                 {
-                    agent.ChangeCurrentWorldState(state);
                     Debug.Log("<color=#cc00cc>" + agent.Character.characterData.characterName + "</color> assumes state:" + state.ToString());
+                    agent.ChangeCurrentWorldState(state);
                 }
                 else
                 {

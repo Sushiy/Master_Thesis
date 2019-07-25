@@ -535,14 +535,14 @@ public class GOAP_Agent
             {
                 currentWorldstates.Remove(newState); //this should find the state based on the key only
                 currentWorldstates.Add(newState);
-                Debug.Log(Character.name + " <color=#cc0000>Updated state:</color> " + newState.ToString());
+                Debug.Log(Character.characterData.characterName + " <color=#cc0000>Updated state:</color> " + newState.ToString());
 
             }
             else
             {
                 if(!currentWorldstates.ContainsExactly(newState))
                 {
-                    Debug.Log(Character.name + " <color=#cc0000>Add state:</color> " + newState.ToString());
+                    Debug.Log(Character.characterData.characterName + " <color=#cc0000>Add state:</color> " + newState.ToString());
                     currentWorldstates.Add(newState);
                 }
 
@@ -552,7 +552,7 @@ public class GOAP_Agent
         //Otherwise, if the newstate is not contained in the currentworldstate, add it
         else
         {
-            Debug.Log(Character.name + " <color=#cc0000>Add state:</color> " + newState.ToString());
+            Debug.Log(Character.characterData.characterName + " <color=#cc0000>Add state:</color> " + newState.ToString());
             currentWorldstates.Add(newState);
         }
     }
@@ -567,7 +567,7 @@ public class GOAP_Agent
     {
         if (currentWorldstates.ContainsKey(state))
         {
-            Debug.Log(Character.name + " <color=#cc0000>Remove state:</color> " + state.ToString());
+            Debug.Log(Character.characterData.characterName + " <color=#cc0000>Remove state:</color> " + state.ToString());
             currentWorldstates.Remove(state);
         }
     }
@@ -593,7 +593,7 @@ public class GOAP_Agent
 
     public string PrintCurrentWorldstates()
     {
-        string msg = Character.name + " Current Worldstates\n";
+        string msg = Character.characterData.characterName + " Current Worldstates\n";
         foreach (GOAP_Worldstate state in currentWorldstates)
         {
             msg += state.ToString() + "\n";

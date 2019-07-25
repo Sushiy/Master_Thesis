@@ -97,7 +97,7 @@ public class CharacterCreationPanel : MonoBehaviour
     private void AddInventory(ItemType item)
     {
         InventoryPanel p = Instantiate(inventoryPrefab, inventoryParent).GetComponent<InventoryPanel>();
-        p.SetContent(characterData, ItemTypeOptions, itemTypes.IndexOf(item));
+        p.SetContent(itemTypes, characterData, ItemTypeOptions);
     }
 
     private void UpdateActions()
@@ -145,7 +145,7 @@ public class CharacterCreationPanel : MonoBehaviour
     public void NewInventoryItem()
     {
         InventoryPanel p = Instantiate(inventoryPrefab, inventoryParent).GetComponent<InventoryPanel>();
-        p.SetContent(characterData, ItemTypeOptions);
+        p.SetContent(itemTypes,characterData, ItemTypeOptions);
         characterData.startingInventory.Add(0);
     }
 

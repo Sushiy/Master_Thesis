@@ -54,6 +54,7 @@ public class Action_TendToField : GOAP_Action
                 Debug.Log("<color=#cc0000>" + agent.Character.characterData.characterName + "s Hoe broke.</color>");
                 agent.Character.UpdateInventory(ItemType.Hoe, false);
             }
+            Debug.Log("<color=#cc00cc>" + agent.Character.characterData.characterName + "</color> hopes that the field is now ripe");
             CompletePerform(agent);
             field.TendToField();
         }

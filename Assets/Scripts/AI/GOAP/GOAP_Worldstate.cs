@@ -119,7 +119,7 @@ public class GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
 
     public override string ToString()
     {
-        if(key == WorldStateKey.eHasItem)
+        if (key == WorldStateKey.eHasItem)
             return key.ToString() + ":" + ((ItemType)value).ToString();
         else
             return key.ToString() + ":" + value.ToString();
