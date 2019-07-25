@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class CharacterSpawner : MonoBehaviour
 {
+    public static CharacterSpawner instance;
+
     public GOAP_Character.CharacterData example1;
     public GOAP_Character.CharacterData example2;
     public GOAP_Character.CharacterData defaultCharacter;
@@ -18,13 +20,21 @@ public class CharacterSpawner : MonoBehaviour
 
     private void Awake()
     {
-        characterDatas = new List<GOAP_Character.CharacterData>();
+        if(instance == null)
+        {
+            instance = this;
+            characterDatas = new List<GOAP_Character.CharacterData>();
 
-        characterDatas.Add(example1);
-        characterDatas.Add(example2);
+            characterDatas.Add(example1);
+            characterDatas.Add(example2);
 
-        SceneManager.sceneLoaded += OnSceneLoaded;
-        DontDestroyOnLoad(this.gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            DontDestroyOnLoad(this.gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     public GOAP_Character.CharacterData NewCharacter()
@@ -36,6 +46,7 @@ public class CharacterSpawner : MonoBehaviour
 
     public void SpawnPreparedCharacters()
     {
+        Debug.Log("Spawning " + characterDatas.Count + " characters");
         for(int i = 0; i < characterDatas.Count; i++)
         {
             SpawnCharacter(characterDatas[i]);
@@ -49,7 +60,7 @@ public class CharacterSpawner : MonoBehaviour
         Vector2 randomOffset = Random.insideUnitCircle * MaxSpawnDistance;
         spawnPosition += new Vector3(randomOffset.x, 0, randomOffset.y);
         GOAP_Character character = Instantiate(characterPrefab, spawnPosition, Quaternion.identity).GetComponent<GOAP_Character>();
-        character.SetCharacterData(characterData);
+        character.SetCharacterData(new GOAP_Character.CharacterData(characterData));
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)

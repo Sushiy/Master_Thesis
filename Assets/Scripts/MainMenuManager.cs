@@ -7,7 +7,6 @@ using TMPro;
 public class MainMenuManager : MonoBehaviour
 {
     public TextMeshProUGUI characterCount;
-    public CharacterSpawner characterSpawner;
 
     // Use this for initialization
     void Start () {
@@ -17,7 +16,7 @@ public class MainMenuManager : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        characterCount.text = "Characters ("+ characterSpawner.characterDatas.Count + ")";
+        characterCount.text = "Characters ("+ CharacterSpawner.instance.characterDatas.Count + ")";
 	}
     
     public void LoadMainScene()

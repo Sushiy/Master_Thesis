@@ -7,8 +7,6 @@ public class CharacterCreator : MonoBehaviour
     public Transform characterCreationParent;
     public GameObject characterCreationPrefab;
 
-    public CharacterSpawner characterSpawner;
-
     private void Start()
     {
         AddInitialCharacters();
@@ -17,15 +15,15 @@ public class CharacterCreator : MonoBehaviour
     public void NewCharacter()
     {
         CharacterCreationPanel p =  Instantiate(characterCreationPrefab, characterCreationParent).GetComponent<CharacterCreationPanel>();
-        p.SetContent(characterSpawner.NewCharacter(), characterSpawner);
+        p.SetContent(CharacterSpawner.instance.NewCharacter());
     }
 
     void AddInitialCharacters()
     {
-        for(int i = 0; i < characterSpawner.characterDatas.Count; i++)
+        for(int i = 0; i < CharacterSpawner.instance.characterDatas.Count; i++)
         {
             CharacterCreationPanel p = Instantiate(characterCreationPrefab, characterCreationParent).GetComponent<CharacterCreationPanel>();
-            p.SetContent(characterSpawner.characterDatas[i], characterSpawner);
+            p.SetContent(CharacterSpawner.instance.characterDatas[i]);
         }
     }
 }

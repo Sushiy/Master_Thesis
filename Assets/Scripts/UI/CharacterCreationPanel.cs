@@ -23,7 +23,6 @@ public class CharacterCreationPanel : MonoBehaviour
     public GameObject actionsPrefab;
 
     private GOAP_Character.CharacterData characterData;
-    private CharacterSpawner spawner;
 
     private List<TMP_Dropdown.OptionData> skillOptions;
     private List<TMP_Dropdown.OptionData> worldStateOptions;
@@ -45,11 +44,10 @@ public class CharacterCreationPanel : MonoBehaviour
 
     }
 
-    public void SetContent(GOAP_Character.CharacterData characterData, CharacterSpawner spawner)
+    public void SetContent(GOAP_Character.CharacterData characterData)
     {
         Debug.Log("Setting content for character " + characterData.characterName);
         this.characterData = characterData;
-        this.spawner = spawner;
 
         nameField.text = characterData.characterName;
 
@@ -77,7 +75,7 @@ public class CharacterCreationPanel : MonoBehaviour
 
     public void OnRemoveClicked()
     {
-        spawner.characterDatas.Remove(characterData);
+        CharacterSpawner.instance.characterDatas.Remove(characterData);
         Destroy(gameObject);
     }
 
