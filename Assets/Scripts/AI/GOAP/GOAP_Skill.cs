@@ -7,7 +7,7 @@ public enum Skills
     None = 0,
     WoodCutting = 0,
     Smithing = 1,
-    Fighting = 2,
+    Farming = 2,
     Cooking = 3
 }
 

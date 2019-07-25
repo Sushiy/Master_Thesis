@@ -33,7 +33,6 @@ public static class GOAP_Planner
         catch(KeyNotFoundException)
         {
             Debug.LogError(actionType);
-
             return null;
         }
         catch(MissingMethodException)

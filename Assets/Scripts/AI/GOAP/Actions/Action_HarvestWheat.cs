@@ -13,6 +13,7 @@ public class Action_HarvestWheat : GOAP_Action
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Hoe);
         AddRequiredWorldState(WorldStateKey.bIsWheatRipe, true);
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Wheat);
+        BenefitingSkill = Skills.Farming;
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)

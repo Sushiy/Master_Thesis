@@ -9,7 +9,7 @@ using System;
 [ExecuteInEditMode]
 public class TextSizer : MonoBehaviour
 {
-    public TMP_Text Text;
+    public TextMeshProUGUI Text;
     public bool ResizeTextObject = true;
     public Vector2 Padding;
     public Vector2 MaxSize = new Vector2(1000, float.PositiveInfinity);
@@ -68,6 +68,7 @@ public class TextSizer : MonoBehaviour
 
     protected virtual void Update()
     {
+        Debug.Log("Update this shit");
         if (!_isTextNull && (Text.text != _lastText || _lastSize != _selfRectTransform.rect.size || _forceRefresh || ControlAxes != _lastControlAxes))
         {
             var preferredSize = Text.GetPreferredValues(MaxX, MaxY);
@@ -110,6 +111,12 @@ public class TextSizer : MonoBehaviour
     }
     private void OnValidate()
     {
+        Refresh();
+    }
+
+    public void SetText(string s)
+    {
+        Text.text = s;
         Refresh();
     }
 }

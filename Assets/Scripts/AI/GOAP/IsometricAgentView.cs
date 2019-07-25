@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class IsometricAgentView : MonoBehaviour, IGOAP_AgentView
 {
-    public TMPro.TextMeshProUGUI actionText;
+    public TextSizer actionText;
     public float speed = 3.0f;
     private GameObjectActionTarget selfActionTarget;
 
@@ -36,7 +36,7 @@ public class IsometricAgentView : MonoBehaviour, IGOAP_AgentView
 
     public void PrintMessage(string message)
     {
-        actionText.text = message;
+        actionText.SetText(message);
     }
 
     public IActionTarget GetActionTargetSelf()

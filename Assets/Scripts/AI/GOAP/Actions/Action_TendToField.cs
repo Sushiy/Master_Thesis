@@ -15,6 +15,7 @@ public class Action_TendToField : GOAP_Action
         AddRequiredWorldState(WorldStateKey.bIsWheatRipe, false);
         AddSatisfyWorldState(WorldStateKey.bWasFieldTended, true);
         AddSatisfyWorldState(WorldStateKey.bIsWheatRipe, true);
+        BenefitingSkill = Skills.Farming;
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
