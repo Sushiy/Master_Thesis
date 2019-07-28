@@ -8,9 +8,16 @@ public class IsometricAgentView : MonoBehaviour, IGOAP_AgentView
     public float speed = 3.0f;
     private GameObjectActionTarget selfActionTarget;
 
+    private Vector3? moveToTarget;
+
     private void Awake()
     {
         selfActionTarget = GetComponent<GameObjectActionTarget>();    
+    }
+
+    private void Update()
+    {
+        Move();
     }
 
     public Vector3 GetPosition()
@@ -25,12 +32,25 @@ public class IsometricAgentView : MonoBehaviour, IGOAP_AgentView
 
     public void MoveTo(Vector3 position)
     {
-        Vector3 targetVector = (position - transform.position);
-        targetVector.y = 0;
-        transform.position += targetVector.normalized * speed * Time.deltaTime;
-        if(targetVector.sqrMagnitude > 0)
+        moveToTarget = position;
+    }
+
+    public void StopMove()
+    {
+        moveToTarget = null;
+    }
+
+    private void Move()
+    {
+        if(moveToTarget != null)
         {
-            transform.rotation = Quaternion.LookRotation(-targetVector);
+            Vector3 targetVector = ((Vector3)moveToTarget - transform.position);
+            targetVector.y = 0;
+            transform.position += targetVector.normalized * speed * Time.deltaTime;
+            if (targetVector.sqrMagnitude > 0)
+            {
+                transform.rotation = Quaternion.LookRotation(-targetVector);
+            }
         }
     }
 

@@ -162,7 +162,7 @@ public static class GOAP_Planner
             {
                 if (availableActions[i].Equals("Action_" + current.action)) continue; //Dont do the same action twice
 
-                Node neighbor = (availableActions[i] == "Action_BuyItem") ? GenerateBuyNode(current, currentWorldState,agent) : GetValidNeighborNode(current, InstantiateAction(availableActions[i]), currentWorldState, agent);
+                Node neighbor = GetValidNeighborNode(current, InstantiateAction(availableActions[i]), currentWorldState, agent);
                 if(neighbor != null)
                 {
                     neighbor.id = currentNodeID++;
@@ -340,31 +340,6 @@ public static class GOAP_Planner
 
         return new Node(activeNode, newRequired, action, newRequired.Count * heuristicFactor + action.ActionCost + activeNode.estimatedPathCost);
     }
-
-    private static Node GenerateBuyNode(Node activeNode, List_GOAP_Worldstate planningWorldState, GOAP_Agent agent)
-    {
-        List_GOAP_Worldstate newRequired = new List_GOAP_Worldstate(activeNode.required);
-        Action_BuyItem action = new Action_BuyItem();
-
-        bool isValidAction = false;
-
-        //Check for eHasItem worldStates
-        foreach (GOAP_Worldstate state in activeNode.required)
-        {
-            if (state.key == WorldStateKey.eHasItem)
-            {
-                action.SetWantedItem((ItemType)state.value);
-                newRequired.Remove(state);
-                isValidAction = true;
-                break;
-            }
-        }
-
-        if (!isValidAction) return null;
-
-        float estimatedBuyCost = action.ActionCost * activeNode.required.Count;
-        return new Node(activeNode, newRequired, action, estimatedBuyCost + activeNode.estimatedPathCost);
-    }
     
     /// <summary>
     /// Generates a Node containing a PostQuest action from the activeNodes required worldstates
@@ -421,7 +396,7 @@ public static class GOAP_Planner
 
         message += "|";
         plannerLog += message;
-        Debug.Log(plannerLog);
+        agent.Character.Log(plannerLog);
         return queue;
     }
 

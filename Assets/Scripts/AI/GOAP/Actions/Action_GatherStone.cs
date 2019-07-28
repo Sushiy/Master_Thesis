@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Action_MineIron : GOAP_Action
+public class Action_GatherStone : GOAP_Action
 {
-    public Action_MineIron()
+    public Action_GatherStone()
     {
         Init();
-        actionID = "MineIron";
-        workCost = 10f;
-        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Iron);
-        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.IronPickaxe);
+        actionID = "GatherStone";
+        workCost = 40f;
+        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Stone);
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
@@ -32,14 +31,9 @@ public class Action_MineIron : GOAP_Action
         StartPerform(agent);
         UpdateWorkTime(deltaTime);
 
-        if(completed)
+        if (completed)
         {
-            agent.Character.UpdateInventory(ItemType.Iron, true, 2);
-            if(Random.value < 0.1f)
-            {
-                agent.Character.Log("<color=#cc0000>" + agent.Character.characterData.characterName + "s Pickaxe broke.</color>");
-                agent.Character.UpdateInventory(ItemType.IronPickaxe, false);
-            }
+            agent.Character.UpdateInventory(ItemType.Stone, true, 1);
             CompletePerform(agent);
         }
         return completed;

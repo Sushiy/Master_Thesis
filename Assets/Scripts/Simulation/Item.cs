@@ -11,19 +11,17 @@ public enum ItemType
     Wheat,
     Water,
     Stone,
-    Herb,
 
     //Tools are in 0x10..
-    Axe = 0x100,
-    Pickaxe,
-    Hoe,
-    Hammer,
-    Sword,
+    IronAxe = 0x100,
+    IronPickaxe,
+    IronHoe,
+    FishingRod,
+    StoneAxe,
+    StonePickaxe,
+
 
     //Items are in 0x20..
-    Bread = 0x200,
+    Food = 0x200,
     Flour,
-    Medicine,
-    Shingles,
-    Bricks,
 }

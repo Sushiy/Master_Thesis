@@ -9,8 +9,8 @@ public class Action_HarvestWheat : GOAP_Action
     {
         Init();
         actionID = "HarvestWheat";
-        workCost = 30f;
-        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Hoe);
+        workCost = 10f;
+        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.IronHoe);
         AddRequiredWorldState(WorldStateKey.bIsWheatRipe, true);
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Wheat);
         BenefitingSkill = Skills.Farming;
@@ -40,7 +40,7 @@ public class Action_HarvestWheat : GOAP_Action
             {
                 agent.ChangeCurrentWorldState(new GOAP_Worldstate(WorldStateKey.bIsWheatRipe, false, field));
                 agent.ChangeCurrentWorldState(new GOAP_Worldstate(WorldStateKey.bWasFieldTended, field.IsAlreadyTendedTo, field));
-                Debug.Log("<color=#cc0000>" + agent.Character.characterData.characterName + " could not harvest wheat, as it is not ripe.</color>");
+                agent.Character.Log("<color=#cc0000>" + agent.Character.characterData.characterName + " could not harvest wheat, as it is not ripe.</color>");
                 agent.Replan();
                 return true;
             }
@@ -51,8 +51,8 @@ public class Action_HarvestWheat : GOAP_Action
         {
             if (Random.value < 0.3f)
             {
-                Debug.Log("<color=#cc0000>" + agent.Character.characterData.characterName + "s Hoe broke.</color>");
-                agent.Character.UpdateInventory(ItemType.Hoe, false);
+                agent.Character.Log("<color=#cc0000>" + agent.Character.characterData.characterName + "s Hoe broke.</color>");
+                agent.Character.UpdateInventory(ItemType.IronHoe, false);
             }
             agent.Character.UpdateInventory(ItemType.Wheat, true, 4);
             CompletePerform(agent);

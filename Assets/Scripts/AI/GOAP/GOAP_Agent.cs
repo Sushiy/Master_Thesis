@@ -86,6 +86,9 @@ public class GOAP_Agent
         timeSincePlanned = Random.Range(0, planningWaitTimer);
     }
 
+    /// <summary>
+    /// This action chooses a goal from among the personal goals after checking if there are completed quests to finish first
+    /// </summary>
     public void ChooseGoal()
     {
         activeGoal.Clear();
@@ -121,7 +124,7 @@ public class GOAP_Agent
                 msg += character.characterData.goals[i].key + ":" + character.characterData.goals[i].value + " already satisfied\n";
             }
         }
-        Debug.Log(msg);
+        Character.Log(msg);
 
         timeSincePlanned = 0.0f;
     }
@@ -159,7 +162,7 @@ public class GOAP_Agent
         {
             if (currentWorldstates[i].Forget(deltaTime))
             {
-                Debug.Log("<color=#cc00cc>" + Character.characterData.characterName + "</color> forgets state:" + currentWorldstates[i]);
+                Character.Log("<color=#cc00cc>" + Character.characterData.characterName + "</color> forgets state:" + currentWorldstates[i]);
                 RemoveCurrentWorldState(currentWorldstates[i]);
             }
         }
@@ -347,7 +350,7 @@ public class GOAP_Agent
             {
                 if (!GOAP_QuestBoard.instance.quests.ContainsKey(activeQuest.id))
                 {
-                    Debug.Log("<color=#0000cc>" + Character.characterData.characterName + "</color> can't complete quest, already finished");
+                    Character.Log("<color=#0000cc>" + Character.characterData.characterName + "</color> can't complete quest, already finished");
                     CancelPlan();
                     return;
                 }
@@ -358,7 +361,7 @@ public class GOAP_Agent
                 if (activeAction.SatisfyWorldstates.Count > 0 && IsSatisfiedInCurrentWorldstate(activeAction.SatisfyWorldstates))
                 {
                     actionCompleted = true;
-                    Debug.Log("<color=#0000cc>" + character.characterData.characterName + "</color> didn't need to perform <color=#cc0000>" + activeAction.ActionID + "</color> anymore.");
+                    Character.Log("<color=#0000cc>" + character.characterData.characterName + "</color> didn't need to perform <color=#cc0000>" + activeAction.ActionID + "</color> anymore.");
                 }
                 else
                 {
@@ -378,7 +381,7 @@ public class GOAP_Agent
             }
             else
             {
-                Debug.Log("<color=#0000cc>" + character.characterData.characterName + "</color> cannot perform <color=#cc0000>" + activeAction.ActionID + "</color> anymore.");
+                Character.Log("<color=#0000cc>" + character.characterData.characterName + "</color> cannot perform <color=#cc0000>" + activeAction.ActionID + "</color> anymore.");
                 Replan();
             }
 
@@ -398,7 +401,7 @@ public class GOAP_Agent
                     checkedCharacterGoals.Remove(activeGoal[0]);
                 }
             }
-            Debug.Log("<color=#0000cc>" + character.characterData.characterName + "</color> has completed his action queue for Goal " + planMemory[(int)activePlanInfo].goalInfo);
+            Character.Log("<color=#0000cc>" + character.characterData.characterName + "</color> has completed his action queue for Goal " + planMemory[(int)activePlanInfo].goalInfo);
             activeGoal.Clear();
             activePlanInfo = null;
             ChangeState(FSM_State.IDLE);
@@ -422,6 +425,7 @@ public class GOAP_Agent
         }
         else
         {
+            View.StopMove();
             ChangeState(FSM_State.PERFORMACTION);
         }
     }
@@ -474,6 +478,10 @@ public class GOAP_Agent
         ChangeState(FSM_State.IDLE);
     }
 
+    /// <summary>
+    /// Checks the questboard for any quests that have not yet been attempted by the agent before
+    /// </summary>
+    /// <returns></returns>
     public GOAP_Quest CheckForQuests()
     {
         if(GOAP_QuestBoard.instance.quests.Count == 0)
@@ -542,7 +550,7 @@ public class GOAP_Agent
             {
                 if(!currentWorldstates.ContainsExactly(newState))
                 {
-                    Debug.Log(Character.characterData.characterName + " <color=#cc0000>Add state:</color> " + newState.ToString());
+                    Character.Log(Character.characterData.characterName + " <color=#cc0000>Add state:</color> " + newState.ToString());
                     currentWorldstates.Add(newState);
                 }
 
@@ -552,7 +560,7 @@ public class GOAP_Agent
         //Otherwise, if the newstate is not contained in the currentworldstate, add it
         else
         {
-            Debug.Log(Character.characterData.characterName + " <color=#cc0000>Add state:</color> " + newState.ToString());
+            Character.Log(Character.characterData.characterName + " <color=#cc0000>Add state:</color> " + newState.ToString());
             currentWorldstates.Add(newState);
         }
     }
@@ -567,39 +575,9 @@ public class GOAP_Agent
     {
         if (currentWorldstates.ContainsKey(state))
         {
-            Debug.Log(Character.characterData.characterName + " <color=#cc0000>Remove state:</color> " + state.ToString());
+            Character.Log(Character.characterData.characterName + " <color=#cc0000>Remove state:</color> " + state.ToString());
             currentWorldstates.Remove(state);
         }
-    }
-
-    public string PrintGoal()
-    {
-        string msg = "";
-        if (activeGoal.Count < 1) return "None";
-        foreach(GOAP_Worldstate state in activeGoal)
-        {
-            msg += state.ToString() + "\n";
-        }
-        if(activeQuest != null)
-        {
-            msg += "(Quest " + activeQuest.id + ")";
-        }
-        else
-        {
-            msg += "(Personal)";
-        }
-        return msg;
-    }
-
-    public string PrintCurrentWorldstates()
-    {
-        string msg = Character.characterData.characterName + " Current Worldstates\n";
-        foreach (GOAP_Worldstate state in currentWorldstates)
-        {
-            msg += state.ToString() + "\n";
-        }
-
-        return msg;
     }
 
     public void ResetPlanningTimer()
@@ -619,7 +597,7 @@ public class GOAP_Agent
     public void SaveQuestPlan(int questID)
     {
         questPlans.Add(questID, new Queue<GOAP_Action>(currentActions));
-        Debug.Log("<color=#0000cc>" + character.characterData.characterName + "</color> Saved a new QuestPlan. It includes " + questPlans.Last().Value.Count + " actions and starts with " + questPlans.Last().Value.Peek());
+        Character.Log("<color=#0000cc>" + character.characterData.characterName + "</color> Saved a new QuestPlan. It includes " + questPlans.Last().Value.Count + " actions and starts with " + questPlans.Last().Value.Peek());
         currentActions.Clear();
         activeAction = null;
         activeGoal.Clear();
@@ -669,5 +647,35 @@ public class GOAP_Agent
     public string PrintCurrentState()
     {
         return currentState.ToString();
+    }
+
+    public string PrintGoal()
+    {
+        string msg = "";
+        if (activeGoal.Count < 1) return "None";
+        foreach (GOAP_Worldstate state in activeGoal)
+        {
+            msg += state.ToString() + "\n";
+        }
+        if (activeQuest != null)
+        {
+            msg += "(Quest " + activeQuest.id + ")";
+        }
+        else
+        {
+            msg += "(Personal)";
+        }
+        return msg;
+    }
+
+    public string PrintCurrentWorldstates()
+    {
+        string msg = Character.characterData.characterName + " Current Worldstates\n";
+        foreach (GOAP_Worldstate state in currentWorldstates)
+        {
+            msg += state.ToString() + "\n";
+        }
+
+        return msg;
     }
 }

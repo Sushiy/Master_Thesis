@@ -8,7 +8,7 @@ public class Action_MakeHoe : GOAP_Action
     {
         Init();
         actionID = "MakeHoe";
-        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Hoe);
+        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.IronHoe);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Iron);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Wood);
         BenefitingSkill = Skills.Smithing;
@@ -37,7 +37,7 @@ public class Action_MakeHoe : GOAP_Action
         {
             agent.Character.UpdateInventory(ItemType.Wood, false);
             agent.Character.UpdateInventory(ItemType.Iron, false);
-            agent.Character.UpdateInventory(ItemType.Hoe, true);
+            agent.Character.UpdateInventory(ItemType.IronHoe, true);
             CompletePerform(agent);
         }
         return completed;

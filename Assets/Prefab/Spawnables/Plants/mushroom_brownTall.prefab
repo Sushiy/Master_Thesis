@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 4219543326092228}
   - component: {fileID: 33500906590157444}
   - component: {fileID: 23302987190969414}
+  - component: {fileID: 114093978566043752}
   m_Layer: 0
   m_Name: mushroom_brownTall
   m_TagString: Untagged
@@ -84,3 +85,14 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1638468608672734}
   m_Mesh: {fileID: 4300000, guid: 68d1e5bb7aaefee4ab47f922b402636c, type: 3}
+--- !u!114 &114093978566043752
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1638468608672734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 293dd63fa9a88f441bccfc41c1363775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

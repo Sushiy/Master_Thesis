@@ -68,7 +68,6 @@ public class TextSizer : MonoBehaviour
 
     protected virtual void Update()
     {
-        Debug.Log("Update this shit");
         if (!_isTextNull && (Text.text != _lastText || _lastSize != _selfRectTransform.rect.size || _forceRefresh || ControlAxes != _lastControlAxes))
         {
             var preferredSize = Text.GetPreferredValues(MaxX, MaxY);

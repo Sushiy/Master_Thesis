@@ -43,9 +43,9 @@ public class Field_GOAT : GameObjectActionTarget
 
     void SetGrowthState(int state)
     {
-        float alpha = (float)state / (float)MAXGROWTHSTATE;
-        currentGrowthState = state;
-        for(int i = 0; i < plantRenderers.Length; i++)
+        currentGrowthState = Mathf.Clamp(state, 1, MAXGROWTHSTATE);
+        float alpha = (float)currentGrowthState / (float)MAXGROWTHSTATE;
+        for (int i = 0; i < plantRenderers.Length; i++)
         {
             plantRenderers[i].material.color = plantColor.Evaluate(alpha);
             plantRenderers[i].transform.localScale = new Vector3(0.7f, alpha * 0.7f, 0.7f);

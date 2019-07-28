@@ -2,21 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Action_MakeAxe : GOAP_Action
+public class Action_MakeFishingRod : GOAP_Action
 {
-    public Action_MakeAxe()
+    public Action_MakeFishingRod()
     {
         Init();
-        actionID = "MakeAxe";
-        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.IronAxe);
-        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Iron);
+        actionID = "MakeFishingRod";
+        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.FishingRod);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Wood);
-        BenefitingSkill = Skills.Smithing;
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
     {
-        target = InfoBlackBoard.instance.FindClosest(InfoBlackBoard.instance.smithingWorkshopLocations, agent.View.GetPosition()); //TODO: This isnt technically correct
+        target = InfoBlackBoard.instance.FindClosest(InfoBlackBoard.instance.woodWorkshopLocations, agent.View.GetPosition()); //TODO: This isnt technically correct
         if (target != null)
             return true;
         else
@@ -33,11 +31,10 @@ public class Action_MakeAxe : GOAP_Action
         StartPerform(agent);
         UpdateWorkTime(deltaTime);
 
-        if(completed)
+        if (completed)
         {
             agent.Character.UpdateInventory(ItemType.Wood, false);
-            agent.Character.UpdateInventory(ItemType.Iron, false);
-            agent.Character.UpdateInventory(ItemType.IronAxe, true);
+            agent.Character.UpdateInventory(ItemType.FishingRod, true);
             CompletePerform(agent);
         }
         return completed;

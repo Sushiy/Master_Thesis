@@ -9,7 +9,7 @@ public class Action_MakeFlour : GOAP_Action
     {
         Init();
         actionID = "MakeFlour";
-        workCost = 10f;
+        workCost = 2f;
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Wheat);
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Flour);
     }

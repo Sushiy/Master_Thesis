@@ -9,7 +9,7 @@ public class Action_EatFood : GOAP_Action
         Init();
         actionID = "EatFood";
         workCost = 5f;
-        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Bread);
+        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Food);
         AddSatisfyWorldState(WorldStateKey.bHasEaten, true);
     }
 
@@ -30,7 +30,7 @@ public class Action_EatFood : GOAP_Action
 
         if (completed)
         {
-            agent.Character.UpdateInventory(ItemType.Bread, false);
+            agent.Character.UpdateInventory(ItemType.Food, false);
             agent.Character.Eat();
             CompletePerform(agent);
         }
