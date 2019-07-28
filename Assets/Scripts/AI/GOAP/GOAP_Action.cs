@@ -14,7 +14,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         "Action_CheckForQuest",
         "Action_PostQuest",
         "Action_WaitForQuest",
-        "Action_CompleteQuest",
+        "Action_CompleteQuest"
     };
 
     public List_GOAP_Worldstate RequiredWorldstates { private set; get; }
@@ -81,7 +81,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         //Only do this, when once at the beginning of the action
         if (alphaWorkTime != 0f) return;
 
-        Debug.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterData.characterName + "</color>:" + actionID + "(" + ActionCost + ((BenefitingSkill == Skills.None ) ? ")" : (" reduced by:" + BenefitingSkill.ToString()) + ")") );
+        agent.Character.Log("<color=#0000cc><b>PERFORMING</b>: " + agent.Character.characterData.characterName + "</color>:" + actionID + "(" + ActionCost + ((BenefitingSkill == Skills.None ) ? ")" : (" reduced by:" + BenefitingSkill.ToString()) + ")") );
         agent.View.PrintMessage(ActionID);
     }
 
@@ -117,7 +117,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
                     if (state.IsObservableState && !agent.currentWorldstates.ContainsKey(state))
                     {
                         agent.ChangeCurrentWorldState(state);
-                        Debug.Log("<color=#cc00cc>" + agent.Character.characterData.characterName + "</color> assumes state:" + state.ToString());
+                        agent.Character.Log("<color=#cc00cc>" + agent.Character.characterData.characterName + "</color> assumes state:" + state.ToString());
                     }
                     else
                     {

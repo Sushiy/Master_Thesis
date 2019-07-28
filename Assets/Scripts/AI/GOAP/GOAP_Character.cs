@@ -82,6 +82,9 @@ public class GOAP_Character : MonoBehaviour
     float health;
 
     public GOAP_Agent agent;
+    float agentDeltaTime;
+
+    public string log;
 
     public GameObjectActionTarget home;
 
@@ -154,7 +157,6 @@ public class GOAP_Character : MonoBehaviour
         social = 100;
     }
 
-
     private void AddStartingInventory()
     {
         for(int i = 0; i < characterData.startingInventory.Count; i++)
@@ -165,9 +167,13 @@ public class GOAP_Character : MonoBehaviour
 
     private void Update()
     {
-        float deltaTime = Time.deltaTime;
-        agent.Update(deltaTime);
-        UpdateHealthData(deltaTime);
+        agentDeltaTime += Time.deltaTime;
+        if(agentDeltaTime >= 0.1f)
+        {
+            agent.Update(agentDeltaTime);
+            UpdateHealthData(agentDeltaTime);
+            agentDeltaTime = 0;
+        }
     }
 
     public void AddSkill(Skills id, int level)
@@ -194,5 +200,11 @@ public class GOAP_Character : MonoBehaviour
                 agent.RemoveCurrentWorldState(id);
             }
         }
+    }
+
+    public void Log(string msg)
+    {
+        Debug.Log(msg);
+        log += "\n" + msg;
     }
 }

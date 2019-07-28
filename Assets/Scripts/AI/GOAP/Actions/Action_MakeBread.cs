@@ -8,9 +8,10 @@ public class Action_MakeBread : GOAP_Action
     {
         Init();
         actionID = "MakeBread";
+        workCost = 2f;
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Flour);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Water);
-        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Bread);
+        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Food);
         BenefitingSkill = Skills.Cooking;
     }
 
@@ -33,7 +34,7 @@ public class Action_MakeBread : GOAP_Action
         {
             agent.Character.UpdateInventory(ItemType.Flour, false);
             agent.Character.UpdateInventory(ItemType.Water, false);
-            agent.Character.UpdateInventory(ItemType.Bread, true);
+            agent.Character.UpdateInventory(ItemType.Food, true, 2);
             CompletePerform(agent);
         }
         return completed;

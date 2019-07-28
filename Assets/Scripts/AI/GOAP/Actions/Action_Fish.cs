@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Action_GetWater : GOAP_Action 
+public class Action_Fish : GOAP_Action
 {
-
-	public Action_GetWater()
+    public Action_Fish()
     {
         Init();
-        actionID = "GetWater";
-        workCost = 2f;
-        range = 2f;
-        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Water);
+        actionID = "Fish";
+        workCost = 20f;
+        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.FishingRod);
+        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Food);
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
     {
+
         target = InfoBlackBoard.instance.FindClosest(InfoBlackBoard.instance.getWaterLocations, agent.View.GetPosition()); //TODO: This isnt technically correct
         if (target != null)
             return true;
@@ -35,6 +35,12 @@ public class Action_GetWater : GOAP_Action
 
         if (completed)
         {
+            agent.Character.UpdateInventory(ItemType.Food, true, 3);
+            if (Random.value < 0.05f)
+            {
+                agent.Character.Log("<color=#cc0000>" + agent.Character.characterData.characterName + "s Fishing rod broke.</color>");
+                agent.Character.UpdateInventory(ItemType.FishingRod, false);
+            }
             CompletePerform(agent);
         }
         return completed;

@@ -41,7 +41,7 @@ public class Action_CheckForQuest : GOAP_Action
             if (actionQueue != null && actionQueue.Count > 0)
             {
                 //if a valid plan was found, add it to the actionQueue
-                Debug.Log("<color=#0000cc>" + agent.Character.characterData.characterName + "</color> found a valid Plan for Quest " + agent.activeQuest.id);
+                agent.Character.Log("<color=#0000cc>" + agent.Character.characterData.characterName + "</color> found a valid Plan for Quest " + agent.activeQuest.id);
                 agent.UpdateActionQueue(actionQueue);
                 agent.checkedCharacterGoals.Remove(new GOAP_Worldstate(WorldStateKey.bHasCheckedQuestboard, 1));
                 CompletePerform(agent);
@@ -49,14 +49,14 @@ public class Action_CheckForQuest : GOAP_Action
             }
             else
             {
-                Debug.Log("<color=#0000cc>" + agent.Character.characterData.characterName + "</color> didn't find a valid Plan for Quest " + agent.activeQuest.id);
+                agent.Character.Log("<color=#0000cc>" + agent.Character.characterData.characterName + "</color> didn't find a valid Plan for Quest " + agent.activeQuest.id);
                 agent.activeQuest = null;
                 return false;
             }
         }
         else
         {
-            Debug.Log("<color=#0000cc>" + agent.Character.characterData.characterName + "</color> didn't find any Quests.");
+            agent.Character.Log("<color=#0000cc>" + agent.Character.characterData.characterName + "</color> didn't find any Quests.");
             CompletePerform(agent);
             agent.checkedCharacterGoals.Remove(new GOAP_Worldstate(WorldStateKey.bHasCheckedQuestboard, 1));
             return true;

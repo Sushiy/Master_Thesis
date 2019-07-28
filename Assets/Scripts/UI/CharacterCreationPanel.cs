@@ -119,7 +119,7 @@ public class CharacterCreationPanel : MonoBehaviour
             Instantiate(actionsPrefab, actionsParent);
         }
 
-        for (int i = 0; i < actionsParent.childCount; i++)
+        for (int i = 0; i < characterData.availableActions.Count; i++)
         {
             SimpleContentPanel p = actionsParent.GetChild(i).GetComponent<SimpleContentPanel>();
             p.SetContent(characterData.availableActions[i], "");

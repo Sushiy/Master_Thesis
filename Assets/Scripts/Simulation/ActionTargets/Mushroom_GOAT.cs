@@ -2,27 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Tree_GOAT : GameObjectActionTarget
+public class Mushroom_GOAT : GameObjectActionTarget
 {
-    public const int MAXGROWTHSTATE = 5;
-    public const float GROWTHTIME = 60f; // time it takes to increase growthstate
+    const int MAXGROWTHSTATE = 3;
+    const float GROWTHTIME = 20f; // time it takes to increase growthstate
     float randGrowthTime;
-    //State of growth from 1-5
+    //State of growth from 1-3
     int currentGrowthState = MAXGROWTHSTATE;
 
     Vector3 originalScale;
 
     float growthTimeAlpha = 0.0f;
 
-    public int WoodAmount
-    {
-        get { return currentGrowthState; }
-    }
-
     private void Start()
     {
         originalScale = transform.localScale;
-        SetGrowthState((int)Random.Range(1, MAXGROWTHSTATE));
+        SetGrowthState(1);
     }
 
     private void Update()
@@ -40,7 +35,7 @@ public class Tree_GOAT : GameObjectActionTarget
 
     public override bool IsAvailable()
     {
-        if(currentGrowthState == MAXGROWTHSTATE)
+        if (currentGrowthState == MAXGROWTHSTATE)
         {
             return true;
         }
@@ -49,14 +44,15 @@ public class Tree_GOAT : GameObjectActionTarget
 
     void SetGrowthState(int i)
     {
+        
         currentGrowthState = Mathf.Clamp(i, 1, MAXGROWTHSTATE);
         randGrowthTime = GROWTHTIME * Random.Range(0.5f, 1.5f);
-        transform.localScale = i * originalScale / MAXGROWTHSTATE;
+        transform.localScale = currentGrowthState * originalScale / MAXGROWTHSTATE;
     }
 
-    public void CutDown()
+    public void Gather()
     {
-        currentGrowthState = 0;
-        growthTimeAlpha = 0f;
+        SetGrowthState(1);
+        Destroy(this);
     }
 }

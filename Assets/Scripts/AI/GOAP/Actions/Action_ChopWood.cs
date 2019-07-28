@@ -9,7 +9,7 @@ public class Action_ChopWood : GOAP_Action
         Init();
         actionID = "ChopWood";
         workCost = 2f;
-        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Axe);
+        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.IronAxe);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Log);
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Wood);
         BenefitingSkill = Skills.WoodCutting;
@@ -42,7 +42,7 @@ public class Action_ChopWood : GOAP_Action
             if (Random.value < 0.1f)
             {
                 Debug.Log("<color=#cc0000>" + agent.Character.characterData.characterName + "s Axe broke.</color>");
-                agent.Character.UpdateInventory(ItemType.Axe, false);
+                agent.Character.UpdateInventory(ItemType.IronAxe, false);
             }
             CompletePerform(agent);
         }

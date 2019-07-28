@@ -8,7 +8,7 @@ public class Action_MakePickaxe : GOAP_Action
     {
         Init();
         actionID = "MakePickaxe";
-        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Pickaxe);
+        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.IronPickaxe);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Iron);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Wood);
         BenefitingSkill = Skills.Smithing;
@@ -37,7 +37,7 @@ public class Action_MakePickaxe : GOAP_Action
         {
             agent.Character.UpdateInventory(ItemType.Wood, false);
             agent.Character.UpdateInventory(ItemType.Iron, false);
-            agent.Character.UpdateInventory(ItemType.Pickaxe, true);
+            agent.Character.UpdateInventory(ItemType.IronPickaxe, true);
             CompletePerform(agent);
         }
         return completed;

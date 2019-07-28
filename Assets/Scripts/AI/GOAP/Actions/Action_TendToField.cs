@@ -9,8 +9,8 @@ public class Action_TendToField : GOAP_Action
     {
         Init();
         actionID = "TendToField";
-        workCost = 20f;
-        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Hoe);
+        workCost = 10f;
+        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.IronHoe);
         AddRequiredWorldState(WorldStateKey.bWasFieldTended, false);
         AddRequiredWorldState(WorldStateKey.bIsWheatRipe, false);
         AddSatisfyWorldState(WorldStateKey.bWasFieldTended, true);
@@ -53,7 +53,7 @@ public class Action_TendToField : GOAP_Action
             if (Random.value < 0.3f)
             {
                 Debug.Log("<color=#cc0000>" + agent.Character.characterData.characterName + "s Hoe broke.</color>");
-                agent.Character.UpdateInventory(ItemType.Hoe, false);
+                agent.Character.UpdateInventory(ItemType.IronHoe, false);
             }
             Debug.Log("<color=#cc00cc>" + agent.Character.characterData.characterName + "</color> hopes that the field is now ripe");
             CompletePerform(agent);

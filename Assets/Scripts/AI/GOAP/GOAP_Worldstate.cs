@@ -14,9 +14,8 @@ public enum WorldStateKey
     bHasStockpiledRessources,
     bWasFieldTended,
     bIsWheatRipe,
+    bIsTreeAvailable,
     bIsMushroomAvailable,
-    bIsDeadWoodAvailable,
-    bIsIronAvailable
 }
 
 public enum WorldStateType
@@ -150,13 +149,13 @@ public class GOAP_Worldstate : System.IEquatable<GOAP_Worldstate>
         {
             case WorldStateKey.bWasFieldTended:
             case WorldStateKey.bIsWheatRipe:
-                return Field_GOAT.GROWTHTIME;
+                return Field_GOAT.GROWTHTIME * 2;
+            case WorldStateKey.bIsTreeAvailable:
+                return Tree_GOAT.GROWTHTIME;
             case WorldStateKey.bIsMushroomAvailable:
-            case WorldStateKey.bIsIronAvailable:
-            case WorldStateKey.bIsDeadWoodAvailable:
-                return 40f;
+                return 60f;
             case WorldStateKey.bHasCheckedQuestboard:
-                return 5f;
+                return 10f;
             default:
                 return 0f;
         }
