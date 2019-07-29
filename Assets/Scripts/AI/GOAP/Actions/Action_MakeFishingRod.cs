@@ -8,6 +8,7 @@ public class Action_MakeFishingRod : GOAP_Action
     {
         Init();
         actionID = "MakeFishingRod";
+        workCost = 2;
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.FishingRod);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Wood);
     }
@@ -38,5 +39,10 @@ public class Action_MakeFishingRod : GOAP_Action
             CompletePerform(agent);
         }
         return completed;
+    }
+
+    public override GOAP_Action GetVariation(int i)
+    {
+        throw new System.NotImplementedException();
     }
 }

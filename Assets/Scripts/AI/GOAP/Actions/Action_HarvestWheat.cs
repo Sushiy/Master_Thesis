@@ -9,7 +9,7 @@ public class Action_HarvestWheat : GOAP_Action
     {
         Init();
         actionID = "HarvestWheat";
-        workCost = 10f;
+        workCost = 5f;
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.IronHoe);
         AddRequiredWorldState(WorldStateKey.bIsWheatRipe, true);
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Wheat);
@@ -59,5 +59,10 @@ public class Action_HarvestWheat : GOAP_Action
             field.Harvest();
         }
         return completed;
+    }
+
+    public override GOAP_Action GetVariation(int i)
+    {
+        throw new System.NotImplementedException();
     }
 }

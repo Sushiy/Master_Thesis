@@ -7,6 +7,55 @@ using UnityEngine;
 //This class contains all info on individual actions. Most of all it holds the required and satisfyWorldstate fields, which are needed for planning.
 public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
 {
+    public class VariationData
+    {
+        public List_GOAP_Worldstate RequiredWorldstates { private set; get; }
+        public List_GOAP_Worldstate SatisfyWorldstates { private set; get; }
+        public float workCost;
+        public float range;
+        public Skills benefitingSkill;
+
+        public VariationData()
+        {
+            RequiredWorldstates = new List_GOAP_Worldstate();
+            SatisfyWorldstates = new List_GOAP_Worldstate();
+            workCost = 1f;
+            range = 1f;
+            benefitingSkill = Skills.None;
+        }
+
+        public VariationData(List_GOAP_Worldstate required, List_GOAP_Worldstate satisfy, float workCost = 1, float range = 1, Skills benefitingSkill = Skills.None)
+        {
+            RequiredWorldstates = required;
+            SatisfyWorldstates = satisfy;
+            this.workCost = workCost;
+            this.range = range;
+            this.benefitingSkill = benefitingSkill;
+        }
+
+        public void AddRequiredWorldState(WorldStateKey key, bool value, IActionTarget target = null)
+        {
+            AddRequiredWorldState(key, value ? 1 : 0, target);
+        }
+        public void AddRequiredWorldState(WorldStateKey key, int value, IActionTarget target = null)
+        {
+            GOAP_Worldstate state = new GOAP_Worldstate(key, value, target);
+            RequiredWorldstates.Add(state);
+        }
+        public void AddSatisfyWorldState(WorldStateKey key, bool value, IActionTarget target = null)
+        {
+            AddSatisfyWorldState(key, value ? 1 : 0, target);
+        }
+        public void AddSatisfyWorldState(WorldStateKey key, int value, IActionTarget target = null)
+        {
+            GOAP_Worldstate state = new GOAP_Worldstate(key, value, target);
+            SatisfyWorldstates.Add(state);
+        }
+    }
+
+    public List<VariationData> variations;
+    protected int variationIndex;
+
     public static string[] baseActions =
     {
         "Action_EatFood",
@@ -71,6 +120,7 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
     {
         RequiredWorldstates = new List_GOAP_Worldstate();
         SatisfyWorldstates = new List_GOAP_Worldstate();
+        variations = new List<VariationData>();
     }
 
     //Perform this Action
@@ -148,7 +198,22 @@ public abstract class GOAP_Action :System.IEquatable<GOAP_Action>
         return false;
     }
 
+    public bool HasVariations()
+    {
+        return variations != null && variations.Count > 0;
+    }
 
+    protected void SetVariationData(int i)
+    {
+        RequiredWorldstates = variations[i].RequiredWorldstates;
+        SatisfyWorldstates = variations[i].SatisfyWorldstates;
+        workCost = variations[i].workCost;
+        range = variations[i].range;
+        BenefitingSkill = variations[i].benefitingSkill;
+        variationIndex = i;
+    }
+
+    public abstract GOAP_Action GetVariation(int i);
 
     protected void AddRequiredWorldState(WorldStateKey key, bool value, IActionTarget target = null)
     {

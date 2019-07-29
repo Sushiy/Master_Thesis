@@ -88,16 +88,19 @@ public static class GOAP_Planner
     /// <returns>the starting node, if one was found, else null</returns>
     private static Node WhileBuild(List_GOAP_Worldstate goal, List<string> availableActions, List_GOAP_Worldstate currentWorldState, GOAP_Agent agent)
     {
+        //Pick the latest planInfo
         PlanInfo planInfo = agent.planMemory[agent.planMemory.Count - 1];
         int currentNodeID = 0;
 
         Node current = null;
 
-        List<Node> openSet = new List<Node>(); //This is a List so it can be sorted
+        List<Node> openSet = new List<Node>();
 
+        //Get a Node for the goal
         Node goalNode = GetGoalNode(currentWorldState, goal);
         goalNode.id = currentNodeID;
         planInfo.AddNode(goalNode.id, -1, goalNode.required.ToString(), "None", 0f);
+        
         //If the goal is already fulfilled, return the goal
         if(goalNode.required.Count == 0)
         {
@@ -162,49 +165,47 @@ public static class GOAP_Planner
             {
                 if (availableActions[i].Equals("Action_" + current.action)) continue; //Dont do the same action twice
 
-                Node neighbor = GetValidNeighborNode(current, InstantiateAction(availableActions[i]), currentWorldState, agent);
-                if(neighbor != null)
+                List<Node> neighbors = GetValidNeighborNodeVariations(current, InstantiateAction(availableActions[i]), currentWorldState, agent);
+                if(neighbors != null && neighbors.Count > 0)
                 {
-                    neighbor.id = currentNodeID++;
-                    foundValidNeighbor = true;
-                    int indexOfNodeWithSameState = openSet.IndexOf(neighbor);
-                    if (indexOfNodeWithSameState != -1)
+                    for (int j = 0; j < neighbors.Count; j++)
                     {
-                        string tmp = openSet[indexOfNodeWithSameState].ToString();
-                        //if there is already another node with the same resulting planningworldstate, check which has the lower pathcost
-                        if (openSet[indexOfNodeWithSameState].estimatedPathCost > neighbor.estimatedPathCost)
+                        if (neighbors[j] == null) break;
+                        foundValidNeighbor = true;
+                        neighbors[j].id = currentNodeID++;
+                        int indexOfNodeWithSameState = openSet.IndexOf(neighbors[j]);
+                        if (indexOfNodeWithSameState != -1)
                         {
-                            //if the new node has a lower pathcost, pick that
-                            openSet.Remove(openSet[indexOfNodeWithSameState]);                            
-                            openSet.Add(neighbor);
-
-                            if (writePlannerLog)
+                            string tmp = openSet[indexOfNodeWithSameState].ToString();
+                            //if there is already another node with the same resulting planningworldstate, check which has the lower pathcost
+                            if (openSet[indexOfNodeWithSameState].estimatedPathCost > neighbors[j].estimatedPathCost)
                             {
-                                plannerLog += makeIndent(graphDepth) + "-><color=#CCCC00>OpenSet Replaced</color>  " + tmp + "with" + neighbor.ToString() + "\n";
+                                //if the new node has a lower pathcost, pick that
+                                openSet.Remove(openSet[indexOfNodeWithSameState]);
+                                openSet.Add(neighbors[j]);
+
+                                if (writePlannerLog)
+                                {
+                                    plannerLog += makeIndent(graphDepth) + "-><color=#CCCC00>OpenSet Replaced</color>  " + tmp + "with" + neighbors[j].ToString() + "\n";
+                                }
+                            }
+                            else
+                            {
+                                //if the new node has a higher pathcost, don't do anything
+                                if (writePlannerLog)
+                                {
+                                    plannerLog += makeIndent(graphDepth) + "-><color=#CC0000>OpenSet Not Replaced</color>  " + tmp + "with" + neighbors[j].ToString() + "\n";
+                                }
                             }
                         }
                         else
                         {
-                            //if the new node has a higher pathcost, don't do anything
+                            openSet.Add(neighbors[j]);
+                            //Debug Log to visualize the process
                             if (writePlannerLog)
                             {
-                                plannerLog += makeIndent(graphDepth) + "-><color=#CC0000>OpenSet Not Replaced</color>  " + tmp + "with" + neighbor.ToString() + "\n";
+                                plannerLog += makeIndent(graphDepth) + "-><color=#CCCC00>OpenSet Updated</color>  " + neighbors[j].ToString() + "\n";
                             }
-                            neighbor = null;
-                        }
-                    }
-                    else
-                    {
-                        openSet.Add(neighbor);
-                        if(neighbor.action.ActionID == "GatherWood")
-                        {
-                            int a = 0;
-                            a += 1;
-                        }
-                        //Debug Log to visualize the process
-                        if (writePlannerLog)
-                        {
-                            plannerLog += makeIndent(graphDepth) + "-><color=#CCCC00>OpenSet Updated</color>  " + neighbor.ToString() + "\n";
                         }
                     }
                 }
@@ -273,9 +274,32 @@ public static class GOAP_Planner
     /// <param name="planningWorldState">worldstate at the current stage of planning</param>
     /// <param name="agent">currently planning agent</param>
     /// <returns></returns>
-    private static Node GetValidNeighborNode(Node activeNode, GOAP_Action action, List_GOAP_Worldstate planningWorldState, GOAP_Agent agent)
+    private static List<Node> GetValidNeighborNodeVariations(Node activeNode, GOAP_Action action, List_GOAP_Worldstate planningWorldState, GOAP_Agent agent)
     {
         if (action == null) return null;
+
+        List<Node> nodes = new List<Node>();
+
+        if(action.HasVariations())
+        {
+            for(int i = 0; i < action.variations.Count; i++)
+            {
+                if(action.variations[i] != null)
+                {
+                    nodes.Add(GetValidNeighborNode(activeNode, action.GetVariation(i), planningWorldState, agent));
+                }
+            }
+        }
+        else
+        {
+            nodes.Add(GetValidNeighborNode(activeNode, action, planningWorldState, agent));
+        }
+
+        return nodes;
+    }
+    
+    private static Node GetValidNeighborNode(Node activeNode, GOAP_Action action, List_GOAP_Worldstate planningWorldState, GOAP_Agent agent)
+    {
         bool isUsefulAction = false;
 
         List_GOAP_Worldstate newRequired = new List_GOAP_Worldstate(activeNode.required);
@@ -285,7 +309,7 @@ public static class GOAP_Planner
         {
             if (action.SatisfyWorldstates.ContainsExactly(state))
             {
-                if(state.key == WorldStateKey.bWasFieldTended && state.value == 0)
+                if (state.key == WorldStateKey.bWasFieldTended && state.value == 0)
                 {
                     Debug.LogError(action.SatisfyWorldstates.ToString());
                 }
@@ -340,7 +364,7 @@ public static class GOAP_Planner
 
         return new Node(activeNode, newRequired, action, newRequired.Count * heuristicFactor + action.ActionCost + activeNode.estimatedPathCost);
     }
-    
+
     /// <summary>
     /// Generates a Node containing a PostQuest action from the activeNodes required worldstates
     /// </summary>
@@ -357,7 +381,7 @@ public static class GOAP_Planner
             //Debug.Log("Adding state " + state.ToString() + " to quest");
             action.AddQuestWorldstate(state);
         }
-        float estimatedQuestCost = action.ActionCost * activeNode.required.Count;
+        float estimatedQuestCost = action.ActionCost * activeNode.required.Count * heuristicFactor;
         return new Node(activeNode, newRequired, action, estimatedQuestCost + activeNode.estimatedPathCost);
     }
     

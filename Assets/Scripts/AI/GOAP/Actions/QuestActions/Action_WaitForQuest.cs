@@ -43,10 +43,17 @@ public class Action_WaitForQuest : GOAP_Action
             }
             else
             {
-                Debug.Log("<color=#0000cc><b>Restarting</b>: " + agent.Character.characterData.characterName + "</color>: WaitForQuest " + ownQuestID);
+                agent.Character.Log("<color=#0000cc><b>Restarting</b>: " + agent.Character.characterData.characterName + "</color>: WaitForQuest " + ownQuestID);
                 UpdateWorkTime(deltaTime);
                 if (originalQuestID != -1)
                 {
+                    if (!GOAP_QuestBoard.instance.quests.ContainsKey(originalQuestID))
+                    {
+                        agent.Character.Log("<color=#0000cc>" + agent.Character.characterData.characterName + "</color> canceled " + ownQuestID + "because the target quest was already completed");
+                        agent.CancelPlan();
+                        agent.completedQuestIDs.Remove(originalQuestID);
+                        return true;
+                    }
                     agent.activeQuest = GOAP_QuestBoard.instance.quests[originalQuestID];
                     agent.activeGoal.Clear();
                     agent.activeGoal.AddRange(agent.activeQuest.RequiredStates);
@@ -76,6 +83,7 @@ public class Action_WaitForQuest : GOAP_Action
             else
             {
                 Debug.Log("<color=#0000cc><b>Canceling</b>: " + agent.Character.characterData.characterName + "</color>: WaitForQuest " + ownQuestID);
+                agent.completedQuestIDs.Remove(originalQuestID);
                 agent.CancelPlan();
                 return true;
             }
@@ -87,5 +95,10 @@ public class Action_WaitForQuest : GOAP_Action
     public void AddQuestWorldstate(GOAP_Worldstate state)
     {
         SatisfyWorldstates.Add(state);
+    }
+
+    public override GOAP_Action GetVariation(int i)
+    {
+        throw new System.NotImplementedException();
     }
 }

@@ -8,6 +8,7 @@ public class Action_MakeHoe : GOAP_Action
     {
         Init();
         actionID = "MakeHoe";
+        workCost = 2f;
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.IronHoe);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Iron);
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.Wood);
@@ -41,5 +42,10 @@ public class Action_MakeHoe : GOAP_Action
             CompletePerform(agent);
         }
         return completed;
+    }
+
+    public override GOAP_Action GetVariation(int i)
+    {
+        throw new System.NotImplementedException();
     }
 }

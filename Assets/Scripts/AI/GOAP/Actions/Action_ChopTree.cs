@@ -9,11 +9,24 @@ public class Action_ChopTree : GOAP_Action
     {
         Init();
         actionID = "ChopTree";
-        workCost = 4f;
-        AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.IronAxe);
-        AddRequiredWorldState(WorldStateKey.bIsTreeAvailable, 1);
-        AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Log);
-        BenefitingSkill = Skills.WoodCutting;
+
+        VariationData ironAxe = new VariationData();
+        ironAxe.AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.IronAxe);
+        ironAxe.AddRequiredWorldState(WorldStateKey.bIsTreeAvailable, 1);
+        ironAxe.AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Log);
+        ironAxe.benefitingSkill = Skills.WoodCutting;
+        ironAxe.workCost = 4f;
+        ironAxe.range = 1f;
+        variations.Add(ironAxe);
+
+        VariationData stoneAxe = new VariationData();
+        stoneAxe.AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.StoneAxe);
+        stoneAxe.AddRequiredWorldState(WorldStateKey.bIsTreeAvailable, 1);
+        stoneAxe.AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Log);
+        stoneAxe.benefitingSkill = Skills.WoodCutting;
+        stoneAxe.workCost = 12f;
+        stoneAxe.range = 1f;
+        variations.Add(stoneAxe);
     }
 
     public override bool CheckProceduralConditions(GOAP_Agent agent)
@@ -48,13 +61,27 @@ public class Action_ChopTree : GOAP_Action
         if(completed)
         {
             agent.Character.UpdateInventory(ItemType.Log, true);
-            if(Random.value < 0.2f)
+            if (Random.value < (variationIndex == 0 ? 0.2f : 0.5f))
             {
                 agent.Character.Log("<color=#cc0000>" + agent.Character.characterData.characterName + "s Axe broke.</color>");
-                agent.Character.UpdateInventory(ItemType.IronAxe, false);
+                if (variationIndex == 0)
+                {
+                    agent.Character.UpdateInventory(ItemType.IronAxe, false);
+                }
+                else
+                {
+                    agent.Character.UpdateInventory(ItemType.StoneAxe, false);
+                }
             }
             CompletePerform(agent);
         }
         return completed;
+    }
+
+    public override GOAP_Action GetVariation(int i)
+    {
+        Action_ChopTree action = new Action_ChopTree();
+        action.SetVariationData(i);
+        return action;
     }
 }

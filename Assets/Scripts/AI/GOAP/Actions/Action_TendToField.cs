@@ -9,7 +9,7 @@ public class Action_TendToField : GOAP_Action
     {
         Init();
         actionID = "TendToField";
-        workCost = 10f;
+        workCost = 5f;
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.IronHoe);
         AddRequiredWorldState(WorldStateKey.bWasFieldTended, false);
         AddRequiredWorldState(WorldStateKey.bIsWheatRipe, false);
@@ -60,5 +60,10 @@ public class Action_TendToField : GOAP_Action
             field.TendToField();
         }
         return completed;
+    }
+
+    public override GOAP_Action GetVariation(int i)
+    {
+        throw new System.NotImplementedException();
     }
 }

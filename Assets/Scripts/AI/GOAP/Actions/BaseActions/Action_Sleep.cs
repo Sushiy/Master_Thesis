@@ -9,7 +9,7 @@ public class Action_Sleep : GOAP_Action
     {
         Init();
         actionID = "Sleep";
-        workCost = 60f;
+        workCost = 10f;
         AddSatisfyWorldState(WorldStateKey.bHasSlept, true);
     }
 
@@ -33,5 +33,10 @@ public class Action_Sleep : GOAP_Action
             CompletePerform(agent);
         }
         return completed;
+    }
+
+    public override GOAP_Action GetVariation(int i)
+    {
+        throw new System.NotImplementedException();
     }
 }

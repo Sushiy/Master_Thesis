@@ -45,6 +45,9 @@ public class UICharacterWindow : BasicWindow
     public GameObject inventoryContentPrefab;
     private List<GameObject> inventoryItems;
 
+    [Header("LogTab")]
+    public TextMeshProUGUI logContent;
+
     private void Awake()
     {
         if(instance != null)
@@ -108,6 +111,9 @@ public class UICharacterWindow : BasicWindow
         hungrySlider.value = character.food / 100f;
         tiredSlider.value = character.sleep / 100f;
         lonelySlider.value = character.social / 100f;
+
+        //Log Tab
+        logContent.text = character.log;
 
         //Character Tab
         ClearInventoryPanel();

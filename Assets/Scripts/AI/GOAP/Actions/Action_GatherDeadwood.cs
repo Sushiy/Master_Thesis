@@ -8,7 +8,7 @@ public class Action_GatherDeadwood : GOAP_Action
     {
         Init();
         actionID = "GatherDeadwood";
-        workCost = 40f;
+        workCost = 12f;
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Wood);
     }
 
@@ -37,5 +37,10 @@ public class Action_GatherDeadwood : GOAP_Action
             CompletePerform(agent);
         }
         return completed;
+    }
+
+    public override GOAP_Action GetVariation(int i)
+    {
+        throw new System.NotImplementedException();
     }
 }

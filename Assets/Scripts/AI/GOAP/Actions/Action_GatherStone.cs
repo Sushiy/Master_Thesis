@@ -8,7 +8,7 @@ public class Action_GatherStone : GOAP_Action
     {
         Init();
         actionID = "GatherStone";
-        workCost = 40f;
+        workCost = 10f;
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Stone);
     }
 
@@ -37,5 +37,10 @@ public class Action_GatherStone : GOAP_Action
             CompletePerform(agent);
         }
         return completed;
+    }
+
+    public override GOAP_Action GetVariation(int i)
+    {
+        throw new System.NotImplementedException();
     }
 }

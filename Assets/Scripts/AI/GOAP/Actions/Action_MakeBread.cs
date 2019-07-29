@@ -39,4 +39,9 @@ public class Action_MakeBread : GOAP_Action
         }
         return completed;
     }
+
+    public override GOAP_Action GetVariation(int i)
+    {
+        throw new System.NotImplementedException();
+    }
 }

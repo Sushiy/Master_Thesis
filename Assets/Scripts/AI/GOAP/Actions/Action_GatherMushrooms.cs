@@ -8,7 +8,7 @@ public class Action_GatherMushrooms : GOAP_Action
     {
         Init();
         actionID = "GatherMushrooms";
-        workCost = 40f;
+        workCost = 16f;
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Food);
         AddRequiredWorldState(WorldStateKey.bIsMushroomAvailable, true);
     }
@@ -45,5 +45,10 @@ public class Action_GatherMushrooms : GOAP_Action
             CompletePerform(agent);
         }
         return completed;
+    }
+
+    public override GOAP_Action GetVariation(int i)
+    {
+        throw new System.NotImplementedException();
     }
 }

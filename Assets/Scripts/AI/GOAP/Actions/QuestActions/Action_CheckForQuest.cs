@@ -31,15 +31,24 @@ public class Action_CheckForQuest : GOAP_Action
         StartPerform(agent);
         alphaWorkTime = 0.5f;
 
+        //Add a new plan for this quest.
         agent.activeQuest = agent.CheckForQuests();
 
         if(agent.activeQuest != null)
         {
+            //if there is a quest, set the agents goal and add a planInfo
+            agent.activeGoal = agent.activeQuest.RequiredStates;
+            agent.planMemory.Add(new PlanInfo(agent.PrintGoal(), agent.Character.characterData.characterName));
+
             Queue<GOAP_Action> actionQueue = GOAP_Planner.Plan(agent, new List_GOAP_Worldstate(agent.activeQuest.RequiredStates), agent.currentWorldstates, agent.Character.characterData.availableActions);
             agent.ResetPlanningTimer();
 
             if (actionQueue != null && actionQueue.Count > 0)
             {
+                //Approve the planInfo
+                agent.planMemory[agent.planMemory.Count - 1].ApprovePlan(agent.planMemory.Count - 1, agent.PrintActionQueue());
+                agent.activePlanInfo = agent.planMemory.Count - 1;
+
                 //if a valid plan was found, add it to the actionQueue
                 agent.Character.Log("<color=#0000cc>" + agent.Character.characterData.characterName + "</color> found a valid Plan for Quest " + agent.activeQuest.id);
                 agent.UpdateActionQueue(actionQueue);
@@ -49,8 +58,10 @@ public class Action_CheckForQuest : GOAP_Action
             }
             else
             {
+                agent.planMemory.RemoveAt(agent.planMemory.Count - 1);
                 agent.Character.Log("<color=#0000cc>" + agent.Character.characterData.characterName + "</color> didn't find a valid Plan for Quest " + agent.activeQuest.id);
                 agent.activeQuest = null;
+                agent.activeGoal = null;
                 return false;
             }
         }
@@ -62,5 +73,10 @@ public class Action_CheckForQuest : GOAP_Action
             return true;
         }
 
+    }
+
+    public override GOAP_Action GetVariation(int i)
+    {
+        throw new System.NotImplementedException();
     }
 }

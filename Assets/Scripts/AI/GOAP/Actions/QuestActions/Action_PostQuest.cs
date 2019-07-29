@@ -13,7 +13,7 @@ public class Action_PostQuest : GOAP_Action
     public Action_PostQuest()
     {
         Init();
-        workCost = 30f;
+        workCost = 8f;
         actionID = "PostQuest";
         questData.Init();
     }
@@ -56,5 +56,10 @@ public class Action_PostQuest : GOAP_Action
     public void AddQuestWorldstate(GOAP_Worldstate state)
     {
         questData.AddRequired(state);
+    }
+
+    public override GOAP_Action GetVariation(int i)
+    {
+        throw new System.NotImplementedException();
     }
 }

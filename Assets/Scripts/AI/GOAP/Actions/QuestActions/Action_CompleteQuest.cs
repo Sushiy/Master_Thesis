@@ -66,4 +66,9 @@ public class Action_CompleteQuest : GOAP_Action
         this.otherAgent = otherAgent;
         target = otherAgent.View.GetActionTargetSelf();
     }
+
+    public override GOAP_Action GetVariation(int i)
+    {
+        throw new System.NotImplementedException();
+    }
 }

@@ -98,14 +98,14 @@ public class GOAP_Character : MonoBehaviour
     {
         agent = new GOAP_Agent(this, GetComponent<IGOAP_AgentView>());
         inventory = new Inventory();
-        agent.ChangeCurrentWorldState(WorldStateKey.bHasSlept, true);
-        agent.ChangeCurrentWorldState(WorldStateKey.bHasEaten, true);
     }
 
     public void SetCharacterData(CharacterData data)
     {
         characterData = data;
         AddStartingInventory();
+        agent.ChangeCurrentWorldState(WorldStateKey.bHasSlept, true);
+        agent.ChangeCurrentWorldState(WorldStateKey.bHasEaten, true);
     }
 
     public void UpdateHealthData(float deltaTime)

@@ -8,7 +8,7 @@ public class Action_Fish : GOAP_Action
     {
         Init();
         actionID = "Fish";
-        workCost = 20f;
+        workCost = 10f;
         AddRequiredWorldState(WorldStateKey.eHasItem, (int)ItemType.FishingRod);
         AddSatisfyWorldState(WorldStateKey.eHasItem, (int)ItemType.Food);
     }
@@ -35,7 +35,7 @@ public class Action_Fish : GOAP_Action
 
         if (completed)
         {
-            agent.Character.UpdateInventory(ItemType.Food, true, 3);
+            agent.Character.UpdateInventory(ItemType.Food, true, FishingSucess());
             if (Random.value < 0.05f)
             {
                 agent.Character.Log("<color=#cc0000>" + agent.Character.characterData.characterName + "s Fishing rod broke.</color>");
@@ -44,5 +44,20 @@ public class Action_Fish : GOAP_Action
             CompletePerform(agent);
         }
         return completed;
+    }
+
+
+    public int FishingSucess()
+    {
+        float f = Random.Range(0f, 1f);
+        if (f < 0.1f) return 3;
+        if (f < 0.3f) return 2;
+        if (f < 0.7) return 1;
+        return 0;
+    }
+
+    public override GOAP_Action GetVariation(int i)
+    {
+        throw new System.NotImplementedException();
     }
 }

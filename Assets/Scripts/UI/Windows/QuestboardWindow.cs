@@ -50,9 +50,9 @@ public class QuestboardWindow : BasicWindow
     {
         if (questsParent != null)
         {
-            for (int i = 0; i < GOAP_QuestBoard.instance.quests.Count; i++)
+            foreach(KeyValuePair<int, GOAP_Quest> pair in GOAP_QuestBoard.instance.quests)
             {
-                AddQuest(GOAP_QuestBoard.instance.quests[i]);
+                AddQuest(pair.Value);            
             }
         }
     }

@@ -217,6 +217,7 @@ public class GOAP_Agent
         if (AllowedToPlan || completedQuestIDs.Count > 0)
         {
             ChangeState(FSM_State.PLANNING);
+            return;
         }
         else
         {
@@ -236,7 +237,7 @@ public class GOAP_Agent
         {
             if(IsSatisfiedInCurrentWorldstate(GOAP_QuestBoard.instance.quests[postedQuestIDs[i]].RequiredStates))
             {
-                Debug.Log("<color=#0000cc>" + character.characterData.characterName + "</color>s Quest " + postedQuestIDs[i] + " was already solved.");
+                Character.Log("<color=#0000cc>" + character.characterData.characterName + "</color>s Quest " + postedQuestIDs[i] + " was already solved.");
                 alreadySolvedQuests.Add(postedQuestIDs[i]);
             }
         }
@@ -268,6 +269,7 @@ public class GOAP_Agent
                 activePlanInfo = planMemory.Count - 1;
                 if (activePlanInfo == -1) Debug.LogError(character.characterData.characterName + " ActivePlanIndex: -1");
                 ChangeState(FSM_State.PERFORMACTION);
+                return;
             }
             else
             {
@@ -279,6 +281,7 @@ public class GOAP_Agent
                     activeQuest = null;
                     activeGoal.Clear();
                     ChangeState(FSM_State.IDLE);
+                    return;
                 }
             }
         }
@@ -291,10 +294,13 @@ public class GOAP_Agent
                 int id = completedQuestIDs[0];
                 if (questPlans.ContainsKey(id))
                 {
-                    currentActions = new Queue<GOAP_Action>(questPlans[id]);
+                    currentActions = new Queue<GOAP_Action>(questPlans[id].ToArray());
+                    Character.Log("<color=#0000cc>" + character.characterData.characterName + "</color> has completed Quest " + id + " to finish. It includes " + currentActions.Count + " actions and starts with " + currentActions.Peek());
+
                     questPlans.Remove(id);
+                    Character.Log("<color=#0000cc>" + character.characterData.characterName + "</color> removes questplan" + id);
                     ChangeState(FSM_State.PERFORMACTION);
-                    Debug.Log("<color=#0000cc>" + character.characterData.characterName + "</color> has completed Quest " + id + " to finish. It includes " + currentActions.Count + " actions and starts with " + currentActions.Peek());
+                    return;
                 }
                 else
                 {
@@ -304,7 +310,9 @@ public class GOAP_Agent
                         msg += key + ",";
                     }
                     Debug.LogError("<color=#0000cc>" + character.characterData.characterName + "</color> tried to continue Quest " + id + " but didnt find a corresponding plan.\nExisting plans:" + msg);
+                    completedQuestIDs.Remove(id);
                     ChangeState(FSM_State.IDLE);
+                    return;
                 }
             }
             else
@@ -317,6 +325,7 @@ public class GOAP_Agent
                 if(activeGoal.Count == 0)
                 {
                     ChangeState(FSM_State.IDLE);
+                    return;
                 }
             }
 
@@ -367,8 +376,9 @@ public class GOAP_Agent
                 {
                     if (!activeAction.IsInRange(this))
                     {
-                        ChangeState(FSM_State.MOVETO);
                         View.PrintMessage("MoveTo " + activeAction.ActionID);
+                        ChangeState(FSM_State.MOVETO);
+                        return;
                     }
                     else
                     {
@@ -405,6 +415,7 @@ public class GOAP_Agent
             activeGoal.Clear();
             activePlanInfo = null;
             ChangeState(FSM_State.IDLE);
+            return;
         }
     }
 
@@ -427,6 +438,7 @@ public class GOAP_Agent
         {
             View.StopMove();
             ChangeState(FSM_State.PERFORMACTION);
+            return;
         }
     }
 
@@ -451,6 +463,7 @@ public class GOAP_Agent
         currentActions.Clear();
         actionCompleted = true;
         ChangeState(FSM_State.PLANNING);
+        return;
     }
 
     /// <summary>
@@ -476,6 +489,7 @@ public class GOAP_Agent
         currentActions.Clear();
         actionCompleted = true;
         ChangeState(FSM_State.IDLE);
+        return;
     }
 
     /// <summary>
@@ -605,8 +619,9 @@ public class GOAP_Agent
 
     public void Called(Vector3 callerPosition)
     {
-        ChangeState(FSM_State.WAITFORCALL);
         View.TurnTo(callerPosition);
+        ChangeState(FSM_State.WAITFORCALL);
+        return;
     }
 
     public void ReceiveQuestCompletion(int questID)
